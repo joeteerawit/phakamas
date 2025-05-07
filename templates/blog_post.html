@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Transforming Learning Through Project-Based Exploration | Ms. Johnson's
+      Teaching Blog
+    </title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style type="text/tailwindcss">
+      :root {
+        --light-green: #d6efd8;
+        --medium-green: #80af81;
+        --dark-green: #508d4e;
+        --deep-green: #1a5319;
+      }
+
+      .bg-light-green {
+        background-color: var(--light-green);
+      }
+      .bg-medium-green {
+        background-color: var(--medium-green);
+      }
+      .bg-dark-green {
+        background-color: var(--dark-green);
+      }
+      .bg-deep-green {
+        background-color: var(--deep-green);
+      }
+
+      .text-light-green {
+        color: var(--light-green);
+      }
+      .text-medium-green {
+        color: var(--medium-green);
+      }
+      .text-dark-green {
+        color: var(--dark-green);
+      }
+      .text-deep-green {
+        color: var(--deep-green);
+      }
+
+      .border-light-green {
+        border-color: var(--light-green);
+      }
+      .border-medium-green {
+        border-color: var(--medium-green);
+      }
+      .border-dark-green {
+        border-color: var(--dark-green);
+      }
+      .border-deep-green {
+        border-color: var(--deep-green);
+      }
+
+      .hover\:bg-light-green:hover {
+        background-color: var(--light-green);
+      }
+      .hover\:bg-medium-green:hover {
+        background-color: var(--medium-green);
+      }
+      .hover\:bg-dark-green:hover {
+        background-color: var(--dark-green);
+      }
+      .hover\:bg-deep-green:hover {
+        background-color: var(--deep-green);
+      }
+
+      .hover\:text-light-green:hover {
+        color: var(--light-green);
+      }
+      .hover\:text-medium-green:hover {
+        color: var(--medium-green);
+      }
+      .hover\:text-dark-green:hover {
+        color: var(--dark-green);
+      }
+      .hover\:text-deep-green:hover {
+        color: var(--deep-green);
+      }
+
+      .font-heading {
+        font-family: 'Montserrat', sans-serif;
+      }
+
+      .font-body {
+        font-family: 'Open Sans', sans-serif;
+      }
+
+      /* Custom Focus Effect for Form Inputs */
+      .input-focus-effect:focus {
+        box-shadow: 0 0 0 3px rgba(128, 175, 129, 0.5);
+      }
+
+      /* Tag pills */
+      .tag-pill {
+        transition: transform 0.2s;
+      }
+
+      .tag-pill:hover {
+        transform: translateY(-2px);
+      }
+
+      /* Reading Progress Bar */
+      .reading-progress-container {
+        position: fixed;
+        top: 0;
+        z-index: 1000;
+        width: 100%;
+        height: 4px;
+        background: transparent;
+      }
+
+      .reading-progress-bar {
+        height: 4px;
+        background: var(--medium-green);
+        width: 0%;
+      }
+
+      /* Blog post content styling */
+      .blog-content h2 {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--deep-green);
+      }
+
+      .blog-content h3 {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin-top: 1.25rem;
+        margin-bottom: 0.75rem;
+        color: var(--dark-green);
+      }
+
+      .blog-content p {
+        margin-bottom: 1rem;
+        line-height: 1.7;
+      }
+
+      .blog-content ul,
+      .blog-content ol {
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .blog-content ul {
+        list-style-type: disc;
+      }
+
+      .blog-content ol {
+        list-style-type: decimal;
+      }
+
+      .blog-content a {
+        color: var(--dark-green);
+        text-decoration: underline;
+      }
+
+      .blog-content a:hover {
+        color: var(--deep-green);
+      }
+
+      .blog-content blockquote {
+        border-left: 4px solid var(--medium-green);
+        padding-left: 1rem;
+        font-style: italic;
+        margin: 1.5rem 0;
+        color: #4b5563;
+      }
+
+      .blog-content img {
+        border-radius: 0.5rem;
+        margin: 1.5rem 0;
+      }
+
+      .blog-content .callout {
+        background-color: var(--light-green);
+        border-left: 4px solid var(--medium-green);
+        padding: 1rem;
+        margin: 1.5rem 0;
+        border-radius: 0 0.5rem 0.5rem 0;
+      }
+
+      /* Comment section */
+      .comment {
+        transition: background-color 0.3s;
+      }
+
+      .comment:hover {
+        background-color: #f9fafb;
+      }
+
+      /* Animated Underline */
+      .animated-underline {
+        position: relative;
+      }
+
+      .animated-underline::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: -4px;
+        left: 0;
+        background-color: var(--dark-green);
+        transition: width 0.3s ease-in-out;
+      }
+
+      .animated-underline:hover::after {
+        width: 100%;
+      }
+
+      /* Table of Contents */
+      .toc-link {
+        transition: all 0.2s;
+        border-left: 2px solid transparent;
+      }
+
+      .toc-link:hover,
+      .toc-link.active {
+        border-left: 2px solid var(--dark-green);
+        background-color: var(--light-green);
+        color: var(--deep-green);
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="font-body text-gray-800 bg-gray-50">
+    <!-- Reading Progress Bar -->
+    <div class="reading-progress-container">
+      <div class="reading-progress-bar" id="readingProgress"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex">
+            <div class="flex-shrink-0 flex items-center">
+              <span class="text-2xl font-bold text-deep-green font-heading"
+                >Ms. Johnson</span
+              >
+            </div>
+            <div class="hidden sm:ml-10 sm:flex sm:space-x-8">
+              <a
+                href="index.html"
+                class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-dark-green hover:text-gray-700 animated-underline"
+              >
+                Home
+              </a>
+              <a
+                href="index.html#about"
+                class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-dark-green hover:text-gray-700 animated-underline"
+              >
+                About
+              </a>
+              <a
+                href="index.html#approach"
+                class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-dark-green hover:text-gray-700 animated-underline"
+              >
+                Teaching
+              </a>
+              <a
+                href="index.html#portfolio"
+                class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-dark-green hover:text-gray-700 animated-underline"
+              >
+              </a>
+              <a
+                href="index.html#portfolio"
+                class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-dark-green hover:text-gray-700 animated-underline"
+              >
+                Portfolio
+              </a>
+              <a
+                href="index.html#resources"
+                class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-dark-green hover:text-gray-700 animated-underline"
+              >
+                Resources
+              </a>
+              <a
+                href="blog.html"
+                class="inline-flex items-center px-1 pt-1 border-b-2 border-deep-green text-sm font-medium text-gray-900 animated-underline"
+              >
+                Blog
+              </a>
+              <a
+                href="index.html#contact"
+                class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-dark-green hover:text-gray-700 animated-underline"
+              >
+                Contact
+              </a>
+            </div>
+          </div>
+          <div class="-mr-2 flex items-center sm:hidden">
+            <button
+              id="menu-button"
+              type="button"
+              class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-medium-green"
+              aria-expanded="false"
+            >
+              <span class="sr-only">Open main menu</span>
+              <svg
+                class="block h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile menu -->
+      <div id="mobile-menu" class="sm:hidden hidden">
+        <div class="pt-2 pb-3 space-y-1">
+          <a
+            href="index.html"
+            class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-dark-green hover:text-gray-800"
+            >Home</a
+          >
+          <a
+            href="index.html#about"
+            class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-dark-green hover:text-gray-800"
+            >About</a
+          >
+          <a
+            href="index.html#approach"
+            class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-dark-green hover:text-gray-800"
+            >Teaching</a
+          >
+          <a
+            href="index.html#portfolio"
+            class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-dark-green hover:text-gray-800"
+            >Portfolio</a
+          >
+          <a
+            href="index.html#resources"
+            class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-dark-green hover:text-gray-800"
+            >Resources</a
+          >
+          <a
+            href="blog.html"
+            class="block pl-3 pr-4 py-2 border-l-4 border-deep-green bg-light-green text-deep-green font-medium"
+            >Blog</a
+          >
+          <a
+            href="index.html#contact"
+            class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:border-dark-green hover:text-gray-800"
+            >Contact</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <!-- Blog Post Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Main Content -->
+        <div class="lg:w-2/3">
+          <!-- Blog Post Header -->
+          <div class="mb-8">
+            <div class="flex flex-wrap gap-2 mb-3">
+              <span
+                class="px-3 py-1 bg-light-green text-xs rounded-full text-deep-green"
+                >Project-Based Learning</span
+              >
+              <span
+                class="px-3 py-1 bg-light-green text-xs rounded-full text-deep-green"
+                >Engagement</span
+              >
+              <span
+                class="px-3 py-1 bg-light-green text-xs rounded-full text-deep-green"
+                >Collaboration</span
+              >
+            </div>
+
+            <h1
+              class="text-3xl md:text-4xl font-bold text-deep-green font-heading mb-4"
+            >
+              Transforming Learning Through Project-Based Exploration
+            </h1>
+
+            <div class="flex items-center mb-6">
+              <img
+                class="h-10 w-10 rounded-full mr-3"
+                src="https://picsum.photos/80/80"
+                alt="Ms. Johnson"
+              />
+              <div>
+                <p class="text-gray-900 font-medium">Ms. Johnson</p>
+                <p class="text-gray-500 text-sm">
+                  May 2, 2025 &bull; 10 min read
+                </p>
+              </div>
+            </div>
+
+            <div class="w-full h-96 rounded-lg overflow-hidden mb-8">
+              <img
+                src="https://picsum.photos/1200/600"
+                alt="Students working on garden project"
+                class="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          <!-- Blog Post Content -->
+          <div class="blog-content prose prose-green max-w-none">
+            <p>
+              When I first proposed the idea of creating a community garden with
+              my fourth-grade students, I had no idea how transformative the
+              experience would be. What began as a simple science project
+              evolved into a cross-curricular learning journey that engaged
+              students in meaningful, authentic ways while fostering deep
+              collaboration and community connections.
+            </p>
+
+            <div class="callout">
+              <p class="font-medium">
+                Project-Based Learning (PBL) gives students the opportunity to
+                develop knowledge and skills through engaging projects set
+                around challenges and problems they may face in the real world.
+              </p>
+            </div>
+
+            <h2>The Power of Project-Based Learning</h2>
+
+            <p>
+              Project-based learning creates authentic opportunities for
+              students to develop critical skills while exploring real-world
+              challenges. Unlike traditional instruction, PBL puts students in
+              the driver's seat, allowing them to take ownership of their
+              learning journey and develop essential skills for the future.
+            </p>
+
+            <p>
+              Research consistently shows that when students engage in
+              well-designed project-based learning experiences, they demonstrate
+              better retention of content, improved problem-solving abilities,
+              and stronger collaboration skills compared to more traditional
+              instructional approaches. Additionally, PBL has been shown to
+              increase student motivation and engagement, particularly for
+              learners who may struggle in conventional classroom settings.
+            </p>
+
+            <h2>Our Classroom Garden Project</h2>
+
+            <p>
+              The community garden project began with a simple question during
+              our ecosystem unit: "How can we create a sustainable ecosystem
+              that benefits our school community?" This driving question set the
+              stage for a three-month exploration that integrated multiple
+              subject areas:
+            </p>
+
+            <ul>
+              <li>
+                <strong>Science:</strong> Students researched plant biology,
+                ecosystems, soil composition, and sustainable gardening
+                practices.
+              </li>
+              <li>
+                <strong>Math:</strong> Teams calculated area measurements,
+                created budgets, tracked plant growth data, and designed
+                geometric garden layouts.
+              </li>
+              <li>
+                <strong>Language Arts:</strong> Students wrote persuasive
+                proposals to the principal, created informational garden signs,
+                and kept detailed garden journals.
+              </li>
+              <li>
+                <strong>Social Studies:</strong> The class explored the cultural
+                significance of various plants, studied food systems, and
+                examined the role of community gardens throughout history.
+              </li>
+              <li>
+                <strong>Art:</strong> Students designed garden layouts, created
+                plant markers, and developed a garden logo.
+              </li>
+            </ul>
+
+            <p>
+              Throughout the project, students worked in collaborative teams
+              with specific roles and responsibilities. Each team was
+              responsible for a different section of the garden, but they had to
+              coordinate with other teams to ensure the overall garden design
+              was cohesive and sustainable.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+              <img
+                src="https://picsum.photos/600/400"
+                alt="Students planning garden layout"
+                class="rounded-lg w-full h-64 object-cover"
+              />
+              <img
+                src="https://picsum.photos/600/400"
+                alt="Students planting seeds"
+                class="rounded-lg w-full h-64 object-cover"
+              />
+            </div>
+
+            <h2>Overcoming Challenges</h2>
+
+            <p>
+              Like any authentic project, our garden venture faced real
+              challenges. Initially, we struggled with limited resources and
+              space constraints. Students had to problem-solve creatively,
+              eventually deciding to implement vertical gardening techniques and
+              seek donations from local businesses.
+            </p>
+
+            <p>
+              When our first seedlings failed to thrive, instead of becoming
+              discouraged, students conducted research to determine what went
+              wrong. They tested soil pH levels, adjusted sunlight exposure, and
+              modified their watering schedule. This authentic troubleshooting
+              opportunity taught resilience and the scientific method in action.
+            </p>
+
+            <h2>Cultivating Community Connections</h2>
+
+            <p>
+              What truly elevated this project was the community involvement it
+              generated. Students invited family members with gardening
+              experience to share their knowledge, connected with a local master
+              gardener program for advice, and partnered with the cafeteria
+              staff to use some of the produce in school lunches.
+            </p>
+
+            <p>
+              These community connections added depth to the learning
+              experience, helping students see the relevance of their work
+              beyond the classroom walls. The project culminated in a Garden
+              Celebration Day, where students led tours for parents and
+              community members, explaining their process and sharing the
+              knowledge they had gained.
+            </p>
+
+            <blockquote>
+              "I never thought I'd be interested in plants, but now I want to
+              start a garden at home! I love watching the plants grow from seeds
+              that we planted ourselves. It makes me feel proud." — Emma, 4th
+              Grade Student
+            </blockquote>
+
+            <h2>Key Elements for Successful PBL Implementation</h2>
+
+            <p>
+              Through this experience, I identified several key elements that
+              contributed to the success of our project-based learning:
+            </p>
+
+            <ol>
+              <li>
+                <strong>Authentic Driving Question:</strong> Start with a
+                question that connects to real-world issues and provides
+                purpose.
+              </li>
+              <li>
+                <strong>Student Voice and Choice:</strong> Allow students to
+                make decisions about project direction and execution.
+              </li>
+              <li>
+                <strong>Regular Reflection:</strong> Build in opportunities for
+                students to reflect on their learning process.
+              </li>
+              <li>
+                <strong>Public Product:</strong> Create something that can be
+                shared beyond the classroom.
+              </li>
+              <li>
+                <strong>Intentional Skill Building:</strong> Explicitly teach
+                and assess both academic content and success skills.
+              </li>
+              <li>
+                <strong>Flexible Timeline:</strong> Be willing to adjust
+                schedules as the project evolves and new learning opportunities
+                arise.
+              </li>
+            </ol>
+
+            <div class="callout">
+              <p class="font-medium">
+                Need help getting started with Project-Based Learning? Download
+                my <a href="#">PBL Planning Template</a> and
+                <a href="#">Assessment Guide</a> to support your implementation.
+              </p>
+            </div>
+
+            <h2>Assessment Approaches</h2>
+
+            <p>
+              Assessment in project-based learning looks different from
+              traditional testing. For our garden project, I implemented a
+              multi-faceted assessment approach:
+            </p>
+
+            <ul>
+              <li>
+                <strong>Knowledge Checks:</strong> Brief quizzes on content
+                knowledge related to plant biology and ecosystems.
+              </li>
+              <li>
+                <strong>Process Documentation:</strong> Students maintained
+                digital portfolios documenting their learning journey.
+              </li>
+              <li>
+                <strong>Skill Rubrics:</strong> Clear rubrics for collaboration,
+                communication, and problem-solving skills.
+              </li>
+              <li>
+                <strong>Self and Peer Evaluation:</strong> Regular opportunities
+                for reflection and feedback.
+              </li>
+              <li>
+                <strong>Authentic Assessment:</strong> The success of the garden
+                itself and students' ability to explain their learning to
+                visitors.
+              </li>
+            </ul>
+
+            <p>
+              This balanced approach allowed me to assess both content knowledge
+              and the development of essential skills while honoring the unique
+              nature of project-based learning.
+            </p>
+
+            <h2>The Impact on Student Learning</h2>
+
+            <p>
+              The results of this project-based learning experience were
+              remarkable. Students demonstrated deeper understanding of science
+              concepts compared to previous years when taught through
+              traditional methods. Their writing samples showed increased
+              complexity and purpose. Most notably, students who typically
+              struggled with engagement were among the most passionate
+              participants in the garden project.
+            </p>
+
+            <p>
+              Beyond academic growth, I observed significant development in
+              students' collaboration, communication, and problem-solving
+              abilities. They learned to navigate group dynamics, advocate for
+              their ideas, and persist through challenges—all essential skills
+              for future success.
+            </p>
+
+            <h2>Getting Started with PBL in Your Classroom</h2>
+
+            <p>
+              If you're interested in implementing project-based learning in
+              your own classroom, here are some practical steps to get started:
+            </p>
+
+            <ol>
+              <li>
+                Start small with a mini-project before attempting a larger
+                initiative.
+              </li>
+              <li>
+                Identify curriculum connections and standards that can be
+                addressed through the project.
+              </li>
+              <li>
+                Develop a compelling driving question that will engage students.
+              </li>
+              <li>
+                Create a rough project calendar while allowing for flexibility.
+              </li>
+              <li>
+                Gather resources and identify potential community partners.
+              </li>
+              <li>
+                Design scaffolding to support all learners throughout the
+                process.
+              </li>
+              <li>
+                Plan assessment strategies that balance content and skills.
+              </li>
+            </ol>
+
+            <p>
+              Remember that project-based learning is itself a journey. Your
+              first attempts may not be perfect, but the authentic learning
+              experiences you provide for your students will be invaluable.
+            </p>
+
+            <h2>Conclusion</h2>
+
+            <p>
+              Our classroom garden project transformed not only a small patch of
+              school grounds but also the learning experience for my students.
+              By engaging in meaningful, authentic work with real-world
+              connections, students developed deep content knowledge alongside
+              essential skills for future success.
+            </p>
+
+            <p>
+              As educators, we have the opportunity to create learning
+              experiences that transcend traditional classroom boundaries.
+              Project-based learning provides a framework for these
+              transformative experiences, allowing students to connect with
+              content in meaningful ways while developing the skills they'll
+              need for lifelong success.
+            </p>
+
+            <p>
+              I'd love to hear about your experiences with project-based
+              learning! Share your stories or questions in the comments below.
+            </p>
+          </div>
+
+          <!-- Author Bio -->
+          <div class="mt-12 p-6 bg-light-green rounded-lg">
+            <div class="flex items-center">
+              <img
+                class="h-16 w-16 rounded-full mr-4"
+                src="https://picsum.photos/160/160"
+                alt="Ms. Johnson"
+              />
+              <div>
+                <h3 class="text-lg font-bold text-deep-green">
+                  About Ms. Johnson
+                </h3>
+                <p class="text-gray-700">
+                  Elementary educator with 7+ years of experience specializing
+                  in student-centered learning approaches. Passionate about
+                  creating inclusive classroom environments and empowering
+                  students through project-based learning.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Share Buttons -->
+          <div class="mt-8 flex items-center justify-between">
+            <div class="flex items-center">
+              <span class="text-gray-700 mr-4">Share this article:</span>
+              <div class="flex space-x-4">
+                <a href="#" class="text-gray-500 hover:text-deep-green">
+                  <svg
+                    class="h-5 w-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"
+                    />
+                  </svg>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-deep-green">
+                  <svg
+                    class="h-5 w-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.1 10.1 0 01-3.127 1.184 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+                    />
+                  </svg>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-deep-green">
+                  <svg
+                    class="h-5 w-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M19.7 3.04h-15.4c-0.69 0-1.25 0.56-1.25 1.25v15.4c0 0.69 0.56 1.25 1.25 1.25h15.4c0.69 0 1.25-0.56 1.25-1.25v-15.4c0-0.69-0.56-1.25-1.25-1.25zm-4.25 16.35h-2.8v-8.36h2.8v8.36zm-1.4-9.5c-0.9 0-1.63-0.73-1.63-1.63s0.73-1.63 1.63-1.63 1.63 0.73 1.63 1.63-0.73 1.63-1.63 1.63zm9.8 9.5h-2.8v-4.35c0-3.11-3.75-2.88-3.75 0v4.35h-2.8v-8.36h2.8v1.66c1.61-2.98 6.55-3.2 6.55 2.85v3.86z"
+                    />
+                  </svg>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-deep-green">
+                  <svg
+                    class="h-5 w-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M7.8 2h8.4c1.5 0 2.7 0.3 3.5 0.9s1.3 1.4 1.3 2.5c0 0.9-0.3 1.7-0.8 2.4s-1.3 1.2-2.2 1.5c1.1 0.3 2 0.8 2.5 1.6s0.9 1.7 0.9 2.8c0 1.6-0.5 2.8-1.6 3.7s-2.6 1.3-4.5 1.3h-7.5v-16.7zM11 10.9v5.8h2c0.9 0 1.6-0.2 2.1-0.7s0.8-1.1 0.8-1.9c0-1.7-1-2.5-3-2.5h-1.9v-0.7zM11 4.3v5.2h1.7c0.9 0 1.6-0.2 2.1-0.5s0.7-0.9 0.7-1.7c0-0.7-0.2-1.2-0.7-1.6s-1.1-0.5-2-0.5h-1.8v-0.9z"
+                    />
+                  </svg>
+                </a>
+              </div>
+            </div>
+            <button
+              class="text-gray-700 hover:text-deep-green flex items-center"
+            >
+              <svg
+                class="h-5 w-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                ></path>
+              </svg>
+              Print Article
+            </button>
+          </div>
+
+          <!-- Related Posts -->
+          <div class="mt-12">
+            <h3 class="text-2xl font-bold text-deep-green font-heading mb-6">
+              Related Articles
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Related Post 1 -->
+              <div
+                class="bg-white rounded-lg shadow-md overflow-hidden blog-card"
+              >
+                <img
+                  src="https://picsum.photos/600/400"
+                  alt="STEM Projects"
+                  class="w-full h-48 object-cover"
+                />
+                <div class="p-4">
+                  <div class="flex flex-wrap gap-2 mb-2">
+                    <span
+                      class="px-3 py-1 bg-light-green text-xs rounded-full text-deep-green"
+                      >STEM</span
+                    >
+                  </div>
+                  <h4 class="text-lg font-bold text-deep-green mb-2">
+                    10 Low-Cost STEM Projects for Elementary Classrooms
+                  </h4>
+                  <div class="flex justify-between items-center">
+                    <p class="text-gray-500 text-sm">April 12, 2025</p>
+                    <a
+                      href="#"
+                      class="text-dark-green hover:text-deep-green text-sm"
+                      >Read More</a
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Related Post 2 -->
+              <div
+                class="bg-white rounded-lg shadow-md overflow-hidden blog-card"
+              >
+                <img
+                  src="https://picsum.photos/600/400"
+                  alt="Community Partnerships"
+                  class="w-full h-48 object-cover"
+                />
+                <div class="p-4">
+                  <div class="flex flex-wrap gap-2 mb-2">
+                    <span
+                      class="px-3 py-1 bg-light-green text-xs rounded-full text-deep-green"
+                      >Community</span
+                    >
+                  </div>
+                  <h4 class="text-lg font-bold text-deep-green mb-2">
+                    Building Meaningful Community Partnerships in Education
+                  </h4>
+                  <div class="flex justify-between items-center">
+                    <p class="text-gray-500 text-sm">March 28, 2025</p>
+                    <a
+                      href="#"
+                      class="text-dark-green hover:text-deep-green text-sm"
+                      >Read More</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments Section -->
+          <div class="mt-12">
+            <h3 class="text-2xl font-bold text-deep-green font-heading mb-6">
+              Comments (8)
+            </h3>
+
+            <!-- Comment Form -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+              <h4 class="text-xl font-bold text-deep-green mb-4">
+                Leave a Comment
+              </h4>
+              <form>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label
+                      for="name"
+                      class="block text-gray-700 font-medium mb-2"
+                      >Your Name</label
+                    >
+                    <input
+                      type="text"
+                      id="name"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-medium-green focus:border-transparent input-focus-effect"
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="email"
+                      class="block text-gray-700 font-medium mb-2"
+                      >Email Address</label
+                    >
+                    <input
+                      type="email"
+                      id="email"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-medium-green focus:border-transparent input-focus-effect"
+                      placeholder="john@example.com"
+                    />
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <label
+                    for="comment"
+                    class="block text-gray-700 font-medium mb-2"
+                    >Your Comment</label
+                  >
+                  <textarea
+                    id="comment"
+                    rows="4"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-medium-green focus:border-transparent input-focus-effect"
+                    placeholder="Share your thoughts..."
+                  ></textarea>
+                </div>
+                <div class="flex items-start mb-4">
+                  <div class="flex items-center h-5">
+                    <input
+                      id="save-info"
+                      type="checkbox"
+                      class="h-4 w-4 text-dark-green focus:ring-medium-green border-gray-300 rounded"
+                    />
+                  </div>
+                  <div class="ml-3 text-sm">
+                    <label for="save-info" class="text-gray-600"
+                      >Save my name and email for the next time I comment</label
+                    >
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  class="bg-dark-green text-white font-medium py-2 px-6 rounded-lg hover:bg-deep-green transition-colors duration-300"
+                >
+                  Post Comment
+                </button>
+              </form>
+            </div>
+
+            <!-- Comment List -->
+            <div class="space-y-6">
+              <!-- Comment 1 -->
+              <div class="comment bg-white rounded-lg shadow-md p-6">
+                <div class="flex">
+                  <img
+                    class="h-10 w-10 rounded-full mr-4"
+                    src="https://picsum.photos/60/60"
+                    alt="Sarah Thompson"
+                  />
+                  <div>
+                    <div class="flex items-center mb-1">
+                      <h5 class="font-bold text-gray-900 mr-2">
+                        Sarah Thompson
+                      </h5>
+                      <span class="text-gray-500 text-sm"
+                        >May 2, 2025 at 3:45 PM</span
+                      >
+                    </div>
+                    <p class="text-gray-700">
+                      I've been wanting to start a garden project with my third
+                      graders but wasn't sure how to integrate it across
+                      subjects. This article gave me so many great ideas! I
+                      especially love how you incorporated math through
+                      measurements and budgeting. Can't wait to get started!
+                    </p>
+                    <button
+                      class="text-dark-green hover:text-deep-green text-sm mt-2"
+                    >
+                      Reply
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:w-1/3 space-y-8">
+          <!-- Table of Contents -->
+          <div class="bg-white rounded-lg shadow-md p-6 sticky top-24">
+            <h3 class="text-lg font-bold text-deep-green mb-4">
+              Table of Contents
+            </h3>
+            <ul class="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  class="toc-link block pl-3 py-2 text-gray-700 hover:text-deep-green"
+                  >The Power of Project-Based Learning</a
+                >
+              </li>
+              <li>
+                <a href="#" class="toc-link block pl-3 py-2<a
+                  href="#"
+                  class="toc-link block pl-3 py-2 text-gray-700 hover:text-deep-green"
+                  >Our Classroom Garden Project</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="toc-link block pl-3 py-2 text-gray-700 hover:text-deep-green"
+                  >Overcoming Challenges</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="toc-link block pl-3 py-2 text-gray-700 hover:text-deep-green"
+                  >Cultivating Community Connections</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="toc-link block pl-3 py-2 text-gray-700 hover:text-deep-green"
+                  >Key Elements for Successful PBL</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="toc-link block pl-3 py-2 text-gray-700 hover:text-deep-green"
+                  >Assessment Approaches</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="toc-link block pl-3 py-2 text-gray-700 hover:text-deep-green"
+                  >The Impact on Student Learning</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="toc-link block pl-3 py-2 text-gray-700 hover:text-deep-green"
+                  >Getting Started with PBL</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="toc-link block pl-3 py-2 text-gray-700 hover:text-deep-green"
+                  >Conclusion</a
+                >
+              </li>
+            </ul>
+          </div>
+
+          <!-- Download Resources -->
+          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-dark-green text-white p-6">
+              <h3 class="text-lg font-bold mb-2">Free PBL Resources</h3>
+              <p class="text-gray-100 text-sm mb-4">
+                Download these free resources to help implement project-based
+                learning in your classroom.
+              </p>
+            </div>
+            <div class="p-6 space-y-4">
+              <a
+                href="#"
+                class="flex items-center p-3 border border-light-green rounded-lg hover:bg-light-green transition-colors"
+              >
+                <svg
+                  class="h-8 w-8 text-deep-green mr-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  ></path>
+                </svg>
+                <div>
+                  <h4 class="font-medium text-gray-900">
+                    PBL Planning Template
+                  </h4>
+                  <p class="text-gray-600 text-sm">PDF (482 KB)</p>
+                </div>
+              </a>
+              <a
+                href="#"
+                class="flex items-center p-3 border border-light-green rounded-lg hover:bg-light-green transition-colors"
+              >
+                <svg
+                  class="h-8 w-8 text-deep-green mr-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                  ></path>
+                </svg>
+                <div>
+                  <h4 class="font-medium text-gray-900">
+                    PBL Assessment Guide
+                  </h4>
+                  <p class="text-gray-600 text-sm">PDF (596 KB)</p>
+                </div>
+              </a>
+              <a
+                href="#"
+                class="flex items-center p-3 border border-light-green rounded-lg hover:bg-light-green transition-colors"
+              >
+                <svg
+                  class="h-8 w-8 text-deep-green mr-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  ></path>
+                </svg>
+                <div>
+                  <h4 class="font-medium text-gray-900">
+                    Student Reflection Templates
+                  </h4>
+                  <p class="text-gray-600 text-sm">PDF (324 KB)</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Popular Posts -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-bold text-deep-green mb-4">
+              Popular Posts
+            </h3>
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <img
+                  src="https://picsum.photos/100/100"
+                  alt="Morning Routines"
+                  class="w-16 h-16 rounded object-cover mr-4"
+                />
+                <div>
+                  <h4 class="font-medium text-gray-900 hover:text-dark-green">
+                    <a href="#"
+                      >10 Morning Routines That Set the Tone for Learning</a
+                    >
+                  </h4>
+                  <p class="text-gray-500 text-sm">March 15, 2025</p>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <img
+                  src="https://picsum.photos/100/100"
+                  alt="Math Games"
+                  class="w-16 h-16 rounded object-cover mr-4"
+                />
+                <div>
+                  <h4 class="font-medium text-gray-900 hover:text-dark-green">
+                    <a href="#">Math Games That Students Actually Love</a>
+                  </h4>
+                  <p class="text-gray-500 text-sm">February 28, 2025</p>
+                </div>
+              </div>
+              <div class="flex items-start">
+                <img
+                  src="https://picsum.photos/100/100"
+                  alt="Reading Corners"
+                  class="w-16 h-16 rounded object-cover mr-4"
+                />
+                <div>
+                  <h4 class="font-medium text-gray-900 hover:text-dark-green">
+                    <a href="#">Creating Cozy Reading Corners on a Budget</a>
+                  </h4>
+                  <p class="text-gray-500 text-sm">February 10, 2025</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tag Cloud -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-bold text-deep-green mb-4">Topics</h3>
+            <div class="flex flex-wrap gap-2">
+              <a
+                href="#"
+                class="tag-pill px-3 py-1 bg-light-green text-sm rounded-full text-deep-green hover:bg-medium-green hover:text-white"
+              >
+                Teaching Strategies
+              </a>
+              <a
+                href="#"
+                class="tag-pill px-3 py-1 bg-light-green text-sm rounded-full text-deep-green hover:bg-medium-green hover:text-white"
+              >
+                Project-Based Learning
+              </a>
+              <a
+                href="#"
+                class="tag-pill px-3 py-1 bg-light-green text-sm rounded-full text-deep-green hover:bg-medium-green hover:text-white"
+              >
+                STEM
+              </a>
+              <a
+                href="#"
+                class="tag-pill px-3 py-1 bg-light-green text-sm rounded-full text-deep-green hover:bg-medium-green hover:text-white"
+              >
+                Classroom Community
+              </a>
+              <a
+                href="#"
+                class="tag-pill px-3 py-1 bg-light-green text-sm rounded-full text-deep-green hover:bg-medium-green hover:text-white"
+              >
+                Assessment
+              </a>
+              <a
+                href="#"
+                class="tag-pill px-3 py-1 bg-light-green text-sm rounded-full text-deep-green hover:bg-medium-green hover:text-white"
+              >
+                Collaboration
+              </a>
+              <a
+                href="#"
+                class="tag-pill px-3 py-1 bg-light-green text-sm rounded-full text-deep-green hover:bg-medium-green hover:text-white"
+              >
+                Gardening
+              </a>
+            </div>
+          </div>
+
+          <!-- Newsletter Signup -->
+          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-dark-green text-white p-6">
+              <h3 class="text-lg font-bold mb-2">Subscribe to My Newsletter</h3>
+              <p class="text-gray-100 text-sm mb-4">
+                Get the latest teaching tips, resources, and classroom ideas
+                delivered directly to your inbox.
+              </p>
+              <form>
+                <div class="mb-3">
+                  <input
+                    type="email"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-medium-green focus:border-transparent"
+                    placeholder="Your email address"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  class="w-full bg-medium-green hover:bg-light-green hover:text-deep-green text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300"
+                >
+                  Subscribe Now
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-deep-green text-white py-12 mt-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-6 md:mb-0">
+            <h2 class="text-2xl font-bold mb-2">Ms. Johnson</h2>
+            <p class="text-gray-300">Elementary Educator</p>
+          </div>
+
+          <div class="flex flex-col md:flex-row items-center md:space-x-8">
+            <a
+              href="index.html"
+              class="text-gray-300 hover:text-white mb-2 md:mb-0"
+              >Home</a
+            >
+            <a
+              href="index.html#about"
+              class="text-gray-300 hover:text-white mb-2 md:mb-0"
+              >About</a
+            >
+            <a
+              href="index.html#approach"
+              class="text-gray-300 hover:text-white mb-2 md:mb-0"
+              >Teaching</a
+            >
+            <a
+              href="index.html#portfolio"
+              class="text-gray-300 hover:text-white mb-2 md:mb-0"
+              >Portfolio</a
+            >
+            <a
+              href="index.html#resources"
+              class="text-gray-300 hover:text-white mb-2 md:mb-0"
+              >Resources</a
+            >
+            <a
+              href="blog.html"
+              class="text-gray-300 hover:text-white mb-2 md:mb-0"
+              >Blog</a
+            >
+            <a
+              href="index.html#contact"
+              class="text-gray-300 hover:text-white mb-2 md:mb-0"
+              >Contact</a
+            >
+          </div>
+
+          <div class="flex space-x-4 mt-6 md:mt-0">
+            <a href="#" class="text-gray-300 hover:text-white">
+              <svg
+                class="h-6 w-6"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"
+                />
+              </svg>
+            </a>
+            <a href="#" class="text-gray-300 hover:text-white">
+              <svg
+                class="h-6 w-6"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.1 10.1 0 01-3.127 1.184 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+                />
+              </svg>
+            </a>
+            <a href="#" class="text-gray-300 hover:text-white">
+              <svg
+                class="h-6 w-6"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                />
+              </svg>
+            </a>
+            <a href="#" class="text-gray-300 hover:text-white">
+              <svg
+                class="h-6 w-6"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+          <p class="text-gray-400">
+            &copy; 2025 Ms. Johnson's Teaching Portfolio. All rights reserved.
+          </p>
+          <p class="text-gray-400 mt-2">
+            <a href="#" class="hover:text-white">Privacy Policy</a> |
+            <a href="#" class="hover:text-white">Terms of Use</a> |
+            <a href="#" class="hover:text-white">Site Map</a>
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a
+      href="#"
+      id="backToTop"
+      class="fixed bottom-8 right-8 bg-medium-green text-white p-3 rounded-full shadow-lg opacity-0 invisible transition-all duration-300 hover:bg-dark-green"
+    >
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 10l7-7m0 0l7 7m-7-7v18"
+        ></path>
+      </svg>
+    </a>
+
+    <!-- JavaScript -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Mobile Menu Toggle
+        const menuButton = document.getElementById('menu-button')
+        const mobileMenu = document.getElementById('mobile-menu')
+
+        menuButton.addEventListener('click', function () {
+          mobileMenu.classList.toggle('hidden')
+        })
+
+        // Close mobile menu when clicking on a link
+        const mobileLinks = document.querySelectorAll('#mobile-menu a')
+        mobileLinks.forEach((link) => {
+          link.addEventListener('click', function () {
+            mobileMenu.classList.add('hidden')
+          })
+        })
+
+        // Reading Progress Bar
+        const progressBar = document.getElementById('readingProgress')
+
+        window.addEventListener('scroll', function () {
+          const scrollTop =
+            document.documentElement.scrollTop || document.body.scrollTop
+          const scrollHeight =
+            document.documentElement.scrollHeight -
+            document.documentElement.clientHeight
+          const scrollPercentage = (scrollTop / scrollHeight) * 100
+
+          progressBar.style.width = scrollPercentage + '%'
+
+          // Back to top button visibility
+          const backToTopBtn = document.getElementById('backToTop')
+
+          if (scrollPercentage > 20) {
+            backToTopBtn.classList.remove('opacity-0', 'invisible')
+            backToTopBtn.classList.add('opacity-100', 'visible')
+          } else {
+            backToTopBtn.classList.remove('opacity-100', 'visible')
+            backToTopBtn.classList.add('opacity-0', 'invisible')
+          }
+
+          // Update Table of Contents active state
+          const headings = document.querySelectorAll('.blog-content h2')
+          const tocLinks = document.querySelectorAll('.toc-link')
+
+          let currentActive = 0
+
+          headings.forEach((heading, index) => {
+            if (heading.getBoundingClientRect().top <= 100) {
+              currentActive = index
+            }
+          })
+
+          tocLinks.forEach((link, index) => {
+            link.classList.remove('active')
+            if (index === currentActive) {
+              link.classList.add('active')
+            }
+          })
+        })
+
+        // Back to top functionality
+        const backToTopBtn = document.getElementById('backToTop')
+
+        backToTopBtn.addEventListener('click', function (e) {
+          e.preventDefault()
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+          })
+        })
+
+        // Table of Contents scroll to section
+        const tocLinks = document.querySelectorAll('.toc-link')
+        const headings = document.querySelectorAll('.blog-content h2')
+
+        tocLinks.forEach((link, index) => {
+          link.addEventListener('click', function (e) {
+            e.preventDefault()
+
+            if (headings[index]) {
+              window.scrollTo({
+                top: headings[index].offsetTop - 100,
+                behavior: 'smooth',
+              })
+            }
+          })
+        })
+      })
+    </script>
+  </body>
+</html>
