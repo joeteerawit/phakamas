@@ -1,6 +1,6 @@
 import { Check, RotateCcw, Star, X } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
-import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { playClip } from '../audio/audioManager'
 import type { RhymeMatching } from '../lessons'
 import { useClearFeedbackOnLeave } from '../activities/feedback'
@@ -12,9 +12,9 @@ import { cardClass } from './clay/Card'
 import type { Feedback } from './clay/FeedbackToast'
 import { WoodenSign } from './clay/WoodenSign'
 import type { ActivityStepProps } from './stepProps'
+import { usePointerDrag } from './usePointerDrag'
 
 const WRONG_FLASH_MS = 700
-const DRAG_THRESHOLD_PX = 8
 const TOAST_MS = 2500
 
 type Side = 'left' | 'right'
@@ -67,8 +67,12 @@ export function RhymeMatchingStep({ lesson, title, onFeedback }: ActivityStepPro
     return () => clearTimeout(timer)
   }, [feedback, onFeedback])
 
-  const wrongTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
-  useEffect(() => () => clearTimeout(wrongTimer.current), [])
+  // A wrong pair flashes briefly; each new wrong pair restarts the flash.
+  useEffect(() => {
+    if (!wrong) return
+    const timer = setTimeout(() => setWrong(null), WRONG_FLASH_MS)
+    return () => clearTimeout(timer)
+  }, [wrong])
   useClearFeedbackOnLeave(onFeedback)
 
   const attempt = (left: string, right: string) => {
@@ -77,8 +81,6 @@ export function RhymeMatchingStep({ lesson, title, onFeedback }: ActivityStepPro
       setMistakes((count) => count + 1)
       setWrong({ left, right })
       setFeedback({ kind: 'wrong', message: `${left} กับ ${right} ยังไม่ถูก ลองใหม่นะ` })
-      clearTimeout(wrongTimer.current)
-      wrongTimer.current = setTimeout(() => setWrong(null), WRONG_FLASH_MS)
       return
     }
     const next = new Set(matched).add(left)
@@ -103,7 +105,6 @@ export function RhymeMatchingStep({ lesson, title, onFeedback }: ActivityStepPro
   }
 
   const restart = () => {
-    clearTimeout(wrongTimer.current)
     setRights(shuffleRights(pairs))
     setMatched(new Set())
     setSelected(null)
@@ -135,46 +136,14 @@ export function RhymeMatchingStep({ lesson, title, onFeedback }: ActivityStepPro
     return () => observer.disconnect()
   }, [rights, pairs])
 
-  // Drag: hand-written Pointer Events on the left words; a short press stays a tap.
-  const drag = useRef<{ word: string; start: Point; moved: boolean } | null>(null)
-  const [dragEnd, setDragEnd] = useState<{ word: string; point: Point } | null>(null)
-  const toBoard = (event: PointerEvent): Point => {
-    const origin = board.current!.getBoundingClientRect()
-    return { x: event.clientX - origin.left, y: event.clientY - origin.top }
-  }
-  const dragHandlers = (word: string) => ({
-    onPointerDown: (event: PointerEvent<HTMLButtonElement>) => {
-      if (event.button !== 0) return
-      event.currentTarget.setPointerCapture(event.pointerId)
-      drag.current = { word, start: { x: event.clientX, y: event.clientY }, moved: false }
-    },
-    onPointerMove: (event: PointerEvent<HTMLButtonElement>) => {
-      const current = drag.current
-      if (!current) return
-      if (!current.moved && Math.hypot(event.clientX - current.start.x, event.clientY - current.start.y) < DRAG_THRESHOLD_PX) return
-      current.moved = true
-      setDragEnd({ word, point: toBoard(event) })
-    },
-    onPointerUp: (event: PointerEvent<HTMLButtonElement>) => {
-      setDragEnd(null)
-      if (!drag.current?.moved) return
-      // Touch drags may fire no click; forget the drag once any click has had its turn.
-      setTimeout(() => (drag.current = null))
-      const target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>('[data-rhyme-right]')
-      const right = target?.dataset.rhymeRight
-      if (right && !isLocked('right', right)) attempt(word, right)
-    },
-    onPointerCancel: () => {
-      drag.current = null
-      setDragEnd(null)
-    },
-    onClick: () => {
-      // The click that ends a drag is not a tap.
-      const dragged = drag.current?.moved
-      drag.current = null
-      if (!dragged) pick('left', word)
-    },
-  })
+  // Drag a line from a left word; dropping on a right word tries the pair. A short press stays a tap.
+  const drag = usePointerDrag((word, x, y) => {
+    const target = document.elementFromPoint(x, y)?.closest<HTMLElement>('[data-rhyme-right]')
+    const right = target?.dataset.rhymeRight
+    if (right && !isLocked('right', right)) attempt(word, right)
+  }, () => board.current)
+  const dragEnd = drag.dragging && { word: drag.dragging.id, point: { x: drag.dragging.x, y: drag.dragging.y } }
+  const dragHandlers = (word: string) => ({ ...drag.handlers(word), onClick: drag.click(() => pick('left', word)) })
 
   const reduceMotion = useReducedMotion()
   const line = (from: Point | undefined, to: Point | undefined, className: string, key: string) =>

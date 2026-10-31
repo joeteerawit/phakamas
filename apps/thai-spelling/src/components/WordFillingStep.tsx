@@ -1,5 +1,5 @@
 import { Check, RotateCcw, X } from 'lucide-react'
-import { useRef, useState, type PointerEvent } from 'react'
+import { useState } from 'react'
 import { scoreFeedback, useClearFeedbackOnLeave } from '../activities/feedback'
 import { lessonActivity, useReportUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
@@ -8,9 +8,7 @@ import { buttonClass, cx } from './clay/buttonClass'
 import { cardClass, toneAt } from './clay/Card'
 import { WoodenSign } from './clay/WoodenSign'
 import type { ActivityStepProps } from './stepProps'
-
-/** Pointer travel (px) before a press becomes a drag instead of a tap. */
-const DRAG_THRESHOLD = 8
+import { usePointerDrag } from './usePointerDrag'
 
 /**
  * Step 6: place each bank word in the blank under its picture.
@@ -70,6 +68,14 @@ export function WordFillingStep({ lesson, title, onFeedback }: ActivityStepProps
     if (blank) put(word, Number(blank.dataset.blank))
     else if (placed.includes(word) && [...document.querySelectorAll('[data-bank]')].some(hit)) takeBack(word)
   })
+  // The dragged word follows the pointer.
+  const dragProps = (word: string) => {
+    const d = drag.dragging?.id === word ? drag.dragging : null
+    return {
+      ...drag.handlers(word),
+      style: d ? { transform: `translate(${d.dx}px, ${d.dy}px)`, position: 'relative' as const, zIndex: 40, transition: 'none' } : undefined,
+    }
+  }
 
   const bankWords = bank.filter((word) => !placed.includes(word))
 
@@ -94,7 +100,7 @@ export function WordFillingStep({ lesson, title, onFeedback }: ActivityStepProps
             type="button"
             aria-pressed={selected === word}
             onClick={drag.click(() => setSelected(selected === word ? null : word))}
-            {...drag.handlers(word)}
+            {...dragProps(word)}
             className={cx(
               buttonClass('ghost'),
               'touch-none font-heading text-heading font-bold',
@@ -134,7 +140,7 @@ export function WordFillingStep({ lesson, title, onFeedback }: ActivityStepProps
                 type="button"
                 aria-label={`ช่องที่ ${i + 1}: ${word ?? 'ว่าง'}${resultText}`}
                 onClick={drag.click(() => tapBlank(i))}
-                {...(word ? drag.handlers(word) : {})}
+                {...(word ? dragProps(word) : {})}
                 className={cx(
                   'flex min-h-14 w-full cursor-pointer select-none items-center justify-center rounded-full border-[3px] px-(--space-xs)',
                   'font-heading text-heading font-bold transition-[transform,box-shadow] duration-150 ease-out motion-reduce:transition-none',
@@ -180,55 +186,4 @@ export function WordFillingStep({ lesson, title, onFeedback }: ActivityStepProps
       </div>
     </section>
   )
-}
-
-/**
- * Hand-written Pointer Events drag (spec §7): the pressed word follows the pointer and
- * `onDrop(word, x, y)` runs on release. A press that never moves stays an ordinary tap.
- */
-function usePointerDrag(onDrop: (word: string, x: number, y: number) => void) {
-  const start = useRef<{ word: string; x: number; y: number; moved: boolean } | null>(null)
-  const justDropped = useRef(false)
-  const [offset, setOffset] = useState<{ word: string; dx: number; dy: number } | null>(null)
-
-  const end = () => {
-    start.current = null
-    setOffset(null)
-  }
-
-  return {
-    handlers: (word: string) => ({
-      onPointerDown: (e: PointerEvent<HTMLElement>) => {
-        if (e.button !== 0) return
-        e.currentTarget.setPointerCapture(e.pointerId)
-        start.current = { word, x: e.clientX, y: e.clientY, moved: false }
-      },
-      onPointerMove: (e: PointerEvent<HTMLElement>) => {
-        const s = start.current
-        if (s?.word !== word) return
-        const dx = e.clientX - s.x
-        const dy = e.clientY - s.y
-        if (!s.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return
-        s.moved = true
-        setOffset({ word, dx, dy })
-      },
-      onPointerUp: (e: PointerEvent<HTMLElement>) => {
-        const moved = start.current?.moved
-        end()
-        if (!moved) return
-        // The browser still fires click after a drag; swallow it.
-        justDropped.current = true
-        setTimeout(() => (justDropped.current = false))
-        onDrop(word, e.clientX, e.clientY)
-      },
-      onPointerCancel: end,
-      style:
-        offset?.word === word
-          ? { transform: `translate(${offset.dx}px, ${offset.dy}px)`, position: 'relative' as const, zIndex: 40, transition: 'none' }
-          : undefined,
-    }),
-    click: (onTap: () => void) => () => {
-      if (!justDropped.current) onTap()
-    },
-  }
 }
