@@ -15,6 +15,7 @@ describe('audioClips', () => {
       'vocabulary/kang-keng',
       'vocabulary/dang',
       'vocabulary/khang-khao',
+      'explanations/mae-kong',
       'rhyme/line-01',
       'rhyme/line-02',
       'rhyme/line-03',

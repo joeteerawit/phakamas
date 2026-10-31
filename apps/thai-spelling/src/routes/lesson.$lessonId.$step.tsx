@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import type { Feedback } from '../components/clay/FeedbackToast'
 import { StepContent } from '../components/StepContent'
 import { StepLayout } from '../components/StepLayout'
 import { DEFAULT_LESSON_ID, getLesson, parseStepNumber } from '../lessons'
@@ -25,9 +26,10 @@ function StepPage() {
   const { lesson, stepNumber } = Route.useRouteContext()
   const visitStep = useLessonSession((state) => state.visitStep)
   useEffect(() => visitStep(lesson.id, stepNumber), [visitStep, lesson.id, stepNumber])
+  const [feedback, setFeedback] = useState<Feedback | null>(null)
   return (
-    <StepLayout lesson={lesson} stepNumber={stepNumber}>
-      <StepContent lesson={lesson} stepNumber={stepNumber} />
+    <StepLayout lesson={lesson} stepNumber={stepNumber} feedback={feedback}>
+      <StepContent lesson={lesson} stepNumber={stepNumber} onFeedback={setFeedback} />
     </StepLayout>
   )
 }

@@ -67,6 +67,32 @@ describe('mae-kong lesson data', () => {
     ])
   })
 
+  it('marks every final ง by explicit per-syllable position, both in กางเกง (spec Page 04, TC-005)', () => {
+    const { spotting } = maeKong
+    expect(spotting.heading).toBe('มาตราแม่กง (ง) มี ง เป็นตัวสะกด')
+    expect(spotting.explanation.id).toBe('explanations/mae-kong')
+    expect(spotting.explanation.text).toMatch(/แม่กง/)
+    expect(
+      spotting.words.map(({ audio, syllables }) => [
+        audio.id,
+        syllables.map(({ text, final }) => `${text.slice(0, final)}[${text[final]}]${text.slice(final + 1)}`).join('|'),
+      ]),
+    ).toEqual([
+      ['vocabulary/ling', 'ลิ[ง]'],
+      ['vocabulary/chang', 'ช้า[ง]'],
+      ['vocabulary/rang', 'รั[ง]'],
+      ['vocabulary/kang-keng', 'กา[ง]|เก[ง]'],
+    ])
+    for (const { syllables, audio } of spotting.words) expect(syllables.map(({ text }) => text).join('')).toBe(audio.text)
+  })
+
+  it('word filling: 6 bank words, each the answer of exactly one picture', () => {
+    const { bank, pictures } = maeKong.wordFilling
+    expect(bank).toEqual(['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'ดัง', 'ค้างคาว'])
+    expect(pictures.map((p) => p.answer).toSorted()).toEqual([...bank].sort())
+    expect(pictures.map((p) => p.answer)).not.toEqual(bank)
+  })
+
   it('has the 4 rhyme lines with line-01..04 audio IDs (spec §2 Step 7, §5)', () => {
     expect(maeKong.rhyme).toEqual([
       { id: 'rhyme/line-01', text: 'ลิงน้อยนั่งมอง' },
