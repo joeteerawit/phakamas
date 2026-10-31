@@ -38,4 +38,6 @@ export type Lesson = {
   intro: AudioClip
   vocabulary: readonly VocabularyWord[]
   wordFilling: WordFilling
+  /** Step 3 ฟังแล้วอ่านตาม: words practised one at a time, in order. */
+  listenAndRepeat: readonly VocabularyWord[]
 }
