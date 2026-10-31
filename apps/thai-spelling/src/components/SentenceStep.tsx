@@ -2,17 +2,18 @@ import { Check, Mic, Play, RotateCcw, Square, Volume2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { playClip, useClipStatus } from '../audio/audioManager'
 import { discardRecording, playRecording, startRecording, stopRecording, useRecorder } from '../audio/recorder'
-import type { Lesson, Sentence } from '../lessons'
+import type { Sentence } from '../lessons'
 import { Button } from './clay/Button'
 import { cx } from './clay/buttonClass'
 import { Card, cardClass, toneAt } from './clay/Card'
 import { WoodenSign } from './clay/WoodenSign'
-import { recorderErrors } from './RhymeStep'
+import { RecorderMessages } from './RecorderMessages'
+import type { StepProps } from './stepProps'
 
 const icon = 'size-7 shrink-0'
 
 /** Step 9: each sentence card plays only its own sentence; the student records the selected one. */
-export function SentenceStep({ lesson, title }: { lesson: Lesson; title: string }) {
+export function SentenceStep({ lesson, title }: StepProps) {
   const [selected, setSelected] = useState(0)
   useEffect(() => discardRecording, [])
 
@@ -133,20 +134,7 @@ function SentenceRecorder({ number }: { number: number }) {
         )}
       </div>
 
-      <p role="status" className="min-h-[1.6em] text-center font-semibold">
-        {status === 'requesting' && 'กำลังขอใช้ไมโครโฟน…'}
-        {status === 'recording' && (
-          <span className="inline-flex items-center gap-(--space-xs)">
-            <span aria-hidden="true" className="size-3 rounded-full bg-wrong motion-safe:animate-pulse" />
-            กำลังบันทึก (ไม่เกิน 30 วินาที)
-          </span>
-        )}
-      </p>
-      {(status === 'denied' || status === 'unsupported') && (
-        <p role="alert" className="w-full rounded-clay border-[3px] border-border bg-tint-peach p-(--space-sm) text-center font-semibold">
-          {recorderErrors[status]}
-        </p>
-      )}
+      <RecorderMessages />
     </Card>
   )
 }

@@ -2,22 +2,25 @@ import { ChevronLeft, ChevronRight, ListOrdered, Mic, Play, RotateCcw, Square, V
 import { useEffect, useRef, useState } from 'react'
 import { playClip, stopAudio, useAudio } from '../audio/audioManager'
 import { discardRecording, playRecording, startRecording, stopRecording, useRecorder } from '../audio/recorder'
-import type { Lesson } from '../lessons'
 import { Button } from './clay/Button'
 import { cx } from './clay/buttonClass'
 import { Card } from './clay/Card'
 import { WoodenSign } from './clay/WoodenSign'
 import { Mascot } from './Mascot'
+import { RecorderMessages } from './RecorderMessages'
+import type { StepProps } from './stepProps'
 
 const icon = 'size-7 shrink-0'
 
 /** Step 7: ฟังครูอ่าน plays every line in order; step mode plays one line at a time; the student records themself. */
-export function RhymeStep({ lesson, title }: { lesson: Lesson; title: string }) {
+export function RhymeStep({ lesson, title }: StepProps) {
   const lines = lesson.rhyme
   // Step mode's selected line; null outside step mode.
   const [stepLine, setStepLine] = useState<number | null>(null)
   // Index of the line ฟังครูอ่าน is on; when that line ends, the next one plays.
   const sequence = useRef<number | null>(null)
+  // The line หยุดเสียง paused ฟังครูอ่าน on; the next ฟังครูอ่าน resumes there.
+  const paused = useRef<number | null>(null)
 
   const audio = useAudio()
   const playingIndex = lines.findIndex((line) => line.id === audio.clipId)
@@ -38,17 +41,25 @@ export function RhymeStep({ lesson, title }: { lesson: Lesson; title: string }) 
   )
   useEffect(() => discardRecording, [])
 
+  // Teacher audio never plays into a recording (as on Step 9): stop it first.
   const playAll = () => {
+    stopRecording()
+    const start = paused.current ?? 0
+    paused.current = null
     setStepLine(null)
-    sequence.current = 0
-    playClip(lines[0]!)
+    sequence.current = start
+    playClip(lines[start]!)
   }
   const goToLine = (i: number) => {
+    stopRecording()
+    paused.current = null
     sequence.current = null
     setStepLine(i)
     playClip(lines[i]!)
   }
-  const stop = () => {
+  // Pause keeps AudioManager's one-sound rule: stop the clip, remember the line here.
+  const pause = () => {
+    paused.current = sequence.current
     sequence.current = null
     stopAudio()
   }
@@ -94,7 +105,7 @@ export function RhymeStep({ lesson, title }: { lesson: Lesson; title: string }) 
           <ListOrdered aria-hidden="true" className={icon} strokeWidth={2.5} />
           อ่านตามทีละวรรค
         </Button>
-        <Button variant="ghost" onClick={stop} disabled={!busy}>
+        <Button variant="ghost" onClick={pause} disabled={!busy}>
           <Square aria-hidden="true" className={icon} strokeWidth={2.5} />
           หยุดเสียง
         </Button>
@@ -116,11 +127,6 @@ export function RhymeStep({ lesson, title }: { lesson: Lesson; title: string }) 
       <RecorderControls />
     </section>
   )
-}
-
-export const recorderErrors = {
-  denied: 'ยังไม่ได้อนุญาตให้ใช้ไมโครโฟน อนุญาตในเบราว์เซอร์แล้วกดลองอีกครั้งได้ ระหว่างนี้ฟังครูอ่านต่อได้เลย',
-  unsupported: 'อุปกรณ์นี้ใช้ไมโครโฟนบันทึกเสียงไม่ได้ ฟังครูอ่านและอ่านตามได้เลย',
 }
 
 /** ลองอ่านเอง → หยุดบันทึก → ฟังเสียงตัวเอง / อัดใหม่. */
@@ -154,20 +160,7 @@ function RecorderControls() {
         )}
       </div>
 
-      <p role="status" className="min-h-[1.6em] text-center font-semibold">
-        {status === 'requesting' && 'กำลังขอใช้ไมโครโฟน…'}
-        {status === 'recording' && (
-          <span className="inline-flex items-center gap-(--space-xs)">
-            <span aria-hidden="true" className="size-3 rounded-full bg-wrong motion-safe:animate-pulse" />
-            กำลังบันทึก (ไม่เกิน 30 วินาที)
-          </span>
-        )}
-      </p>
-      {(status === 'denied' || status === 'unsupported') && (
-        <p role="alert" className="w-full rounded-clay border-[3px] border-border bg-tint-peach p-(--space-sm) text-center font-semibold">
-          {recorderErrors[status]}
-        </p>
-      )}
+      <RecorderMessages />
     </div>
   )
 }

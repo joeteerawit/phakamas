@@ -68,7 +68,7 @@ export function stopRecording() {
 
 export function playRecording() {
   const { url } = useRecorder.getState()
-  if (!url) return
+  if (!url || useAudio.getState().muted) return
   stopAudio()
   stopPlayback()
   player = new Audio(url)
@@ -96,10 +96,16 @@ function release(granted: MediaStream) {
   if (stream === granted) stream = null
 }
 
-// One sound at a time: a teacher clip starting stops the student's playback.
+// One sound at a time: a teacher clip starting, or mute, stops the student's playback.
 useAudio.subscribe((state) => {
-  if (state.status === 'loading') stopPlayback()
+  if (state.status === 'loading' || state.muted) stopPlayback()
 })
+
+/** Friendly messages for the recorder's error states (shown by RecorderStatus). */
+export const recorderErrors = {
+  denied: 'ยังไม่ได้อนุญาตให้ใช้ไมโครโฟน อนุญาตในเบราว์เซอร์แล้วกดลองอีกครั้งได้ ระหว่างนี้ฟังครูอ่านต่อได้เลย',
+  unsupported: 'อุปกรณ์นี้ใช้ไมโครโฟนบันทึกเสียงไม่ได้ ฟังครูอ่านและอ่านตามได้เลย',
+}
 
 // Spec §3: page unload stops sound and recording.
 globalThis.addEventListener?.('pagehide', discardRecording)
