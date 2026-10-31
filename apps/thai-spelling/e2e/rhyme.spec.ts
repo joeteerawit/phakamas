@@ -1,84 +1,53 @@
 import { expect, type Page, test } from '@playwright/test'
+import { audioLog, endCurrent, open as openStep } from './audioStub.js'
 
-type Stub = {
-  log: string[]
-  mic: 'allow' | 'deny'
-  /** Ends whatever teacher clip or recording is playing. */
-  finish: () => void
-}
+type Mic = 'allow' | 'deny'
 
-/**
- * Fakes HTMLAudioElement, getUserMedia and MediaRecorder; everything logs to `__stub.log`.
- * shortcut: duplicates the Audio fake from audio.spec.ts, move both to a shared helper when a third spec needs it.
- */
-function stubMedia(mic: Stub['mic']) {
-  const stub: Stub = { log: [], mic, finish: () => {} }
-  ;(window as unknown as { __stub: Stub }).__stub = stub
-  const name = (src: string) => (src.startsWith('blob:') ? 'recording' : new URL(src, location.href).pathname)
-
-  class FakeAudio {
-    onplaying: (() => void) | null = null
-    onended: (() => void) | null = null
-    onerror: (() => void) | null = null
-    playing = false
-    src: string
-    constructor(src: string) {
-      this.src = src
-    }
-    play() {
-      stub.log.push(`play:${name(this.src)}`)
-      this.playing = true
-      stub.finish = () => this.onended?.()
-      setTimeout(() => this.onplaying?.())
-      return Promise.resolve()
-    }
-    pause() {
-      if (this.playing) stub.log.push(`pause:${name(this.src)}`)
-      this.playing = false
-    }
-  }
+/** Fakes getUserMedia and MediaRecorder; events go to the shared audio stub log. */
+function stubMic(mic: Mic) {
+  const log = (entry: string) => (window as unknown as { __audio: { log: string[] } }).__audio.log.push(entry)
 
   class FakeRecorder {
     state = 'inactive'
+    mimeType = 'audio/webm'
     ondataavailable: ((event: { data: Blob }) => void) | null = null
     onstop: (() => void) | null = null
     start() {
-      stub.log.push('record:start')
+      log('record:start')
       this.state = 'recording'
     }
     stop() {
       if (this.state === 'inactive') return
-      stub.log.push('record:stop')
+      log('record:stop')
       this.state = 'inactive'
       this.ondataavailable?.({ data: new Blob(['voice'], { type: 'audio/webm' }) })
       this.onstop?.()
     }
   }
 
-  Object.assign(window, { Audio: FakeAudio, MediaRecorder: FakeRecorder })
-  Object.defineProperty(window, 'speechSynthesis', {
-    configurable: true,
-    value: { getVoices: () => [], speak() {}, cancel() {}, addEventListener() {}, removeEventListener() {} },
-  })
+  Object.assign(window, { MediaRecorder: FakeRecorder })
   Object.defineProperty(navigator, 'mediaDevices', {
     configurable: true,
     value: {
       getUserMedia: async () => {
-        stub.log.push('mic:request')
-        if (stub.mic === 'deny') throw new DOMException('denied', 'NotAllowedError')
-        return { getTracks: () => [{ stop: () => stub.log.push('mic:release') }] }
+        log('mic:request')
+        if (mic === 'deny') throw new DOMException('denied', 'NotAllowedError')
+        return { getTracks: () => [{ stop: () => log('mic:release') }] }
       },
     },
   })
 }
 
-async function open(page: Page, mic: Stub['mic'] = 'allow') {
-  await page.addInitScript(stubMedia, mic)
-  await page.goto('/lesson/mae-kong/7')
+async function open(page: Page, mic: Mic = 'allow') {
+  await page.addInitScript(stubMic, mic)
+  await openStep(page, 7)
 }
 
-const log = (page: Page) => page.evaluate(() => (window as unknown as { __stub: Stub }).__stub.log)
-const finish = (page: Page) => page.evaluate(() => (window as unknown as { __stub: Stub }).__stub.finish())
+const log = audioLog
+const finish = endCurrent
+// The shared Audio fake logs a blob: URL's pathname, which starts with the origin.
+const playedRecording = (entries: string[]) => entries.some((entry) => /^play:https?:/.test(entry))
+const pausedRecording = (entries: string[]) => entries.some((entry) => /^pause:https?:/.test(entry))
 const lines = (page: Page) => page.getByRole('list', { name: 'บทคล้องจอง' }).getByRole('listitem')
 const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true })
 
@@ -160,10 +129,10 @@ test.describe('Step 7 rhyme reading', () => {
     await expect.poll(() => log(page)).toEqual(['mic:request', 'record:start', 'record:stop', 'mic:release'])
 
     await button(page, 'ฟังเสียงตัวเอง').click()
-    await expect.poll(() => log(page)).toContain('play:recording')
+    await expect.poll(async () => playedRecording(await log(page))).toBe(true)
 
     await button(page, 'อัดใหม่').click()
-    await expect.poll(() => log(page)).toContain('pause:recording')
+    await expect.poll(async () => pausedRecording(await log(page))).toBe(true)
     await expect(button(page, 'ฟังเสียงตัวเอง')).toHaveCount(0)
     await expect(button(page, 'ลองอ่านเอง')).toBeVisible()
 

@@ -20,6 +20,21 @@ npx -y pnpm@12.16.1 lint       # oxlint
 
 First e2e run on a new machine: `cd apps/thai-spelling && npx playwright install chromium`.
 
+## Placeholder audio (`apps/thai-spelling`)
+
+The mp3s in `apps/thai-spelling/public/assets/audio/` are **TTS placeholders** (PyThaiTTS + FastThaiG2P).
+**They must be replaced by real teacher recordings before launch.**
+
+Regenerate them whenever Lesson data adds or changes an audio ID (a Vitest test fails while any clip is missing).
+Needs Python 3.12, node >= 23 and ffmpeg; keep the venv outside the repo:
+
+```sh
+python3.12 -m venv ~/.venvs/phakamas-tts && ~/.venvs/phakamas-tts/bin/pip install pythaitts
+~/.venvs/phakamas-tts/bin/python apps/thai-spelling/scripts/gen-audio.py
+```
+
+To use KhanomTan v1.1 instead, change the one `ENGINE = ...` line in the script (see its comment).
+
 ## Vercel (project for `apps/thai-spelling`)
 
 | Setting | Value |

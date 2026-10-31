@@ -29,6 +29,8 @@ export type Lesson = {
   /** Teacher introduction played on the cover Step. */
   intro: AudioClip
   vocabulary: readonly VocabularyWord[]
+  /** Step 3 ฟังแล้วอ่านตาม: words practised one at a time, in order. */
+  listenAndRepeat: readonly VocabularyWord[]
   /** The rhyme read on Step 7, one clip per line, in reading order. */
   rhyme: readonly AudioClip[]
 }
