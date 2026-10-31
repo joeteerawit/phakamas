@@ -1,9 +1,10 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Check, ChevronRight, Eye, RotateCcw, Square, Star, Volume2, type LucideIcon } from 'lucide-react'
+import { Check, ChevronRight, Circle, ClipboardCheck, Eye, RotateCcw, Square, Star, Volume2, X, type LucideIcon } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion, type Variants } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { playClip, stopAudio, useAudio, useClipStatus, type AudioStatus } from '../audio/audioManager'
 import type { AudioClip, Lesson, SpottingWord, VocabularyWord } from '../lessons'
+import { checkWordSelection } from '../activities/wordSelection'
 import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
 import { buttonClass, cx } from './clay/buttonClass'
@@ -32,6 +33,7 @@ export function StepContent({ lesson, stepNumber, onFeedback }: StepContentProps
   if (stepNumber === 2) return <VocabularyStep lesson={lesson} title={step.title} />
   if (stepNumber === 3) return <ListenRepeatStep words={lesson.listenAndRepeat} title={step.title} />
   if (stepNumber === 4) return <SpottingStep lesson={lesson} title={step.title} />
+  if (stepNumber === 5) return <WordSelectionStep lesson={lesson} title={step.title} onFeedback={onFeedback} />
   if (stepNumber === 6) return <WordFillingStep lesson={lesson} title={step.title} onFeedback={onFeedback} />
   if (stepNumber === 8) return <RhymeMatchingStep lesson={lesson} title={step.title} onFeedback={onFeedback} />
   if (stepNumber === 7) return <RhymeStep lesson={lesson} title={step.title} />
@@ -433,6 +435,145 @@ function SpottingCard({ item, tone, highlighted, onPlay }: SpottingCardProps) {
         {text}
       </span>
     </button>
+  )
+}
+
+const WORD_SELECTION_ID = 'wordSelection'
+
+type WordSelectionStepProps = {
+  lesson: Lesson
+  title: string
+  onFeedback: StepContentProps['onFeedback']
+}
+
+/** Step 5: select the words of this มาตรา, ตรวจคำตอบ scores every choice, เริ่มใหม่ clears. */
+function WordSelectionStep({ lesson, title, onFeedback }: WordSelectionStepProps) {
+  const { question, choices, praise } = lesson.wordSelection
+  const maxScore = choices.length
+  const [selected, setSelected] = useState<ReadonlySet<string>>(() => new Set())
+  // Words flagged by the last check; editing a word clears its flag.
+  const [wrong, setWrong] = useState<ReadonlySet<string>>(() => new Set())
+  const recordActivityCheck = useLessonSession((state) => state.recordActivityCheck)
+  const skipActivity = useLessonSession((state) => state.skipActivity)
+
+  // Leaving without ever checking counts as skipped (spec §4); a checked result is kept.
+  useEffect(
+    () => () => {
+      skipActivity(WORD_SELECTION_ID, maxScore)
+      onFeedback(null)
+    },
+    [skipActivity, maxScore, onFeedback],
+  )
+
+  const toggle = (word: string) => {
+    setSelected((old) => {
+      const next = new Set(old)
+      if (!next.delete(word)) next.add(word)
+      return next
+    })
+    setWrong((old) => {
+      const next = new Set(old)
+      next.delete(word)
+      return next
+    })
+    onFeedback(null)
+  }
+
+  const check = () => {
+    const result = checkWordSelection(choices, selected)
+    setWrong(new Set(result.wrong))
+    recordActivityCheck(WORD_SELECTION_ID, result.score, maxScore, [...selected])
+    const scoreText = `ได้ ${result.score}/${maxScore} คะแนน`
+    if (result.score === maxScore) {
+      onFeedback({ kind: 'correct', message: `เก่งมาก! ${scoreText}` })
+      playClip(praise)
+    } else {
+      onFeedback({ kind: 'wrong', message: `${scoreText} ลองใหม่นะ` })
+    }
+  }
+
+  const restart = () => {
+    setSelected(new Set())
+    setWrong(new Set())
+    onFeedback(null)
+  }
+
+  return (
+    // max-lg:pb-40 lets the buttons scroll above the fixed feedback toast on phones.
+    <section className="flex flex-1 flex-col items-center gap-(--space-lg) max-lg:pb-40">
+      <WoodenSign>{title}</WoodenSign>
+      <p className="text-center font-heading text-heading font-semibold">{question}</p>
+      <ul className="grid w-full max-w-3xl grid-cols-2 gap-(--space-md) sm:grid-cols-3 md:grid-cols-4">
+        {choices.map(({ word }, i) => (
+          <li key={word}>
+            <WordChoiceButton
+              word={word}
+              tone={toneAt(i)}
+              selected={selected.has(word)}
+              wrong={wrong.has(word)}
+              onToggle={() => toggle(word)}
+            />
+          </li>
+        ))}
+      </ul>
+      <div className="flex w-full flex-col items-stretch gap-(--space-md) sm:w-auto sm:flex-row">
+        <Button onClick={check}>
+          <ClipboardCheck aria-hidden="true" className="size-6" strokeWidth={2.5} />
+          ตรวจคำตอบ
+        </Button>
+        <Button variant="ghost" onClick={restart}>
+          <RotateCcw aria-hidden="true" className="size-6" strokeWidth={2.5} />
+          เริ่มใหม่
+        </Button>
+      </div>
+    </section>
+  )
+}
+
+type WordChoiceButtonProps = {
+  word: string
+  tone: CardTone
+  selected: boolean
+  wrong: boolean
+  onToggle: () => void
+}
+
+function WordChoiceButton({ word, tone, selected, wrong, onToggle }: WordChoiceButtonProps) {
+  const reduceMotion = useReducedMotion()
+  // Right/wrong is never colour alone: each state has its own icon and text.
+  const { icon: Icon, text } = wrong
+    ? { icon: X, text: selected ? 'เลือกผิด' : 'ลืมเลือก' }
+    : selected
+      ? { icon: Check, text: 'เลือกแล้ว' }
+      : { icon: Circle, text: 'แตะเพื่อเลือก' }
+
+  return (
+    <motion.button
+      type="button"
+      aria-pressed={selected}
+      onClick={onToggle}
+      whileTap={reduceMotion ? undefined : { scale: 0.94 }}
+      className={cx(
+        cardClass({ tone, selected, wrong }),
+        'flex w-full cursor-pointer select-none flex-col items-center gap-(--space-xs) p-(--space-sm) sm:p-(--space-md)',
+        'transition-colors duration-150 motion-reduce:transition-none',
+        'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring',
+      )}
+    >
+      <span className="font-heading text-vocab font-bold lg:text-vocab-lg">{word}</span>
+      <span className="flex items-center gap-(--space-xs) font-semibold whitespace-nowrap">
+        <span
+          aria-hidden="true"
+          className={cx(
+            'flex size-7 shrink-0 items-center justify-center rounded-full',
+            wrong ? 'bg-wrong text-on-primary' : selected ? 'bg-highlight text-on-primary' : 'text-foreground',
+          )}
+        >
+          <Icon className="size-5" strokeWidth={3} />
+        </span>
+        {text}
+      </span>
+    </motion.button>
   )
 }
 

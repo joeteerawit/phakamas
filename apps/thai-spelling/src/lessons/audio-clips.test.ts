@@ -16,6 +16,7 @@ describe('audioClips', () => {
       'vocabulary/dang',
       'vocabulary/khang-khao',
       'explanations/mae-kong',
+      'feedback/keng-mak',
       'feedback/correct',
       'feedback/completed',
       'rhyme/line-01',

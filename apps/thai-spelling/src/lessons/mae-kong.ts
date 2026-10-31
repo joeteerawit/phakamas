@@ -1,4 +1,4 @@
-import type { AudioClip, Lesson, SpottingWord, VocabularyWord } from './types.ts'
+import type { AudioClip, Lesson, SpottingWord, VocabularyWord, WordSelectionActivity } from './types.ts'
 
 const image = (name: string) => `/assets/images/vocabulary/${name}_3d.png`
 
@@ -19,6 +19,15 @@ const spot = ({ audio }: { audio: AudioClip }, ...syllables: [text: string, fina
   syllables: syllables.map(([text, final]) => ({ text, final })),
   audio,
 })
+
+const wordSelection = {
+  question: 'คำใดเป็นคำที่มี ง เป็นตัวสะกด (แม่กง)?',
+  choices: [
+    ...['ลิง', 'ช้าง', 'รัง', 'กางเกง'].map((word) => ({ word, correct: true })),
+    ...['แมว', 'นก', 'บ้าน'].map((word) => ({ word, correct: false })),
+  ],
+  praise: { id: 'feedback/keng-mak', text: 'เก่งมาก!' },
+} satisfies WordSelectionActivity
 
 /** แม่กง (ง). Step titles follow spec §1.1. */
 export const maeKong = {
@@ -52,6 +61,7 @@ export const maeKong = {
     },
     words: [spot(ling, ['ลิง', 2]), spot(chang, ['ช้าง', 3]), spot(rang, ['รัง', 2]), spot(kangKeng, ['กาง', 2], ['เกง', 2])],
   },
+  wordSelection,
   // Pictures are shuffled against the bank so the order gives nothing away.
   wordFilling: {
     bank: ['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'ดัง', 'ค้างคาว'],

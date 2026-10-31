@@ -47,6 +47,20 @@ export type WordFilling = {
   pictures: readonly { image: string; answer: string }[]
 }
 
+/** A word on the word-selection Step; `correct` = it belongs to this มาตรา. */
+export type WordChoice = {
+  word: string
+  correct: boolean
+}
+
+/** Step 5: pick the words of this มาตรา among distractors. */
+export type WordSelectionActivity = {
+  question: string
+  choices: readonly WordChoice[]
+  /** Played when every Decision is right. */
+  praise: AudioClip
+}
+
 /** The rhyme-matching Activity: link each left word to the word it rhymes with. */
 export type RhymeMatching = {
   pairs: readonly { left: string; right: string }[]
@@ -75,6 +89,7 @@ export type Lesson = {
   /** Step 3 ฟังแล้วอ่านตาม: words practised one at a time, in order. */
   listenAndRepeat: readonly VocabularyWord[]
   spotting: Spotting
+  wordSelection: WordSelectionActivity
   rhymeMatching: RhymeMatching
   /** The rhyme read on Step 7, one clip per line, in reading order. */
   rhyme: readonly AudioClip[]
