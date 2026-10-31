@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { playClip, stopAudio, useAudio, useClipStatus, type AudioStatus } from '../audio/audioManager'
 import type { AudioClip, Lesson, SpottingWord, VocabularyWord } from '../lessons'
 import { checkWordSelection } from '../activities/wordSelection'
+import { useReportUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
 import { buttonClass, cx } from './clay/buttonClass'
@@ -15,6 +16,7 @@ import { Mascot } from './Mascot'
 import { WordFillingStep } from './WordFillingStep'
 import { RhymeMatchingStep } from './RhymeMatchingStep'
 import { RhymeStep } from './RhymeStep'
+import { SummaryStep } from './SummaryStep'
 
 type StepContentProps = {
   lesson: Lesson
@@ -36,6 +38,7 @@ export function StepContent({ lesson, stepNumber, onFeedback }: StepContentProps
   if (stepNumber === 6) return <WordFillingStep lesson={lesson} title={step.title} onFeedback={onFeedback} />
   if (stepNumber === 8) return <RhymeMatchingStep lesson={lesson} title={step.title} onFeedback={onFeedback} />
   if (stepNumber === 7) return <RhymeStep lesson={lesson} title={step.title} />
+  if (stepNumber === 10) return <SummaryStep lesson={lesson} title={step.title} />
 
   return (
     <div className="flex flex-1 flex-col items-center gap-(--space-xl) text-center">
@@ -452,16 +455,11 @@ function WordSelectionStep({ lesson, title, onFeedback }: WordSelectionStepProps
   // Words flagged by the last check; editing a word clears its flag.
   const [wrong, setWrong] = useState<ReadonlySet<string>>(() => new Set())
   const recordActivityCheck = useLessonSession((state) => state.recordActivityCheck)
-  const skipActivity = useLessonSession((state) => state.skipActivity)
+  // Selections changed since the last check; Home asks before throwing them away.
+  const [unchecked, setUnchecked] = useState(false)
+  useReportUncheckedWork(unchecked)
 
-  // Leaving without ever checking counts as skipped (spec §4); a checked result is kept.
-  useEffect(
-    () => () => {
-      skipActivity(WORD_SELECTION_ID, maxScore)
-      onFeedback(null)
-    },
-    [skipActivity, maxScore, onFeedback],
-  )
+  useEffect(() => () => onFeedback(null), [onFeedback])
 
   const toggle = (word: string) => {
     setSelected((old) => {
@@ -474,12 +472,14 @@ function WordSelectionStep({ lesson, title, onFeedback }: WordSelectionStepProps
       next.delete(word)
       return next
     })
+    setUnchecked(true)
     onFeedback(null)
   }
 
   const check = () => {
     const result = checkWordSelection(choices, selected)
     setWrong(new Set(result.wrong))
+    setUnchecked(false)
     recordActivityCheck(WORD_SELECTION_ID, result.score, maxScore, [...selected])
     const scoreText = `ได้ ${result.score}/${maxScore} คะแนน`
     if (result.score === maxScore) {
@@ -493,6 +493,7 @@ function WordSelectionStep({ lesson, title, onFeedback }: WordSelectionStepProps
   const restart = () => {
     setSelected(new Set())
     setWrong(new Set())
+    setUnchecked(false)
     onFeedback(null)
   }
 

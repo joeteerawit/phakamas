@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react'
 import { playClip } from '../audio/audioManager'
 import type { Lesson, RhymeMatching } from '../lessons'
+import { useReportUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
 import { cx } from './clay/buttonClass'
@@ -50,10 +51,11 @@ export function RhymeMatchingStep({
   const [mistakes, setMistakes] = useState(0)
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   const recordActivityCheck = useLessonSession((state) => state.recordActivityCheck)
-  const skipActivity = useLessonSession((state) => state.skipActivity)
 
   const done = matched.size === pairs.length
   const lockedPairs = pairs.filter((pair) => matched.has(pair.left))
+  // A game started but not finished; Home asks before throwing it away.
+  useReportUncheckedWork(!done && (matched.size > 0 || mistakes > 0))
   const isLocked = (side: Side, word: string) => lockedPairs.some((pair) => pair[side] === word)
 
   // The toast (shown by StepLayout) hides after a moment so it never keeps covering the board or the stars.
@@ -65,14 +67,12 @@ export function RhymeMatchingStep({
   }, [feedback, onFeedback])
 
   const wrongTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
-  // Leaving before every pair is matched counts as skipped; a completed result is never overwritten.
   useEffect(
     () => () => {
       clearTimeout(wrongTimer.current)
-      skipActivity(ACTIVITY_ID, pairs.length)
       onFeedback(null)
     },
-    [skipActivity, pairs.length, onFeedback],
+    [onFeedback],
   )
 
   const attempt = (left: string, right: string) => {

@@ -1,6 +1,7 @@
 import { Check, RotateCcw, X } from 'lucide-react'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import type { Lesson } from '../lessons'
+import { useReportUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
 import { buttonClass, cx } from './clay/buttonClass'
@@ -30,16 +31,10 @@ export function WordFillingStep({ lesson, title, onFeedback }: WordFillingStepPr
   const [results, setResults] = useState<(boolean | null)[]>(() => pictures.map(() => null))
   const [selected, setSelected] = useState<string | null>(null)
   const recordActivityCheck = useLessonSession((state) => state.recordActivityCheck)
-  const skipActivity = useLessonSession((state) => state.skipActivity)
+  // A placed word not checked since it moved; Home asks before throwing it away.
+  useReportUncheckedWork(placed.some((word, i) => word !== null && results[i] === null))
 
-  // Leaving without ever checking counts as skipped (spec §4); a checked result is kept.
-  useEffect(
-    () => () => {
-      skipActivity(ACTIVITY_ID, maxScore)
-      onFeedback(null)
-    },
-    [skipActivity, maxScore, onFeedback],
-  )
+  useEffect(() => () => onFeedback(null), [onFeedback])
 
   const update = (next: (string | null)[]) => {
     setResults((old) => old.map((result, i) => (next[i] === placed[i] ? result : null)))

@@ -1,10 +1,13 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { ChevronLeft, ChevronRight, House, Volume2, VolumeX } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { stopAudio, toggleMute, useAudio } from '../audio/audioManager'
 import type { Lesson } from '../lessons'
+import { lessonActivities, useUncheckedWork } from '../session/activities'
+import { useLessonSession } from '../session/lessonSession'
 import { buttonClass, iconButtonClass } from './clay/buttonClass'
+import { ConfirmDialog } from './clay/ConfirmDialog'
 import { FeedbackToast, type Feedback } from './clay/FeedbackToast'
 import { IconButton } from './clay/IconButton'
 import { GardenBackdrop } from './GardenBackdrop'
@@ -34,6 +37,16 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
   // AUD-004: leaving a Step stops its sound.
   useEffect(() => stopAudio, [stepNumber])
 
+  // Spec §4: only ถัดไป without checking marks this Step's Activity skipped; Back and Home never do.
+  const activity = lessonActivities(lesson).find((a) => a.step === stepNumber)
+  const skipActivity = useLessonSession((state) => state.skipActivity)
+  const skip = () => activity && skipActivity(activity.id, activity.maxScore)
+
+  // TC-019: Home asks first while the Activity has unchecked answers.
+  const unchecked = useUncheckedWork((state) => state.unchecked)
+  const [confirmHome, setConfirmHome] = useState(false)
+  const navigate = useNavigate()
+
   return (
     <div className="relative isolate min-h-dvh overflow-x-clip">
       <GardenBackdrop />
@@ -41,7 +54,17 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
       <div className="mx-auto flex min-h-dvh w-full max-w-[1100px] flex-col lg:px-(--space-lg) lg:py-(--space-xl)">
         <div className="flex flex-1 flex-col lg:rounded-storybook lg:border-[6px] lg:border-sun lg:bg-card lg:shadow-clay">
           <header className="flex items-center gap-(--space-sm) px-(--space-md) pt-(--space-md) lg:px-(--space-xl) lg:pt-(--space-lg)">
-            <Link to="/lesson/$lessonId/$step" params={stepParams(1)} aria-label="กลับไปหน้าปก" className={iconButtonClass()}>
+            <Link
+              to="/lesson/$lessonId/$step"
+              params={stepParams(1)}
+              aria-label="กลับไปหน้าปก"
+              className={iconButtonClass()}
+              onClick={(event) => {
+                if (!unchecked) return
+                event.preventDefault()
+                setConfirmHome(true)
+              }}
+            >
               <House aria-hidden="true" className="size-7" strokeWidth={2.5} />
             </Link>
 
@@ -118,6 +141,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
                 <Link
                   to="/lesson/$lessonId/$step"
                   params={stepParams(stepNumber + 1)}
+                  onClick={skip}
                   className={`${buttonClass('primary', 'bar')} col-start-2 lg:ms-auto`}
                 >
                   ถัดไป
@@ -128,6 +152,18 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
           </nav>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmHome}
+        message="ยังไม่ได้ตรวจคำตอบ จะออกจากหน้านี้ไหม?"
+        confirmLabel="ออกจากหน้านี้"
+        cancelLabel="ทำต่อ"
+        onCancel={() => setConfirmHome(false)}
+        onConfirm={() => {
+          setConfirmHome(false)
+          void navigate({ to: '/lesson/$lessonId/$step', params: stepParams(1) })
+        }}
+      />
 
       <FeedbackToast
         feedback={feedback}
