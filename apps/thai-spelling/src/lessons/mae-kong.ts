@@ -36,4 +36,15 @@ export const maeKong = {
     word('ดัง', 'dang', 'loudspeaker'),
     word('ค้างคาว', 'khang-khao', 'bat'),
   ],
+  rhymeMatching: {
+    pairs: [
+      { left: 'ดัง', right: 'ฟัง' },
+      { left: 'รัง', right: 'นั่ง' },
+      { left: 'กาง', right: 'วาง' },
+    ],
+    sounds: {
+      correct: { id: 'feedback/correct', text: 'ถูกต้อง' },
+      completed: { id: 'feedback/completed', text: 'เก่งมาก จับคู่ถูกครบแล้ว' },
+    },
+  },
 } as const satisfies Lesson

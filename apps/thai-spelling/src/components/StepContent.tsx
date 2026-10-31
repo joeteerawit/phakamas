@@ -10,6 +10,7 @@ import { buttonClass, cx } from './clay/buttonClass'
 import { Card, cardClass, toneAt, type CardTone } from './clay/Card'
 import { WoodenSign } from './clay/WoodenSign'
 import { Mascot } from './Mascot'
+import { RhymeMatchingStep } from './RhymeMatchingStep'
 
 type StepContentProps = {
   lesson: Lesson
@@ -23,6 +24,7 @@ export function StepContent({ lesson, stepNumber }: StepContentProps) {
 
   if (stepNumber === 1) return <CoverStep lesson={lesson} title={step.title} />
   if (stepNumber === 2) return <VocabularyStep lesson={lesson} title={step.title} />
+  if (stepNumber === 8) return <RhymeMatchingStep lesson={lesson} title={step.title} />
 
   return (
     <div className="flex flex-1 flex-col items-center gap-(--space-xl) text-center">

@@ -20,6 +20,13 @@ export type VocabularyWord = {
   audio: AudioClip
 }
 
+/** The rhyme-matching Activity: link each left word to the word it rhymes with. */
+export type RhymeMatching = {
+  pairs: readonly { left: string; right: string }[]
+  /** Played when a pair locks, and when every pair is matched. */
+  sounds: { correct: AudioClip; completed: AudioClip }
+}
+
 /** A complete course for one final-consonant group (มาตราตัวสะกด). */
 export type Lesson = {
   id: string
@@ -29,4 +36,5 @@ export type Lesson = {
   /** Teacher introduction played on the cover Step. */
   intro: AudioClip
   vocabulary: readonly VocabularyWord[]
+  rhymeMatching: RhymeMatching
 }

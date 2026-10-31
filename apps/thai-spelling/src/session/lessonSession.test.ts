@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { useLessonSession } from './lessonSession'
 
 const session = () => useLessonSession.getState().session
-const { visitStep, resetSession } = useLessonSession.getState()
+const { visitStep, resetSession, recordActivity, skipActivity } = useLessonSession.getState()
+const activity = (id: string) => session()?.activities[id]
 
 beforeEach(() => {
   resetSession()
@@ -48,5 +49,38 @@ describe('Lesson Session store', () => {
     visitStep('mae-kong', 3)
     const stored = JSON.parse(localStorage.getItem('thai-spelling:lesson-session') ?? 'null')
     expect(stored.state.session).toMatchObject({ lessonId: 'mae-kong', currentStep: 3, visitedSteps: [3] })
+  })
+
+  it('recording a checked result completes the Activity, keeps the best score and counts attempts', () => {
+    visitStep('mae-kong', 8)
+    recordActivity('rhymeMatching', { score: 3, maxScore: 3, answers: { mistakes: 2 } })
+    recordActivity('rhymeMatching', { score: 1, maxScore: 3, answers: { mistakes: 0 } })
+    expect(activity('rhymeMatching')).toEqual({
+      status: 'completed',
+      bestScore: 3,
+      maxScore: 3,
+      attemptCount: 2,
+      answers: { mistakes: 0 },
+    })
+  })
+
+  it('skipping an untouched Activity stores skipped with score 0', () => {
+    visitStep('mae-kong', 8)
+    skipActivity('rhymeMatching', 3)
+    expect(activity('rhymeMatching')).toEqual({ status: 'skipped', bestScore: 0, maxScore: 3, attemptCount: 0, answers: null })
+  })
+
+  it('skipping never erases a completed result', () => {
+    visitStep('mae-kong', 8)
+    recordActivity('rhymeMatching', { score: 3, maxScore: 3, answers: { mistakes: 1 } })
+    skipActivity('rhymeMatching', 3)
+    expect(activity('rhymeMatching')).toMatchObject({ status: 'completed', bestScore: 3, attemptCount: 1 })
+  })
+
+  it('a skipped Activity can still be completed later', () => {
+    visitStep('mae-kong', 8)
+    skipActivity('rhymeMatching', 3)
+    recordActivity('rhymeMatching', { score: 3, maxScore: 3, answers: { mistakes: 0 } })
+    expect(activity('rhymeMatching')).toMatchObject({ status: 'completed', bestScore: 3, attemptCount: 1 })
   })
 })
