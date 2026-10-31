@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
-const PORT = 4173
+// E2E_PORT lets parallel worktrees run e2e without sharing a preview server.
+const PORT = Number(process.env.E2E_PORT ?? 4173)
 const BASE_URL = `http://localhost:${PORT}`
 
 /**
@@ -28,7 +29,7 @@ export default defineConfig({
   webServer: {
     command: `vite preview --port ${PORT} --strictPort`,
     url: BASE_URL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !process.env.CI && !process.env.E2E_PORT,
     timeout: 60_000,
   },
 })
