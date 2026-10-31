@@ -3,6 +3,7 @@ import { useLessonSession } from './lessonSession'
 
 const session = () => useLessonSession.getState().session
 const { visitStep, resetSession, recordActivityCheck, skipActivity } = useLessonSession.getState()
+const activity = (id: string) => session()?.activities[id]
 
 beforeEach(() => {
   resetSession()
@@ -81,5 +82,38 @@ describe('Lesson Session store', () => {
     recordActivityCheck('wordFilling', 5, 6, [])
     skipActivity('wordFilling', 6)
     expect(session()).toBeNull()
+  })
+
+  it('recording a checked result completes the Activity, keeps the best score and counts attempts', () => {
+    visitStep('mae-kong', 8)
+    recordActivityCheck('rhymeMatching', 3, 3, { mistakes: 2 })
+    recordActivityCheck('rhymeMatching', 1, 3, { mistakes: 0 })
+    expect(activity('rhymeMatching')).toEqual({
+      status: 'completed',
+      bestScore: 3,
+      maxScore: 3,
+      attemptCount: 2,
+      answers: { mistakes: 0 },
+    })
+  })
+
+  it('skipping an untouched Activity stores skipped with score 0', () => {
+    visitStep('mae-kong', 8)
+    skipActivity('rhymeMatching', 3)
+    expect(activity('rhymeMatching')).toEqual({ status: 'skipped', bestScore: 0, maxScore: 3, attemptCount: 0, answers: null })
+  })
+
+  it('skipping never erases a completed result', () => {
+    visitStep('mae-kong', 8)
+    recordActivityCheck('rhymeMatching', 3, 3, { mistakes: 1 })
+    skipActivity('rhymeMatching', 3)
+    expect(activity('rhymeMatching')).toMatchObject({ status: 'completed', bestScore: 3, attemptCount: 1 })
+  })
+
+  it('a skipped Activity can still be completed later', () => {
+    visitStep('mae-kong', 8)
+    skipActivity('rhymeMatching', 3)
+    recordActivityCheck('rhymeMatching', 3, 3, { mistakes: 0 })
+    expect(activity('rhymeMatching')).toMatchObject({ status: 'completed', bestScore: 3, attemptCount: 1 })
   })
 })

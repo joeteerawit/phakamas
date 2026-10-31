@@ -12,6 +12,7 @@ import type { Feedback } from './clay/FeedbackToast'
 import { WoodenSign } from './clay/WoodenSign'
 import { Mascot } from './Mascot'
 import { WordFillingStep } from './WordFillingStep'
+import { RhymeMatchingStep } from './RhymeMatchingStep'
 
 type StepContentProps = {
   lesson: Lesson
@@ -30,6 +31,7 @@ export function StepContent({ lesson, stepNumber, onFeedback }: StepContentProps
   if (stepNumber === 3) return <ListenRepeatStep words={lesson.listenAndRepeat} title={step.title} />
   if (stepNumber === 4) return <SpottingStep lesson={lesson} title={step.title} />
   if (stepNumber === 6) return <WordFillingStep lesson={lesson} title={step.title} onFeedback={onFeedback} />
+  if (stepNumber === 8) return <RhymeMatchingStep lesson={lesson} title={step.title} onFeedback={onFeedback} />
 
   return (
     <div className="flex flex-1 flex-col items-center gap-(--space-xl) text-center">
