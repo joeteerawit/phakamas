@@ -1,10 +1,16 @@
-import type { Lesson, VocabularyWord } from './types'
+import type { Lesson, VocabularyWord } from './types.ts'
 
 const word = (text: string, slug: string, image: string): VocabularyWord => ({
   word: text,
   image: `/assets/images/vocabulary/${image}_3d.png`,
   audio: { id: `vocabulary/${slug}`, text },
 })
+
+const ling = word('ลิง', 'ling', 'monkey')
+const chang = word('ช้าง', 'chang', 'elephant')
+const rang = word('รัง', 'rang', 'nest_with_eggs')
+const kangKeng = word('กางเกง', 'kang-keng', 'jeans')
+const dang = word('ดัง', 'dang', 'loudspeaker')
 
 /** แม่กง (ง). Step titles follow spec §1.1. */
 export const maeKong = {
@@ -28,14 +34,8 @@ export const maeKong = {
     text: 'สวัสดีเด็ก ๆ วันนี้เราจะมาเรียนรู้คำคล้องจองในมาตราแม่กงกัน พร้อมแล้วกดเริ่มเรียนได้เลย',
   },
   // ค้างคาว is a Supporting Word: คาว ends in ว, only ค้าง is แม่กง.
-  vocabulary: [
-    word('ลิง', 'ling', 'monkey'),
-    word('ช้าง', 'chang', 'elephant'),
-    word('รัง', 'rang', 'nest_with_eggs'),
-    word('กางเกง', 'kang-keng', 'jeans'),
-    word('ดัง', 'dang', 'loudspeaker'),
-    word('ค้างคาว', 'khang-khao', 'bat'),
-  ],
+  vocabulary: [ling, chang, rang, kangKeng, dang, word('ค้างคาว', 'khang-khao', 'bat')],
+  listenAndRepeat: [ling, chang, rang, kangKeng, dang],
   rhymeMatching: {
     pairs: [
       { left: 'ดัง', right: 'ฟัง' },

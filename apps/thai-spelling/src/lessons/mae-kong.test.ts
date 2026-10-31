@@ -56,4 +56,14 @@ describe('mae-kong lesson data', () => {
       ['ค้างคาว', 'vocabulary/khang-khao', 'ค้างคาว'],
     ])
   })
+
+  it('practises the 5 Target Words in Step 3 order, each with its own picture and audio', () => {
+    expect(maeKong.listenAndRepeat.map(({ word, image, audio }) => [word, image, audio.id])).toEqual([
+      ['ลิง', '/assets/images/vocabulary/monkey_3d.png', 'vocabulary/ling'],
+      ['ช้าง', '/assets/images/vocabulary/elephant_3d.png', 'vocabulary/chang'],
+      ['รัง', '/assets/images/vocabulary/nest_with_eggs_3d.png', 'vocabulary/rang'],
+      ['กางเกง', '/assets/images/vocabulary/jeans_3d.png', 'vocabulary/kang-keng'],
+      ['ดัง', '/assets/images/vocabulary/loudspeaker_3d.png', 'vocabulary/dang'],
+    ])
+  })
 })
