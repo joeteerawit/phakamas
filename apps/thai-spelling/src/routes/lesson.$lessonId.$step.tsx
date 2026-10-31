@@ -1,7 +1,9 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import { StepContent } from '../components/StepContent'
 import { StepLayout } from '../components/StepLayout'
 import { DEFAULT_LESSON_ID, getLesson, parseStepNumber } from '../lessons'
+import { useLessonSession } from '../session/lessonSession'
 
 export const Route = createFileRoute('/lesson/$lessonId/$step')({
   beforeLoad: ({ params }) => {
@@ -21,6 +23,8 @@ export const Route = createFileRoute('/lesson/$lessonId/$step')({
 
 function StepPage() {
   const { lesson, stepNumber } = Route.useRouteContext()
+  const visitStep = useLessonSession((state) => state.visitStep)
+  useEffect(() => visitStep(lesson.id, stepNumber), [visitStep, lesson.id, stepNumber])
   return (
     <StepLayout lesson={lesson} stepNumber={stepNumber}>
       <StepContent lesson={lesson} stepNumber={stepNumber} />

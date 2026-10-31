@@ -1,9 +1,10 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Check, RotateCcw, Square, Volume2, type LucideIcon } from 'lucide-react'
 import { motion, useReducedMotion, type Variants } from 'motion/react'
 import { useState } from 'react'
 import { playClip, stopAudio, useClipStatus, type AudioStatus } from '../audio/audioManager'
 import type { AudioClip, Lesson, VocabularyWord } from '../lessons'
+import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
 import { buttonClass, cx } from './clay/buttonClass'
 import { Card, cardClass, toneAt, type CardTone } from './clay/Card'
@@ -38,6 +39,15 @@ function CoverStep({ lesson, title }: { lesson: Lesson; title: string }) {
   // Bumped on each tap; the Mascot waves once per bump.
   const [waveCount, setWaveCount] = useState(0)
   const wave = () => setWaveCount((count) => count + 1)
+  const navigate = useNavigate()
+  const resetSession = useLessonSession((state) => state.resetSession)
+  const resumeStep = useLessonSession(({ session }) =>
+    session?.lessonId === lesson.id && session.currentStep > 1 ? session.currentStep : null,
+  )
+  const restart = () => {
+    resetSession()
+    void navigate({ to: '/lesson/$lessonId/$step', params: { lessonId: lesson.id, step: '2' } })
+  }
 
   return (
     <section className="flex flex-1 flex-col items-center justify-center gap-(--space-md) text-center lg:flex-row lg:gap-(--space-xl) lg:text-start">
@@ -53,10 +63,26 @@ function CoverStep({ lesson, title }: { lesson: Lesson; title: string }) {
         </p>
         <p className="text-muted-foreground">วิชาภาษาไทย ชั้นประถมศึกษาปีที่ 2</p>
 
-        <div className="mt-(--space-md) flex w-full flex-col items-stretch gap-(--space-md) sm:w-auto sm:flex-row sm:items-center">
-          <Link to="/lesson/$lessonId/$step" params={{ lessonId: lesson.id, step: '2' }} className={buttonClass('primary', 'lg')}>
-            เริ่มเรียน
-          </Link>
+        <div className="mt-(--space-md) flex w-full flex-col items-stretch gap-(--space-md) sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
+          {resumeStep ? (
+            <>
+              <Link
+                to="/lesson/$lessonId/$step"
+                params={{ lessonId: lesson.id, step: String(resumeStep) }}
+                className={buttonClass('primary', 'lg')}
+              >
+                เรียนต่อ (ขั้น {resumeStep})
+              </Link>
+              <Button variant="ghost" size="lg" onClick={restart}>
+                <RotateCcw aria-hidden="true" className="size-7" strokeWidth={2.5} />
+                เริ่มใหม่
+              </Button>
+            </>
+          ) : (
+            <Link to="/lesson/$lessonId/$step" params={{ lessonId: lesson.id, step: '2' }} className={buttonClass('primary', 'lg')}>
+              เริ่มเรียน
+            </Link>
+          )}
           <IntroButton intro={lesson.intro} />
         </div>
       </div>
