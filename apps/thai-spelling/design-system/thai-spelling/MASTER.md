@@ -34,6 +34,17 @@
 | Wrong | `#DC2626` | `--color-wrong` | Always paired with a ✗ icon |
 | Ring | `#2563EB` | `--color-ring` | Focus ring, 3px |
 
+**Vibrant layer (user asked for a brighter, more colourful look to hold children's attention):**
+
+| Role | Hex | CSS Variable |
+|------|-----|--------------|
+| Sky top / sky / grass | `#38BDF8` / `#BAE6FD` / `#86EFAC` | `--color-sky-top` / `--color-sky` / `--color-grass` |
+| Hills | `#4ADE80`, `#22C55E` | `--color-hill`, `--color-hill-deep` |
+| Sun, orange, purple, red (decor, rainbow, flowers) | `#FDE047`, `#FB923C`, `#A78BFA`, `#F87171` | `--color-sun`, `--color-orange`, `--color-purple`, `--color-red` |
+| Card/pill tints (dark text only) | `#FEF08A` `#FBCFE8` `#BAE6FD` `#BBF7D0` `#DDD6FE` `#FED7AA` | `--color-tint-yellow/pink/sky/mint/lilac/peach` |
+
+Backdrop: sky gradient + rainbow arc + sun with halo + bright hills + flowers. Storybook border 6px sun yellow; Step counter pill sun yellow; progress bar red→yellow→green gradient. Neighbouring cards cycle tints (`toneAt(i)`) so a grid is never all white.
+
 Never use raw hex in components; use tokens. Right/wrong is never colour alone.
 
 ## Typography

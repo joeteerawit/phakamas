@@ -1,53 +1,125 @@
 @import 'tailwindcss';
 
-/* Garden theme: light green, sky blue, yellow, pink (spec §6). */
+/*
+ * Clay garden theme. Every value comes from
+ * design-system/thai-spelling/MASTER.md; components use these tokens only.
+ */
 @theme {
+  /* Drop Tailwind's default palette so only MASTER colours exist. */
+  --color-*: initial;
+
+  --color-primary: #15803d;
+  --color-on-primary: #ffffff;
+  --color-secondary: #2563eb;
+  --color-on-secondary: #ffffff;
+  --color-accent: #f59e0b;
+  --color-on-accent: #0f172a;
+  --color-highlight: #ec4899;
+  /* Vibrant garden backdrop (kids: bright, saturated). */
+  --color-sky-top: #38bdf8;
+  --color-sky: #bae6fd;
+  --color-grass: #86efac;
+  --color-hill: #4ade80;
+  --color-hill-deep: #22c55e;
+  --color-sun: #fde047;
+  --color-orange: #fb923c;
+  --color-purple: #a78bfa;
+  --color-red: #f87171;
+  /* Bright tints for cards and pills (dark text on all of them). */
+  --color-tint-yellow: #fef08a;
+  --color-tint-pink: #fbcfe8;
+  --color-tint-sky: #bae6fd;
+  --color-tint-mint: #bbf7d0;
+  --color-tint-lilac: #ddd6fe;
+  --color-tint-peach: #fed7aa;
+  --color-wood: #92400e;
+  --color-on-wood: #ffffff;
+  --color-card: #ffffff;
+  --color-foreground: #0f172a;
+  --color-muted-foreground: #475569;
+  --color-border: rgb(30 41 59 / 0.15);
+  --color-correct: #15803d;
+  --color-wrong: #dc2626;
+  --color-ring: #2563eb;
+
   --font-sans: 'Anuphan', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Mali', 'Anuphan', ui-sans-serif, system-ui, sans-serif;
 
-  --color-ink: #1f3a2a;
-  --color-ink-soft: #46604f;
+  /* Type scale (mobile → desktop). Thai needs 1.6 for stacked tone marks. */
+  --text-body: 1.125rem;
+  --text-body--line-height: 1.6;
+  --text-body-lg: 1.5rem;
+  --text-body-lg--line-height: 1.6;
+  --text-button: 1.25rem;
+  --text-button--line-height: 1.6;
+  --text-heading: 1.75rem;
+  --text-heading--line-height: 1.6;
+  --text-heading-lg: 2.75rem;
+  --text-heading-lg--line-height: 1.6;
+  --text-vocab: 2rem;
+  --text-vocab--line-height: 1.6;
+  --text-vocab-lg: 2.75rem;
+  --text-vocab-lg--line-height: 1.6;
 
-  --color-leaf-soft: #e8f7dc;
-  --color-leaf: #b7e59a;
-  --color-leaf-strong: #4f9a2e;
+  --radius-clay: 1.5rem;
+  --radius-storybook: 2.5rem;
 
-  --color-sky-soft: #e3f4fd;
-  --color-sky: #a9dcf6;
-  --color-sky-strong: #2a7fb8;
+  --shadow-clay:
+    0 6px 0 rgba(15, 23, 42, 0.12), 0 12px 24px rgba(15, 23, 42, 0.1),
+    inset 0 -4px 0 rgba(15, 23, 42, 0.08), inset 0 2px 0 rgba(255, 255, 255, 0.7);
+  --shadow-clay-pressed: 0 2px 0 rgba(15, 23, 42, 0.12), inset 0 2px 4px rgba(15, 23, 42, 0.12);
+}
 
-  --color-sun-soft: #fff6cf;
-  --color-sun: #ffdf6e;
-  --color-sun-strong: #f7c843;
+/* Spacing (Density 3). Used as e.g. `gap-(--space-sm)`. */
+:root {
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-xl: 48px;
 
-  --color-blossom-soft: #ffe6ee;
-  --color-blossom: #ffb6cc;
-  --color-blossom-strong: #e0698f;
+  /* Mobile Back/Next bar: 3px border + 8px + 56px button + 8px (safe-area added separately). */
+  --bottom-bar-height: 76px;
+}
 
-  --color-focus: #1d4ed8;
+/* Content clears the fixed mobile Back/Next bar, including the home-indicator inset. */
+@utility pb-bottom-bar {
+  padding-bottom: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom) + var(--space-md));
+}
+
+@utility pb-safe-area {
+  padding-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
+}
+
+@utility bottom-above-bar {
+  bottom: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom) + var(--space-sm));
 }
 
 @layer base {
   html {
     color-scheme: light;
     -webkit-text-size-adjust: 100%;
+    background-color: var(--color-sky);
   }
 
   body {
     min-height: 100dvh;
     margin: 0;
     font-family: var(--font-sans);
-    color: var(--color-ink);
-    /* Soft sky → grass garden backdrop. */
-    background-color: var(--color-sky-soft);
-    background-image: linear-gradient(
-      180deg,
-      #bfe6fb 0%,
-      #e3f4fd 42%,
-      #e6f6d4 68%,
-      #b7e59a 88%,
-      #8fd16b 100%
-    );
-    background-attachment: fixed;
-    background-repeat: no-repeat;
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--color-foreground);
+    background-color: var(--color-grass);
+  }
+
+  @media (min-width: 64rem) {
+    body {
+      font-size: var(--text-body-lg);
+    }
+  }
+
+  button,
+  [role='button'] {
+    cursor: pointer;
   }
 }

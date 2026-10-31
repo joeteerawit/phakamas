@@ -1,6 +1,8 @@
+// Self-hosted Thai subsets (MASTER.md): Anuphan 400/600 for body, Mali 600/700 for headings.
 import '@fontsource/anuphan/thai-400.css'
 import '@fontsource/anuphan/thai-600.css'
-import '@fontsource/anuphan/thai-700.css'
+import '@fontsource/mali/thai-600.css'
+import '@fontsource/mali/thai-700.css'
 import './styles.css'
 
 import { createRouter, RouterProvider } from '@tanstack/react-router'

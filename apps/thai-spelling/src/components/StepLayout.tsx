@@ -1,118 +1,147 @@
 import { Link } from '@tanstack/react-router'
-import { motion } from 'motion/react'
-import type { ReactNode } from 'react'
+import { ChevronLeft, ChevronRight, House, Volume2, VolumeX } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
+import { useState, type ReactNode } from 'react'
 import type { Lesson } from '../lessons'
-import { buttonClass } from './button'
+import { buttonClass, iconButtonClass } from './clay/buttonClass'
+import { FeedbackToast, type Feedback } from './clay/FeedbackToast'
+import { IconButton } from './clay/IconButton'
+import { GardenBackdrop } from './GardenBackdrop'
 
 type StepLayoutProps = {
   lesson: Lesson
   stepNumber: number
+  /** Activity feedback shown in the toast; placeholder Steps pass none. */
+  feedback?: Feedback | null
   children: ReactNode
 }
 
-/** Shared Step layout (spec §1.3): header, progress bar, content area, Back/Next. */
-export function StepLayout({ lesson, stepNumber, children }: StepLayoutProps) {
+/**
+ * Shared Step layout (spec §1.3, MASTER.md "Responsive Layout").
+ * < 1024px: compact header, progress bar, single column, Back/Next fixed to the bottom.
+ * ≥ 1024px: everything inside a centred storybook panel on the garden.
+ */
+export function StepLayout({ lesson, stepNumber, feedback = null, children }: StepLayoutProps) {
   const totalSteps = lesson.steps.length
   const isFirst = stepNumber === 1
   const isLast = stepNumber === totalSteps
   const stepParams = (step: number) => ({ lessonId: lesson.id, step: String(step) })
 
-  return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col gap-4 px-3 py-3 sm:px-6 sm:py-5">
-      <header className="flex items-center gap-2 rounded-3xl bg-white/70 p-2 shadow-sm backdrop-blur-sm sm:gap-4 sm:p-3">
-        <Link
-          to="/lesson/$lessonId/$step"
-          params={stepParams(1)}
-          aria-label="กลับไปหน้าปก"
-          className={buttonClass('home')}
-        >
-          <HomeIcon />
-          <span className="hidden sm:inline">หน้าปก</span>
-        </Link>
-        <p className="min-w-0 flex-1 text-center text-lg leading-tight font-bold break-words sm:text-2xl">
-          {lesson.title}
-        </p>
-        <p className="shrink-0 rounded-full bg-sun-soft px-3 py-2 text-lg font-semibold whitespace-nowrap ring-2 ring-sun-strong/60 sm:px-4">
-          ขั้น {stepNumber}/{totalSteps}
-        </p>
-      </header>
+  const direction = useStepDirection(stepNumber)
+  const reduceMotion = useReducedMotion()
+  // Visual state only until audio lands.
+  const [muted, setMuted] = useState(false)
 
-      <div
-        role="progressbar"
-        aria-label="ความคืบหน้าบทเรียน"
-        aria-valuemin={1}
-        aria-valuemax={totalSteps}
-        aria-valuenow={stepNumber}
-        aria-valuetext={`ขั้น ${stepNumber} จาก ${totalSteps}`}
-        className="h-4 w-full overflow-hidden rounded-full bg-white/70 ring-2 ring-white"
-      >
-        <div
-          className="h-full rounded-full bg-linear-to-r from-leaf to-leaf-strong transition-[width] duration-300"
-          style={{ width: `${(stepNumber / totalSteps) * 100}%` }}
-        />
+  return (
+    <div className="relative isolate min-h-dvh overflow-x-clip">
+      <GardenBackdrop />
+
+      <div className="mx-auto flex min-h-dvh w-full max-w-[1100px] flex-col lg:px-(--space-lg) lg:py-(--space-xl)">
+        <div className="flex flex-1 flex-col lg:rounded-storybook lg:border-[6px] lg:border-sun lg:bg-card lg:shadow-clay">
+          <header className="flex items-center gap-(--space-sm) px-(--space-md) pt-(--space-md) lg:px-(--space-xl) lg:pt-(--space-lg)">
+            <Link to="/lesson/$lessonId/$step" params={stepParams(1)} aria-label="กลับไปหน้าปก" className={iconButtonClass()}>
+              <House aria-hidden="true" className="size-7" strokeWidth={2.5} />
+            </Link>
+
+            <div className="flex min-w-0 flex-1 items-center justify-center gap-(--space-md) lg:justify-between lg:ps-(--space-sm)">
+              <p className="hidden min-w-0 truncate font-heading text-heading font-semibold lg:block">{lesson.title}</p>
+              <p className="flex min-h-12 shrink-0 items-center rounded-full border-[3px] border-border bg-sun px-(--space-md) font-semibold whitespace-nowrap shadow-clay">
+                ขั้น {stepNumber}/{totalSteps}
+              </p>
+            </div>
+
+            <IconButton
+              icon={muted ? VolumeX : Volume2}
+              label="ปิดเสียง"
+              aria-pressed={muted}
+              onClick={() => setMuted((value) => !value)}
+            />
+          </header>
+
+          <div className="px-(--space-md) pt-(--space-md) lg:px-(--space-xl)">
+            <div
+              role="progressbar"
+              aria-label="ความคืบหน้าบทเรียน"
+              aria-valuemin={1}
+              aria-valuemax={totalSteps}
+              aria-valuenow={stepNumber}
+              aria-valuetext={`ขั้น ${stepNumber} จาก ${totalSteps}`}
+              className="h-4 w-full overflow-hidden rounded-full border-2 border-border bg-card"
+            >
+              <div
+                className="h-full w-full origin-left rounded-full bg-linear-to-r from-red via-sun to-hill-deep transition-transform duration-250 ease-out motion-reduce:transition-none"
+                style={{ transform: `scaleX(${stepNumber / totalSteps})` }}
+              />
+            </div>
+          </div>
+
+          <main className="flex flex-1 flex-col overflow-x-clip px-(--space-md) pt-(--space-lg) pb-bottom-bar lg:px-(--space-xl) lg:pb-(--space-lg)">
+            <motion.div
+              key={stepNumber}
+              className="flex flex-1 flex-col"
+              initial={reduceMotion ? false : { opacity: 0, x: direction * 48 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+            >
+              {children}
+            </motion.div>
+          </main>
+
+          <nav
+            aria-label="เปลี่ยนขั้น"
+            className="fixed inset-x-0 bottom-0 z-20 border-t-[3px] border-border bg-card/95 px-(--space-md) pt-(--space-sm) pb-safe-area backdrop-blur-sm lg:static lg:z-auto lg:rounded-b-storybook lg:bg-transparent lg:px-(--space-xl) lg:py-(--space-md) lg:backdrop-blur-none"
+          >
+            {/* Phones: two equal columns, Next always on the right. Desktop: pills at either end. */}
+            <div className="mx-auto grid max-w-[1100px] grid-cols-2 items-center gap-(--space-sm) lg:flex lg:justify-between">
+              {!isFirst && (
+                <Link
+                  to="/lesson/$lessonId/$step"
+                  params={stepParams(stepNumber - 1)}
+                  className={`${buttonClass('ghost', 'bar')} col-start-1`}
+                >
+                  <ChevronLeft aria-hidden="true" className="size-6" strokeWidth={2.75} />
+                  ย้อนกลับ
+                </Link>
+              )}
+              {isLast ? (
+                <Link
+                  to="/lesson/$lessonId/$step"
+                  params={stepParams(1)}
+                  className={`${buttonClass('primary', 'bar')} col-start-2 lg:ms-auto`}
+                >
+                  <House aria-hidden="true" className="hidden size-6 sm:block" strokeWidth={2.5} />
+                  กลับหน้าแรก
+                </Link>
+              ) : (
+                <Link
+                  to="/lesson/$lessonId/$step"
+                  params={stepParams(stepNumber + 1)}
+                  className={`${buttonClass('primary', 'bar')} col-start-2 lg:ms-auto`}
+                >
+                  ถัดไป
+                  <ChevronRight aria-hidden="true" className="size-6" strokeWidth={2.75} />
+                </Link>
+              )}
+            </div>
+          </nav>
+        </div>
       </div>
 
-      <main className="flex flex-1 flex-col rounded-[2rem] bg-white/75 p-5 shadow-sm backdrop-blur-sm sm:p-8">
-        <motion.div
-          key={stepNumber}
-          className="flex flex-1 flex-col"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-        >
-          {children}
-        </motion.div>
-      </main>
-
-      <nav aria-label="เปลี่ยนขั้น" className="flex flex-wrap items-center justify-between gap-3">
-        {!isFirst && (
-          <Link
-            to="/lesson/$lessonId/$step"
-            params={stepParams(stepNumber - 1)}
-            className={buttonClass('secondary')}
-          >
-            <span aria-hidden="true">←</span>
-            ย้อนกลับ
-          </Link>
-        )}
-        {isLast ? (
-          <Link
-            to="/lesson/$lessonId/$step"
-            params={stepParams(1)}
-            className={`${buttonClass('primary')} ms-auto`}
-          >
-            กลับหน้าแรก
-          </Link>
-        ) : (
-          <Link
-            to="/lesson/$lessonId/$step"
-            params={stepParams(stepNumber + 1)}
-            className={`${buttonClass('primary')} ms-auto`}
-          >
-            ถัดไป
-            <span aria-hidden="true">→</span>
-          </Link>
-        )}
-      </nav>
+      <FeedbackToast
+        feedback={feedback}
+        className="fixed inset-x-0 bottom-above-bar z-30 flex justify-center px-(--space-md) lg:bottom-(--space-xl)"
+      />
     </div>
   )
 }
 
-function HomeIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="size-6"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 11.5 12 4l9 7.5" />
-      <path d="M5.5 10v9.5h13V10" />
-      <path d="M10 19.5v-5h4v5" />
-    </svg>
-  )
+/** +1 when moving to a later Step, -1 when going back; drives the slide direction. */
+function useStepDirection(stepNumber: number) {
+  const [previousStep, setPreviousStep] = useState(stepNumber)
+  const [direction, setDirection] = useState(1)
+  if (stepNumber !== previousStep) {
+    setDirection(stepNumber > previousStep ? 1 : -1)
+    setPreviousStep(stepNumber)
+  }
+  return direction
 }
