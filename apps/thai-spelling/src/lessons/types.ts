@@ -29,4 +29,6 @@ export type Lesson = {
   /** Teacher introduction played on the cover Step. */
   intro: AudioClip
   vocabulary: readonly VocabularyWord[]
+  /** The rhyme read on Step 7, one clip per line, in reading order. */
+  rhyme: readonly AudioClip[]
 }

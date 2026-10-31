@@ -36,4 +36,8 @@ export const maeKong = {
     word('ดัง', 'dang', 'loudspeaker'),
     word('ค้างคาว', 'khang-khao', 'bat'),
   ],
+  rhyme: ['ลิงน้อยนั่งมอง', 'ช้างร้องเสียงดัง', 'นกบินกลับรัง', 'ฟังเพลงเพลินใจ'].map((text, i) => ({
+    id: `rhyme/line-0${i + 1}`,
+    text,
+  })),
 } as const satisfies Lesson
