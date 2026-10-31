@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { audioLog, open } from './audio-stub.ts'
+import { audioLog, open } from './audioStub.js'
 
 const words = ['ลิง', 'ช้าง', 'รัง', 'กางเกง']
 const card = (page: Page, word: string) => page.getByRole('list').getByRole('button', { name: new RegExp(`^${word} `) })

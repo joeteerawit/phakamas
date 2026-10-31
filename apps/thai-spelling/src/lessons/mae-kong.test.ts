@@ -57,6 +57,16 @@ describe('mae-kong lesson data', () => {
     ])
   })
 
+  it('practises the 5 Target Words in Step 3 order, each with its own picture and audio', () => {
+    expect(maeKong.listenAndRepeat.map(({ word, image, audio }) => [word, image, audio.id])).toEqual([
+      ['ลิง', '/assets/images/vocabulary/monkey_3d.png', 'vocabulary/ling'],
+      ['ช้าง', '/assets/images/vocabulary/elephant_3d.png', 'vocabulary/chang'],
+      ['รัง', '/assets/images/vocabulary/nest_with_eggs_3d.png', 'vocabulary/rang'],
+      ['กางเกง', '/assets/images/vocabulary/jeans_3d.png', 'vocabulary/kang-keng'],
+      ['ดัง', '/assets/images/vocabulary/loudspeaker_3d.png', 'vocabulary/dang'],
+    ])
+  })
+
   it('marks every final ง by explicit per-syllable position, both in กางเกง (spec Page 04, TC-005)', () => {
     const { spotting } = maeKong
     expect(spotting.heading).toBe('มาตราแม่กง (ง) มี ง เป็นตัวสะกด')
@@ -73,5 +83,6 @@ describe('mae-kong lesson data', () => {
       ['vocabulary/rang', 'รั[ง]'],
       ['vocabulary/kang-keng', 'กา[ง]|เก[ง]'],
     ])
+    for (const { syllables, audio } of spotting.words) expect(syllables.map(({ text }) => text).join('')).toBe(audio.text)
   })
 })

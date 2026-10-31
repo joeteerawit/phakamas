@@ -1,12 +1,12 @@
 import type { Page } from '@playwright/test'
 
-type StubOptions = {
+export type StubOptions = {
   /** ok: the mp3 plays; missing: play() rejects; pending: play() never settles. */
   mp3: 'ok' | 'missing' | 'pending'
   thaiVoice: boolean
 }
 
-type AudioStub = {
+export type AudioStub = {
   log: string[]
   opts: StubOptions
   /** Ends whatever is playing, as the browser would. */
@@ -83,3 +83,4 @@ export const setStub = (page: Page, opts: Partial<StubOptions>) =>
   page.evaluate((o) => Object.assign((window as unknown as { __audio: AudioStub }).__audio.opts, o), opts)
 export const endCurrent = (page: Page) =>
   page.evaluate(() => (window as unknown as { __audio: AudioStub }).__audio.finish())
+
