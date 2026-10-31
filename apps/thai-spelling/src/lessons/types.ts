@@ -20,6 +20,14 @@ export type VocabularyWord = {
   audio: AudioClip
 }
 
+/** The word-filling Activity: drag or tap bank words into the blank under each picture. */
+export type WordFilling = {
+  /** Word Bank, in display order. */
+  bank: readonly string[]
+  /** Pictures in display order; `answer` is the bank word that belongs in its blank. */
+  pictures: readonly { image: string; answer: string }[]
+}
+
 /** A complete course for one final-consonant group (มาตราตัวสะกด). */
 export type Lesson = {
   id: string
@@ -29,4 +37,5 @@ export type Lesson = {
   /** Teacher introduction played on the cover Step. */
   intro: AudioClip
   vocabulary: readonly VocabularyWord[]
+  wordFilling: WordFilling
 }

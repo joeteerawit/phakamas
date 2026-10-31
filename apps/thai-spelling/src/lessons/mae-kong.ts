@@ -1,8 +1,10 @@
 import type { Lesson, VocabularyWord } from './types'
 
-const word = (text: string, slug: string, image: string): VocabularyWord => ({
+const image = (name: string) => `/assets/images/vocabulary/${name}_3d.png`
+
+const word = (text: string, slug: string, picture: string): VocabularyWord => ({
   word: text,
-  image: `/assets/images/vocabulary/${image}_3d.png`,
+  image: image(picture),
   audio: { id: `vocabulary/${slug}`, text },
 })
 
@@ -36,4 +38,16 @@ export const maeKong = {
     word('ดัง', 'dang', 'loudspeaker'),
     word('ค้างคาว', 'khang-khao', 'bat'),
   ],
+  // Pictures are shuffled against the bank so the order gives nothing away.
+  wordFilling: {
+    bank: ['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'ดัง', 'ค้างคาว'],
+    pictures: [
+      { image: image('elephant'), answer: 'ช้าง' },
+      { image: image('loudspeaker'), answer: 'ดัง' },
+      { image: image('monkey'), answer: 'ลิง' },
+      { image: image('bat'), answer: 'ค้างคาว' },
+      { image: image('nest_with_eggs'), answer: 'รัง' },
+      { image: image('jeans'), answer: 'กางเกง' },
+    ],
+  },
 } as const satisfies Lesson

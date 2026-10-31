@@ -56,4 +56,11 @@ describe('mae-kong lesson data', () => {
       ['ค้างคาว', 'vocabulary/khang-khao', 'ค้างคาว'],
     ])
   })
+
+  it('word filling: 6 bank words, each the answer of exactly one picture', () => {
+    const { bank, pictures } = maeKong.wordFilling
+    expect(bank).toEqual(['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'ดัง', 'ค้างคาว'])
+    expect(pictures.map((p) => p.answer).toSorted()).toEqual([...bank].sort())
+    expect(pictures.map((p) => p.answer)).not.toEqual(bank)
+  })
 })
