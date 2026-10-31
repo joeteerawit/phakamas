@@ -68,6 +68,14 @@ export type RhymeMatching = {
   sounds: { correct: AudioClip; completed: AudioClip }
 }
 
+/** A sentence on Step 9, illustrated by several pictures side by side. */
+export type Sentence = {
+  /** Fluent Emoji 3D pictures under /assets/images/vocabulary/. */
+  images: readonly string[]
+  /** `text` is the sentence shown on its card. */
+  audio: AudioClip
+}
+
 /** A complete course for one final-consonant group (มาตราตัวสะกด). */
 export type Lesson = {
   id: string
@@ -85,4 +93,6 @@ export type Lesson = {
   rhymeMatching: RhymeMatching
   /** The rhyme read on Step 7, one clip per line, in reading order. */
   rhyme: readonly AudioClip[]
+  /** Step 9 ฝึกอ่านประโยค, in display order. */
+  sentences: readonly Sentence[]
 }

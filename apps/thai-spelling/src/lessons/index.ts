@@ -6,6 +6,7 @@ export type {
   Lesson,
   LessonStep,
   RhymeMatching,
+  Sentence,
   SpottingWord,
   VocabularyWord,
   WordChoice,

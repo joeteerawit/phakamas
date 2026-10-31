@@ -84,3 +84,39 @@ export const setStub = (page: Page, opts: Partial<StubOptions>) =>
 export const endCurrent = (page: Page) =>
   page.evaluate(() => (window as unknown as { __audio: AudioStub }).__audio.finish())
 
+export type Mic = 'allow' | 'deny'
+
+/** Fakes getUserMedia and MediaRecorder; events go to the shared audio stub log. */
+export function stubMic(mic: Mic) {
+  const log = (entry: string) => (window as unknown as { __audio: { log: string[] } }).__audio.log.push(entry)
+
+  class FakeRecorder {
+    state = 'inactive'
+    mimeType = 'audio/webm'
+    ondataavailable: ((event: { data: Blob }) => void) | null = null
+    onstop: (() => void) | null = null
+    start() {
+      log('record:start')
+      this.state = 'recording'
+    }
+    stop() {
+      if (this.state === 'inactive') return
+      log('record:stop')
+      this.state = 'inactive'
+      this.ondataavailable?.({ data: new Blob(['voice'], { type: 'audio/webm' }) })
+      this.onstop?.()
+    }
+  }
+
+  Object.assign(window, { MediaRecorder: FakeRecorder })
+  Object.defineProperty(navigator, 'mediaDevices', {
+    configurable: true,
+    value: {
+      getUserMedia: async () => {
+        log('mic:request')
+        if (mic === 'deny') throw new DOMException('denied', 'NotAllowedError')
+        return { getTracks: () => [{ stop: () => log('mic:release') }] }
+      },
+    },
+  })
+}

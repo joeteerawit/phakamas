@@ -17,6 +17,7 @@ import { WordFillingStep } from './WordFillingStep'
 import { RhymeMatchingStep } from './RhymeMatchingStep'
 import { RhymeStep } from './RhymeStep'
 import { SummaryStep } from './SummaryStep'
+import { SentenceStep } from './SentenceStep'
 
 type StepContentProps = {
   lesson: Lesson
@@ -39,6 +40,7 @@ export function StepContent({ lesson, stepNumber, onFeedback }: StepContentProps
   if (stepNumber === 8) return <RhymeMatchingStep lesson={lesson} title={step.title} onFeedback={onFeedback} />
   if (stepNumber === 7) return <RhymeStep lesson={lesson} title={step.title} />
   if (stepNumber === 10) return <SummaryStep lesson={lesson} title={step.title} />
+  if (stepNumber === 9) return <SentenceStep lesson={lesson} title={step.title} />
 
   return (
     <div className="flex flex-1 flex-col items-center gap-(--space-xl) text-center">

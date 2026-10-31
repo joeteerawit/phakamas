@@ -118,7 +118,7 @@ export function RhymeStep({ lesson, title }: { lesson: Lesson; title: string }) 
   )
 }
 
-const recorderErrors = {
+export const recorderErrors = {
   denied: 'ยังไม่ได้อนุญาตให้ใช้ไมโครโฟน อนุญาตในเบราว์เซอร์แล้วกดลองอีกครั้งได้ ระหว่างนี้ฟังครูอ่านต่อได้เลย',
   unsupported: 'อุปกรณ์นี้ใช้ไมโครโฟนบันทึกเสียงไม่ได้ ฟังครูอ่านและอ่านตามได้เลย',
 }
