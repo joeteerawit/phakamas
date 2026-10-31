@@ -5,7 +5,7 @@ const MAE_KONG = ['ลิง', 'ช้าง', 'รัง', 'กางเกง'
 
 const nextLink = (page: Page) => page.getByRole('link', { name: 'ถัดไป' })
 const backLink = (page: Page) => page.getByRole('link', { name: 'ย้อนกลับ' })
-const homeLink = (page: Page) => page.getByRole('link', { name: 'กลับไปหน้าปก' })
+const homeLink = (page: Page) => page.getByRole('link', { name: 'กลับไปขั้นแรก' })
 const dialog = (page: Page) => page.getByRole('dialog')
 const choice = (page: Page, word: string) => page.getByRole('button', { name: new RegExp(`^${word}(\\s|$)`) })
 const check = (page: Page) => page.getByRole('button', { name: 'ตรวจคำตอบ' })
@@ -41,9 +41,10 @@ test('TC-019: Home with unchecked answers asks first; staying keeps the work', a
   await expect(choice(page, 'ลิง')).toHaveAttribute('aria-pressed', 'true')
 
   await homeLink(page).click()
-  await dialog(page).getByRole('button', { name: 'ออกจากหน้านี้' }).click()
+  await dialog(page).getByRole('button', { name: 'ออกจากขั้นนี้' }).click()
   await expect(page).toHaveURL(/\/1$/)
-  expect(await activities(page)).toEqual({})
+  // Touched but unchecked: in progress, never skipped.
+  expect(await activities(page)).toEqual({ wordSelection: expect.objectContaining({ status: 'in_progress', bestScore: 0 }) })
 })
 
 test('Home leaves straight away once the answers are checked', async ({ page }) => {

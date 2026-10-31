@@ -100,6 +100,16 @@ test.describe('Step 8 rhyme matching', () => {
     expect(await activity(page)).toMatchObject({ status: 'skipped', bestScore: 0, maxScore: 3 })
   })
 
+  test('matching some pairs then ถัดไป records the partial score, not skipped', async ({ page }) => {
+    await open(page, 8)
+    await pair(page, 'ดัง', 'ฟัง')
+    await expect(word(page, 'ดัง')).toContainText('จับคู่แล้ว')
+    expect(await activity(page)).toMatchObject({ status: 'in_progress', bestScore: 0 })
+    await page.getByRole('link', { name: 'ถัดไป' }).click()
+    await expect(page).toHaveURL(/\/9$/)
+    expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 1, maxScore: 3, attemptCount: 1 })
+  })
+
   test('no horizontal scroll at 360px and words are at least 44px', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 740 })
     await open(page, 8)

@@ -37,10 +37,16 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
   // AUD-004: leaving a Step stops its sound.
   useEffect(() => stopAudio, [stepNumber])
 
-  // Spec §4: only ถัดไป without checking marks this Step's Activity skipped; Back and Home never do.
+  // Spec §4: ถัดไป completes a plain Step; on an Activity it saves partial work or, untouched, marks it skipped.
+  // Back and Home never do either.
   const activity = lessonActivities(lesson).find((a) => a.step === stepNumber)
-  const skipActivity = useLessonSession((state) => state.skipActivity)
-  const skip = () => activity && skipActivity(activity.id, activity.maxScore)
+  const leaveViaNext = () => {
+    const { completeStep, recordActivityCheck, skipActivity } = useLessonSession.getState()
+    if (!activity) return completeStep(stepNumber)
+    const { partial } = useUncheckedWork.getState()
+    if (partial) recordActivityCheck(activity.id, partial.score, activity.maxScore, partial.answers)
+    else skipActivity(activity.id, activity.maxScore)
+  }
 
   // TC-019: Home asks first while the Activity has unchecked answers.
   const unchecked = useUncheckedWork((state) => state.unchecked)
@@ -57,7 +63,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
             <Link
               to="/lesson/$lessonId/$step"
               params={stepParams(1)}
-              aria-label="กลับไปหน้าปก"
+              aria-label="กลับไปขั้นแรก"
               className={iconButtonClass()}
               onClick={(event) => {
                 if (!unchecked) return
@@ -141,7 +147,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
                 <Link
                   to="/lesson/$lessonId/$step"
                   params={stepParams(stepNumber + 1)}
-                  onClick={skip}
+                  onClick={leaveViaNext}
                   className={`${buttonClass('primary', 'bar')} col-start-2 lg:ms-auto`}
                 >
                   ถัดไป
@@ -155,8 +161,8 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
 
       <ConfirmDialog
         open={confirmHome}
-        message="ยังไม่ได้ตรวจคำตอบ จะออกจากหน้านี้ไหม?"
-        confirmLabel="ออกจากหน้านี้"
+        message="ยังไม่ได้ตรวจคำตอบ จะออกจากขั้นนี้ไหม?"
+        confirmLabel="ออกจากขั้นนี้"
         cancelLabel="ทำต่อ"
         onCancel={() => setConfirmHome(false)}
         onConfirm={() => {

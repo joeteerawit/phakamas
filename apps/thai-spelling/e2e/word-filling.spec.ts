@@ -115,3 +115,9 @@ test('no horizontal scroll at 360px', async ({ page }) => {
   await check(page).click()
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360)
 })
+
+test('each picture has a neutral screen-reader label that does not give the answer away', async ({ page }) => {
+  const pictures = page.getByRole('img', { name: /^ภาพที่ \d$/ })
+  await expect(pictures).toHaveCount(6)
+  for (let n = 1; n <= 6; n++) await expect(pictures.nth(n - 1)).toHaveAccessibleName(`ภาพที่ ${n}`)
+})

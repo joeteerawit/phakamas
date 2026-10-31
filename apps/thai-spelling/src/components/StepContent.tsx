@@ -1,16 +1,16 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { Check, ChevronRight, Circle, ClipboardCheck, Eye, RotateCcw, Square, Star, Volume2, X, type LucideIcon } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion, type Variants } from 'motion/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ComponentType } from 'react'
 import { playClip, stopAudio, useAudio, useClipStatus, type AudioStatus } from '../audio/audioManager'
-import type { AudioClip, Lesson, SpottingWord, VocabularyWord } from '../lessons'
+import type { AudioClip, SpottingWord, VocabularyWord } from '../lessons'
+import { scoreFeedback, useClearFeedbackOnLeave } from '../activities/feedback'
 import { checkWordSelection } from '../activities/wordSelection'
-import { useReportUncheckedWork } from '../session/activities'
+import { activitySteps, lessonActivity, useReportUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
 import { buttonClass, cx } from './clay/buttonClass'
 import { Card, cardClass, toneAt, type CardTone } from './clay/Card'
-import type { Feedback } from './clay/FeedbackToast'
 import { WoodenSign } from './clay/WoodenSign'
 import { Mascot } from './Mascot'
 import { WordFillingStep } from './WordFillingStep'
@@ -18,54 +18,41 @@ import { RhymeMatchingStep } from './RhymeMatchingStep'
 import { RhymeStep } from './RhymeStep'
 import { SummaryStep } from './SummaryStep'
 import { SentenceStep } from './SentenceStep'
+import type { ActivityStepProps, StepProps } from './stepProps'
+import { useRestartLesson } from './useRestartLesson'
 
-type StepContentProps = {
-  lesson: Lesson
-  stepNumber: number
-  /** Activity Steps report feedback here for the layout's toast. */
-  onFeedback: (feedback: Feedback | null) => void
+type StepContentProps = Omit<ActivityStepProps, 'title'> & { stepNumber: number }
+
+/** Each Step's component, in Step order; Activity Steps are numbered in session/activities. */
+const stepComponents: Record<number, ComponentType<ActivityStepProps>> = {
+  1: CoverStep,
+  2: VocabularyStep,
+  3: ListenRepeatStep,
+  4: SpottingStep,
+  [activitySteps.wordSelection]: WordSelectionStep,
+  [activitySteps.wordFilling]: WordFillingStep,
+  7: RhymeStep,
+  [activitySteps.rhymeMatching]: RhymeMatchingStep,
+  9: SentenceStep,
+  10: SummaryStep,
 }
 
-/** Content area for one Step. Real Step content lands in later tickets. */
+/** Content area for one Step. */
 export function StepContent({ lesson, stepNumber, onFeedback }: StepContentProps) {
   const step = lesson.steps[stepNumber - 1]
-  if (!step) return null
-
-  if (stepNumber === 1) return <CoverStep lesson={lesson} title={step.title} />
-  if (stepNumber === 2) return <VocabularyStep lesson={lesson} title={step.title} />
-  if (stepNumber === 3) return <ListenRepeatStep words={lesson.listenAndRepeat} title={step.title} />
-  if (stepNumber === 4) return <SpottingStep lesson={lesson} title={step.title} />
-  if (stepNumber === 5) return <WordSelectionStep lesson={lesson} title={step.title} onFeedback={onFeedback} />
-  if (stepNumber === 6) return <WordFillingStep lesson={lesson} title={step.title} onFeedback={onFeedback} />
-  if (stepNumber === 8) return <RhymeMatchingStep lesson={lesson} title={step.title} onFeedback={onFeedback} />
-  if (stepNumber === 7) return <RhymeStep lesson={lesson} title={step.title} />
-  if (stepNumber === 10) return <SummaryStep lesson={lesson} title={step.title} />
-  if (stepNumber === 9) return <SentenceStep lesson={lesson} title={step.title} />
-
-  return (
-    <div className="flex flex-1 flex-col items-center gap-(--space-xl) text-center">
-      <WoodenSign>{step.title}</WoodenSign>
-      <Card tone={toneAt(stepNumber)} className="flex w-full max-w-md flex-col items-center gap-(--space-sm)">
-        <Mascot size="sm" />
-        <p className="font-heading text-heading font-semibold">กำลังพัฒนา</p>
-      </Card>
-    </div>
-  )
+  const Step = stepComponents[stepNumber]
+  if (!step || !Step) return null
+  return <Step lesson={lesson} title={step.title} onFeedback={onFeedback} />
 }
 
-function CoverStep({ lesson, title }: { lesson: Lesson; title: string }) {
+function CoverStep({ lesson, title }: StepProps) {
   // Bumped on each tap; the Mascot waves once per bump.
   const [waveCount, setWaveCount] = useState(0)
   const wave = () => setWaveCount((count) => count + 1)
-  const navigate = useNavigate()
-  const resetSession = useLessonSession((state) => state.resetSession)
+  const restart = useRestartLesson(lesson.id)
   const resumeStep = useLessonSession(({ session }) =>
     session?.lessonId === lesson.id && session.currentStep > 1 ? session.currentStep : null,
   )
-  const restart = () => {
-    resetSession()
-    void navigate({ to: '/lesson/$lessonId/$step', params: { lessonId: lesson.id, step: '2' } })
-  }
 
   return (
     <section className="flex flex-1 flex-col items-center justify-center gap-(--space-md) text-center lg:flex-row lg:gap-(--space-xl) lg:text-start">
@@ -137,7 +124,7 @@ const cardLabels: Record<AudioStatus | 'visited', { icon: LucideIcon; text: stri
 }
 
 /** Step 2: picture cards; tapping a card highlights it and plays its word. */
-function VocabularyStep({ lesson, title }: { lesson: Lesson; title: string }) {
+function VocabularyStep({ lesson, title }: StepProps) {
   const [visited, setVisited] = useState<ReadonlySet<string>>(() => new Set())
 
   return (
@@ -216,7 +203,8 @@ const wordStatusText: Partial<Record<AudioStatus, string>> = {
  * Step 3: one big word at a time, played only on demand. When its sound
  * ends the Mascot says ถึงตาหนูอ่านแล้ว; hearing every word earns a star.
  */
-function ListenRepeatStep({ words, title }: { words: readonly VocabularyWord[]; title: string }) {
+function ListenRepeatStep({ lesson, title }: StepProps) {
+  const words = lesson.listenAndRepeat
   const reduceMotion = useReducedMotion()
   const [index, setIndex] = useState(0)
   const [heard, setHeard] = useState<ReadonlySet<string>>(() => new Set())
@@ -348,7 +336,7 @@ function ListenRepeatStep({ words, title }: { words: readonly VocabularyWord[]; 
 }
 
 /** Step 4: tap a card (or แสดงตัวสะกด for all) to highlight each final ง at its data position. */
-function SpottingStep({ lesson, title }: { lesson: Lesson; title: string }) {
+function SpottingStep({ lesson, title }: StepProps) {
   const { heading, explanation, words } = lesson.spotting
   const [showAll, setShowAll] = useState(false)
   const [tapped, setTapped] = useState<ReadonlySet<string>>(() => new Set())
@@ -441,27 +429,18 @@ function SpottingCard({ item, tone, highlighted, onPlay }: SpottingCardProps) {
   )
 }
 
-const WORD_SELECTION_ID = 'wordSelection'
-
-type WordSelectionStepProps = {
-  lesson: Lesson
-  title: string
-  onFeedback: StepContentProps['onFeedback']
-}
-
 /** Step 5: select the words of this มาตรา, ตรวจคำตอบ scores every choice, เริ่มใหม่ clears. */
-function WordSelectionStep({ lesson, title, onFeedback }: WordSelectionStepProps) {
+function WordSelectionStep({ lesson, title, onFeedback }: ActivityStepProps) {
   const { question, choices, praise } = lesson.wordSelection
-  const maxScore = choices.length
+  const activity = lessonActivity(lesson, 'wordSelection')
   const [selected, setSelected] = useState<ReadonlySet<string>>(() => new Set())
   // Words flagged by the last check; editing a word clears its flag.
   const [wrong, setWrong] = useState<ReadonlySet<string>>(() => new Set())
   const recordActivityCheck = useLessonSession((state) => state.recordActivityCheck)
   // Selections changed since the last check; Home asks before throwing them away.
   const [unchecked, setUnchecked] = useState(false)
-  useReportUncheckedWork(unchecked)
-
-  useEffect(() => () => onFeedback(null), [onFeedback])
+  useReportUncheckedWork(activity, unchecked)
+  useClearFeedbackOnLeave(onFeedback)
 
   const toggle = (word: string) => {
     setSelected((old) => {
@@ -482,14 +461,9 @@ function WordSelectionStep({ lesson, title, onFeedback }: WordSelectionStepProps
     const result = checkWordSelection(choices, selected)
     setWrong(new Set(result.wrong))
     setUnchecked(false)
-    recordActivityCheck(WORD_SELECTION_ID, result.score, maxScore, [...selected])
-    const scoreText = `ได้ ${result.score}/${maxScore} คะแนน`
-    if (result.score === maxScore) {
-      onFeedback({ kind: 'correct', message: `เก่งมาก! ${scoreText}` })
-      playClip(praise)
-    } else {
-      onFeedback({ kind: 'wrong', message: `${scoreText} ลองใหม่นะ` })
-    }
+    recordActivityCheck(activity.id, result.score, activity.maxScore, [...selected])
+    onFeedback(scoreFeedback(result.score, activity.maxScore, 'ลองใหม่นะ'))
+    if (result.score === activity.maxScore) playClip(praise)
   }
 
   const restart = () => {

@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { useLessonSession } from './lessonSession'
 
 const session = () => useLessonSession.getState().session
-const { visitStep, resetSession, recordActivityCheck, skipActivity } = useLessonSession.getState()
+const { visitStep, resetSession, recordActivityCheck, skipActivity, completeStep, markActivityInProgress } =
+  useLessonSession.getState()
 const activity = (id: string) => session()?.activities[id]
 
 beforeEach(() => {
@@ -115,5 +116,49 @@ describe('Lesson Session store', () => {
     skipActivity('rhymeMatching', 3)
     recordActivityCheck('rhymeMatching', 3, 3, { mistakes: 0 })
     expect(activity('rhymeMatching')).toMatchObject({ status: 'completed', bestScore: 3, attemptCount: 1 })
+  })
+
+  it('checking an Activity completes its Step', () => {
+    visitStep('mae-kong', 6)
+    recordActivityCheck('wordFilling', 2, 6, [])
+    expect(session()?.completedSteps).toEqual([6])
+  })
+
+  it('leaving a non-Activity Step via ถัดไป completes it, once', () => {
+    visitStep('mae-kong', 3)
+    completeStep(3)
+    completeStep(3)
+    expect(session()?.completedSteps).toEqual([3])
+  })
+
+  it('skipping an Activity does not complete its Step', () => {
+    visitStep('mae-kong', 8)
+    skipActivity('rhymeMatching', 3)
+    expect(session()?.completedSteps ?? []).toEqual([])
+  })
+
+  it('a Session stored before completedSteps existed still loads and completes Steps', () => {
+    useLessonSession.setState({
+      session: { lessonId: 'mae-kong', currentStep: 4, visitedSteps: [2, 3, 4], startedAt: '2026-01-01', activities: {} },
+    })
+    completeStep(4)
+    expect(session()?.completedSteps).toEqual([4])
+  })
+
+  it('interacting without checking marks the Activity in_progress', () => {
+    visitStep('mae-kong', 5)
+    markActivityInProgress('wordSelection', 7)
+    expect(activity('wordSelection')).toEqual({ status: 'in_progress', bestScore: 0, maxScore: 7, attemptCount: 0, answers: null })
+  })
+
+  it('in_progress never overwrites a checked result, and ถัดไป unchecked still skips it', () => {
+    visitStep('mae-kong', 5)
+    recordActivityCheck('wordSelection', 4, 7, [])
+    markActivityInProgress('wordSelection', 7)
+    expect(activity('wordSelection')).toMatchObject({ status: 'completed', bestScore: 4 })
+
+    markActivityInProgress('wordFilling', 6)
+    skipActivity('wordFilling', 6)
+    expect(activity('wordFilling')).toMatchObject({ status: 'skipped', bestScore: 0 })
   })
 })

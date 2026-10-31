@@ -1,7 +1,6 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { ChevronRight, RotateCcw, Star } from 'lucide-react'
 import { useState } from 'react'
-import type { Lesson } from '../lessons'
 import { lessonActivities } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
@@ -10,12 +9,13 @@ import { Card, cardClass, toneAt } from './clay/Card'
 import { ConfirmDialog } from './clay/ConfirmDialog'
 import { WoodenSign } from './clay/WoodenSign'
 import { Mascot } from './Mascot'
+import type { StepProps } from './stepProps'
+import { useRestartLesson } from './useRestartLesson'
 
 /** Step 10: review key words and rhyme pairs, each Activity's bestScore and the total. Reading Assessment is Phase 2. */
-export function SummaryStep({ lesson, title }: { lesson: Lesson; title: string }) {
+export function SummaryStep({ lesson, title }: StepProps) {
   const results = useLessonSession((state) => state.session?.activities)
-  const resetSession = useLessonSession((state) => state.resetSession)
-  const navigate = useNavigate()
+  const restart = useRestartLesson(lesson.id)
   const [confirmReset, setConfirmReset] = useState(false)
 
   const activities = lessonActivities(lesson).map((activity) => {
@@ -56,7 +56,7 @@ export function SummaryStep({ lesson, title }: { lesson: Lesson; title: string }
       </Card>
 
       <Card tone="yellow" className="flex w-full max-w-3xl flex-col gap-(--space-sm)">
-        <h2 id="summary-scores" className="font-heading text-heading font-semibold">คะแนนเกม</h2>
+        <h2 id="summary-scores" className="font-heading text-heading font-semibold">คะแนนกิจกรรม</h2>
         <ul aria-labelledby="summary-scores" className="flex flex-col gap-(--space-sm)">
           {activities.map((activity) => (
             <li
@@ -103,10 +103,7 @@ export function SummaryStep({ lesson, title }: { lesson: Lesson; title: string }
         confirmLabel="ล้างและเริ่มใหม่"
         cancelLabel="ยกเลิก"
         onCancel={() => setConfirmReset(false)}
-        onConfirm={() => {
-          resetSession()
-          void navigate({ to: '/lesson/$lessonId/$step', params: { lessonId: lesson.id, step: '2' } })
-        }}
+        onConfirm={restart}
       />
     </section>
   )

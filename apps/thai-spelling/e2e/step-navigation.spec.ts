@@ -58,7 +58,7 @@ test('Step 10 shows กลับหน้าแรก instead of Next, returning
 
 test('Home button returns to Step 1', async ({ page }) => {
   await page.goto('/lesson/mae-kong/5')
-  await page.getByRole('link', { name: 'กลับไปหน้าปก' }).click()
+  await page.getByRole('link', { name: 'กลับไปขั้นแรก' }).click()
   await expectStep(page, 1, 'หน้าปก')
 })
 

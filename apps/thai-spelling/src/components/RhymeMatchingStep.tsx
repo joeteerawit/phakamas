@@ -2,16 +2,17 @@ import { Check, RotateCcw, Star, X } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react'
 import { playClip } from '../audio/audioManager'
-import type { Lesson, RhymeMatching } from '../lessons'
-import { useReportUncheckedWork } from '../session/activities'
+import type { RhymeMatching } from '../lessons'
+import { useClearFeedbackOnLeave } from '../activities/feedback'
+import { lessonActivity, useReportUncheckedWork, useUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
 import { cx } from './clay/buttonClass'
 import { cardClass } from './clay/Card'
 import type { Feedback } from './clay/FeedbackToast'
 import { WoodenSign } from './clay/WoodenSign'
+import type { ActivityStepProps } from './stepProps'
 
-const ACTIVITY_ID = 'rhymeMatching'
 const WRONG_FLASH_MS = 700
 const DRAG_THRESHOLD_PX = 8
 const TOAST_MS = 2500
@@ -34,16 +35,9 @@ function shuffleRights(pairs: RhymeMatching['pairs']) {
 }
 
 /** Step 8: link each left word to its rhyme by tap-tap (primary, keyboard too) or by dragging a line. */
-export function RhymeMatchingStep({
-  lesson,
-  title,
-  onFeedback,
-}: {
-  lesson: Lesson
-  title: string
-  onFeedback: (feedback: Feedback | null) => void
-}) {
+export function RhymeMatchingStep({ lesson, title, onFeedback }: ActivityStepProps) {
   const { pairs, sounds } = lesson.rhymeMatching
+  const activity = lessonActivity(lesson, 'rhymeMatching')
   const [rights, setRights] = useState(() => shuffleRights(pairs))
   const [matched, setMatched] = useState<ReadonlySet<string>>(() => new Set())
   const [selected, setSelected] = useState<{ side: Side; word: string } | null>(null)
@@ -54,8 +48,15 @@ export function RhymeMatchingStep({
 
   const done = matched.size === pairs.length
   const lockedPairs = pairs.filter((pair) => matched.has(pair.left))
-  // A game started but not finished; Home asks before throwing it away.
-  useReportUncheckedWork(!done && (matched.size > 0 || mistakes > 0))
+  // An Activity started but not finished; Home asks before throwing it away.
+  const started = !done && (matched.size > 0 || mistakes > 0)
+  useReportUncheckedWork(activity, started)
+  // ถัดไป before finishing records the pairs matched so far (spec: ถัดไป บันทึกผล); untouched stays skipped.
+  useEffect(() => {
+    if (!started) return
+    useUncheckedWork.setState({ partial: { score: matched.size, answers: { mistakes } } })
+    return () => useUncheckedWork.setState({ partial: null })
+  }, [started, matched.size, mistakes])
   const isLocked = (side: Side, word: string) => lockedPairs.some((pair) => pair[side] === word)
 
   // The toast (shown by StepLayout) hides after a moment so it never keeps covering the board or the stars.
@@ -67,13 +68,8 @@ export function RhymeMatchingStep({
   }, [feedback, onFeedback])
 
   const wrongTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
-  useEffect(
-    () => () => {
-      clearTimeout(wrongTimer.current)
-      onFeedback(null)
-    },
-    [onFeedback],
-  )
+  useEffect(() => () => clearTimeout(wrongTimer.current), [])
+  useClearFeedbackOnLeave(onFeedback)
 
   const attempt = (left: string, right: string) => {
     setSelected(null)
@@ -92,7 +88,7 @@ export function RhymeMatchingStep({
       setFeedback({ kind: 'correct', message: `${left} คล้องจองกับ ${right}` })
       return
     }
-    recordActivityCheck(ACTIVITY_ID, pairs.length, pairs.length, { mistakes })
+    recordActivityCheck(activity.id, pairs.length, activity.maxScore, { mistakes })
     playClip(sounds.completed)
     setFeedback({ kind: 'correct', message: 'เก่งมาก! จับคู่ถูกครบแล้ว' })
   }

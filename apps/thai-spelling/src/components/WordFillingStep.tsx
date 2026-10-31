@@ -1,40 +1,32 @@
 import { Check, RotateCcw, X } from 'lucide-react'
-import { useEffect, useRef, useState, type PointerEvent } from 'react'
-import type { Lesson } from '../lessons'
-import { useReportUncheckedWork } from '../session/activities'
+import { useRef, useState, type PointerEvent } from 'react'
+import { scoreFeedback, useClearFeedbackOnLeave } from '../activities/feedback'
+import { lessonActivity, useReportUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
 import { buttonClass, cx } from './clay/buttonClass'
 import { cardClass, toneAt } from './clay/Card'
-import type { Feedback } from './clay/FeedbackToast'
 import { WoodenSign } from './clay/WoodenSign'
+import type { ActivityStepProps } from './stepProps'
 
-const ACTIVITY_ID = 'wordFilling'
 /** Pointer travel (px) before a press becomes a drag instead of a tap. */
 const DRAG_THRESHOLD = 8
-
-type WordFillingStepProps = {
-  lesson: Lesson
-  title: string
-  onFeedback: (feedback: Feedback | null) => void
-}
 
 /**
  * Step 6: place each bank word in the blank under its picture.
  * Tap-to-select (mouse, touch, keyboard) is the main path; Pointer-Events drag is a shortcut.
  */
-export function WordFillingStep({ lesson, title, onFeedback }: WordFillingStepProps) {
+export function WordFillingStep({ lesson, title, onFeedback }: ActivityStepProps) {
   const { bank, pictures } = lesson.wordFilling
-  const maxScore = pictures.length
+  const activity = lessonActivity(lesson, 'wordFilling')
   const [placed, setPlaced] = useState<(string | null)[]>(() => pictures.map(() => null))
   // null = not checked since the blank last changed.
   const [results, setResults] = useState<(boolean | null)[]>(() => pictures.map(() => null))
   const [selected, setSelected] = useState<string | null>(null)
   const recordActivityCheck = useLessonSession((state) => state.recordActivityCheck)
   // A placed word not checked since it moved; Home asks before throwing it away.
-  useReportUncheckedWork(placed.some((word, i) => word !== null && results[i] === null))
-
-  useEffect(() => () => onFeedback(null), [onFeedback])
+  useReportUncheckedWork(activity, placed.some((word, i) => word !== null && results[i] === null))
+  useClearFeedbackOnLeave(onFeedback)
 
   const update = (next: (string | null)[]) => {
     setResults((old) => old.map((result, i) => (next[i] === placed[i] ? result : null)))
@@ -55,12 +47,8 @@ export function WordFillingStep({ lesson, title, onFeedback }: WordFillingStepPr
     const score = next.filter(Boolean).length
     setResults(next)
     setSelected(null)
-    recordActivityCheck(ACTIVITY_ID, score, maxScore, placed)
-    onFeedback(
-      score === maxScore
-        ? { kind: 'correct', message: `เก่งมาก! ได้ ${score}/${maxScore} คะแนน` }
-        : { kind: 'wrong', message: `ได้ ${score}/${maxScore} คะแนน กดลองอีกครั้งเพื่อแก้ช่องที่ผิด` },
-    )
+    recordActivityCheck(activity.id, score, activity.maxScore, placed)
+    onFeedback(scoreFeedback(score, activity.maxScore, 'กดลองอีกครั้งเพื่อแก้ช่องที่ผิด'))
   }
   const retry = () => {
     setPlaced(placed.map((w, i) => (results[i] === false ? null : w)))
@@ -136,7 +124,7 @@ export function WordFillingStep({ lesson, title, onFeedback }: WordFillingStepPr
             >
               <img
                 src={picture.image}
-                alt=""
+                alt={`ภาพที่ ${i + 1}`}
                 width={256}
                 height={256}
                 draggable={false}

@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 
 const stepBadge = (page: Page) => page.getByText(/^ขั้น \d+\/10$/)
 const nextLink = (page: Page) => page.getByRole('link', { name: 'ถัดไป' })
-const homeLink = (page: Page) => page.getByRole('link', { name: 'กลับไปหน้าปก' })
+const homeLink = (page: Page) => page.getByRole('link', { name: 'กลับไปขั้นแรก' })
 const resumeLink = (page: Page) => page.getByRole('link', { name: /^เรียนต่อ/ })
 const restartButton = (page: Page) => page.getByRole('button', { name: 'เริ่มใหม่' })
 const startLink = (page: Page) => page.getByRole('link', { name: 'เริ่มเรียน' })
@@ -76,4 +76,19 @@ test('resume buttons fit at 360px with ≥44px targets and no horizontal scroll'
   }
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   expect(overflow).toBe(0)
+})
+
+test('ถัดไป completes non-Activity Steps; checking an Activity completes its Step', async ({ page }) => {
+  await page.goto('/lesson/mae-kong/3')
+  await nextLink(page).click()
+  await nextLink(page).click()
+  await expect(stepBadge(page)).toHaveText('ขั้น 5/10')
+  await page.getByRole('button', { name: /^ลิง/ }).click()
+  let stored = await page.evaluate(() => JSON.parse(localStorage.getItem('thai-spelling:lesson-session') ?? 'null'))
+  expect(stored.state.session.activities.wordSelection).toMatchObject({ status: 'in_progress' })
+  expect(stored.state.session.completedSteps).toEqual([3, 4])
+
+  await page.getByRole('button', { name: 'ตรวจคำตอบ' }).click()
+  stored = await page.evaluate(() => JSON.parse(localStorage.getItem('thai-spelling:lesson-session') ?? 'null'))
+  expect(stored.state.session.completedSteps).toEqual([3, 4, 5])
 })
