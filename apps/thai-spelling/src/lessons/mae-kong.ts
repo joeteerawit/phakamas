@@ -1,4 +1,4 @@
-import type { Lesson, VocabularyWord } from './types'
+import type { Lesson, VocabularyWord } from './types.ts'
 
 const word = (text: string, slug: string, image: string): VocabularyWord => ({
   word: text,
