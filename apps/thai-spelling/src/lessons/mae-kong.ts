@@ -1,8 +1,10 @@
 import type { AudioClip, Lesson, SpottingWord, VocabularyWord } from './types.ts'
 
-const word = (text: string, slug: string, image: string): VocabularyWord => ({
+const image = (name: string) => `/assets/images/vocabulary/${name}_3d.png`
+
+const word = (text: string, slug: string, picture: string): VocabularyWord => ({
   word: text,
-  image: `/assets/images/vocabulary/${image}_3d.png`,
+  image: image(picture),
   audio: { id: `vocabulary/${slug}`, text },
 })
 
@@ -49,5 +51,17 @@ export const maeKong = {
       text: 'เด็ก ๆ ลองสังเกตนะ คำว่า ลิง ช้าง รัง มีตัว ง อยู่ท้ายคำ เราเรียกว่าตัวสะกด คำที่มี ง เป็นตัวสะกด อยู่ในมาตราแม่กง ส่วนคำว่า กางเกง มีสองพยางค์ คือ กาง กับ เกง จึงมีตัว ง สะกดถึงสองตัวเลยจ้ะ',
     },
     words: [spot(ling, ['ลิง', 2]), spot(chang, ['ช้าง', 3]), spot(rang, ['รัง', 2]), spot(kangKeng, ['กาง', 2], ['เกง', 2])],
+  },
+  // Pictures are shuffled against the bank so the order gives nothing away.
+  wordFilling: {
+    bank: ['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'ดัง', 'ค้างคาว'],
+    pictures: [
+      { image: image('elephant'), answer: 'ช้าง' },
+      { image: image('loudspeaker'), answer: 'ดัง' },
+      { image: image('monkey'), answer: 'ลิง' },
+      { image: image('bat'), answer: 'ค้างคาว' },
+      { image: image('nest_with_eggs'), answer: 'รัง' },
+      { image: image('jeans'), answer: 'กางเกง' },
+    ],
   },
 } as const satisfies Lesson

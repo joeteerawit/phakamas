@@ -24,6 +24,10 @@ export type LessonSession = {
 type LessonSessionStore = {
   session: LessonSession | null
   visitStep: (lessonId: string, step: number) => void
+  /** A press of ตรวจคำตอบ: counts the attempt and keeps the best score. */
+  recordActivityCheck: (activityId: string, score: number, maxScore: number, answers: unknown) => void
+  /** Leaving an Activity unchecked: skipped, score 0. Never overwrites a checked result. */
+  skipActivity: (activityId: string, maxScore: number) => void
   resetSession: () => void
 }
 
@@ -46,6 +50,25 @@ export const useLessonSession = create<LessonSessionStore>()(
               visitedSteps: current.visitedSteps.includes(step) ? current.visitedSteps : [...current.visitedSteps, step],
             },
           }
+        }),
+      recordActivityCheck: (activityId, score, maxScore, answers) =>
+        set(({ session }) => {
+          if (!session) return {}
+          const old = session.activities[activityId]
+          const result: ActivityResult = {
+            status: 'completed',
+            bestScore: Math.max(old?.bestScore ?? 0, score),
+            maxScore,
+            attemptCount: (old?.attemptCount ?? 0) + 1,
+            answers,
+          }
+          return { session: { ...session, activities: { ...session.activities, [activityId]: result } } }
+        }),
+      skipActivity: (activityId, maxScore) =>
+        set(({ session }) => {
+          if (!session || session.activities[activityId]?.attemptCount) return {}
+          const result: ActivityResult = { status: 'skipped', bestScore: 0, maxScore, attemptCount: 0, answers: null }
+          return { session: { ...session, activities: { ...session.activities, [activityId]: result } } }
         }),
       resetSession: () => set({ session: null }),
     }),

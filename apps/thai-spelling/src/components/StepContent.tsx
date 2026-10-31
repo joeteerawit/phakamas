@@ -8,16 +8,20 @@ import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
 import { buttonClass, cx } from './clay/buttonClass'
 import { Card, cardClass, toneAt, type CardTone } from './clay/Card'
+import type { Feedback } from './clay/FeedbackToast'
 import { WoodenSign } from './clay/WoodenSign'
 import { Mascot } from './Mascot'
+import { WordFillingStep } from './WordFillingStep'
 
 type StepContentProps = {
   lesson: Lesson
   stepNumber: number
+  /** Activity Steps report feedback here for the layout's toast. */
+  onFeedback: (feedback: Feedback | null) => void
 }
 
 /** Content area for one Step. Real Step content lands in later tickets. */
-export function StepContent({ lesson, stepNumber }: StepContentProps) {
+export function StepContent({ lesson, stepNumber, onFeedback }: StepContentProps) {
   const step = lesson.steps[stepNumber - 1]
   if (!step) return null
 
@@ -25,6 +29,7 @@ export function StepContent({ lesson, stepNumber }: StepContentProps) {
   if (stepNumber === 2) return <VocabularyStep lesson={lesson} title={step.title} />
   if (stepNumber === 3) return <ListenRepeatStep words={lesson.listenAndRepeat} title={step.title} />
   if (stepNumber === 4) return <SpottingStep lesson={lesson} title={step.title} />
+  if (stepNumber === 6) return <WordFillingStep lesson={lesson} title={step.title} onFeedback={onFeedback} />
 
   return (
     <div className="flex flex-1 flex-col items-center gap-(--space-xl) text-center">

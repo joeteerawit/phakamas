@@ -85,4 +85,11 @@ describe('mae-kong lesson data', () => {
     ])
     for (const { syllables, audio } of spotting.words) expect(syllables.map(({ text }) => text).join('')).toBe(audio.text)
   })
+
+  it('word filling: 6 bank words, each the answer of exactly one picture', () => {
+    const { bank, pictures } = maeKong.wordFilling
+    expect(bank).toEqual(['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'ดัง', 'ค้างคาว'])
+    expect(pictures.map((p) => p.answer).toSorted()).toEqual([...bank].sort())
+    expect(pictures.map((p) => p.answer)).not.toEqual(bank)
+  })
 })
