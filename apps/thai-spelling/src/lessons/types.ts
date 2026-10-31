@@ -20,6 +20,25 @@ export type VocabularyWord = {
   audio: AudioClip
 }
 
+/** One syllable of a spotting word; `final` is the index of its final consonant in `text`. */
+export type Syllable = {
+  text: string
+  final: number
+}
+
+/** A word on the final-consonant Step. Positions are explicit, never found by searching. */
+export type SpottingWord = {
+  syllables: readonly Syllable[]
+  audio: AudioClip
+}
+
+/** The final-consonant spotting Step: heading, explanation narration and marked words. */
+export type Spotting = {
+  heading: string
+  explanation: AudioClip
+  words: readonly SpottingWord[]
+}
+
 /** A complete course for one final-consonant group (มาตราตัวสะกด). */
 export type Lesson = {
   id: string
@@ -29,4 +48,5 @@ export type Lesson = {
   /** Teacher introduction played on the cover Step. */
   intro: AudioClip
   vocabulary: readonly VocabularyWord[]
+  spotting: Spotting
 }

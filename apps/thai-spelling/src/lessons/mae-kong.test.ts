@@ -56,4 +56,22 @@ describe('mae-kong lesson data', () => {
       ['ค้างคาว', 'vocabulary/khang-khao', 'ค้างคาว'],
     ])
   })
+
+  it('marks every final ง by explicit per-syllable position, both in กางเกง (spec Page 04, TC-005)', () => {
+    const { spotting } = maeKong
+    expect(spotting.heading).toBe('มาตราแม่กง (ง) มี ง เป็นตัวสะกด')
+    expect(spotting.explanation.id).toBe('explanations/mae-kong')
+    expect(spotting.explanation.text).toMatch(/แม่กง/)
+    expect(
+      spotting.words.map(({ audio, syllables }) => [
+        audio.id,
+        syllables.map(({ text, final }) => `${text.slice(0, final)}[${text[final]}]${text.slice(final + 1)}`).join('|'),
+      ]),
+    ).toEqual([
+      ['vocabulary/ling', 'ลิ[ง]'],
+      ['vocabulary/chang', 'ช้า[ง]'],
+      ['vocabulary/rang', 'รั[ง]'],
+      ['vocabulary/kang-keng', 'กา[ง]|เก[ง]'],
+    ])
+  })
 })

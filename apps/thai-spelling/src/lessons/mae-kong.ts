@@ -1,10 +1,16 @@
-import type { Lesson, VocabularyWord } from './types'
+import type { Lesson, SpottingWord, VocabularyWord } from './types'
 
 const word = (text: string, slug: string, image: string): VocabularyWord => ({
   word: text,
   image: `/assets/images/vocabulary/${image}_3d.png`,
   audio: { id: `vocabulary/${slug}`, text },
 })
+
+// Syllable splits and the explanation need teacher review before release (spec Page 04 Rule).
+const spot = (slug: string, ...syllables: [text: string, final: number][]): SpottingWord => {
+  const text = syllables.map(([syllable]) => syllable).join('')
+  return { syllables: syllables.map(([syllable, final]) => ({ text: syllable, final })), audio: { id: `vocabulary/${slug}`, text } }
+}
 
 /** แม่กง (ง). Step titles follow spec §1.1. */
 export const maeKong = {
@@ -36,4 +42,12 @@ export const maeKong = {
     word('ดัง', 'dang', 'loudspeaker'),
     word('ค้างคาว', 'khang-khao', 'bat'),
   ],
+  spotting: {
+    heading: 'มาตราแม่กง (ง) มี ง เป็นตัวสะกด',
+    explanation: {
+      id: 'explanations/mae-kong',
+      text: 'เด็ก ๆ ลองสังเกตนะ คำว่า ลิง ช้าง รัง มีตัว ง อยู่ท้ายคำ เราเรียกว่าตัวสะกด คำที่มี ง เป็นตัวสะกด อยู่ในมาตราแม่กง ส่วนคำว่า กางเกง มีสองพยางค์ คือ กาง กับ เกง จึงมีตัว ง สะกดถึงสองตัวเลยจ้ะ',
+    },
+    words: [spot('ling', ['ลิง', 2]), spot('chang', ['ช้าง', 3]), spot('rang', ['รัง', 2]), spot('kang-keng', ['กาง', 2], ['เกง', 2])],
+  },
 } as const satisfies Lesson
