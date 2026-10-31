@@ -24,7 +24,7 @@ export function GardenBackdrop() {
       </div>
 
       {/* Sun with a soft halo. */}
-      <div className="absolute top-[5%] right-[6%] size-20 rounded-full bg-sun shadow-[0_0_0_14px_rgb(253_224_71/0.35),0_0_0_28px_rgb(253_224_71/0.18)] lg:size-28" />
+      <div className="absolute top-[5%] right-[6%] size-20 rounded-full bg-sun shadow-[0_0_0_14px_color-mix(in_srgb,var(--color-sun)_35%,transparent),0_0_0_28px_color-mix(in_srgb,var(--color-sun)_18%,transparent)] lg:size-28" />
 
       <Cloud className="top-[10%] left-[-4%] scale-75 sm:left-[6%] lg:scale-100" />
       <Cloud className="top-[22%] right-[-6%] scale-90 sm:right-[12%] lg:top-[16%]" />
@@ -56,7 +56,7 @@ function Cloud({ className }: { className: string }) {
 
 function Flower({ className }: { className: string }) {
   return (
-    <div className={cx('absolute size-7 rounded-full shadow-[0_0_0_6px_rgb(255_255_255/0.55)] lg:size-9', className)}>
+    <div className={cx('absolute size-7 rounded-full shadow-[0_0_0_6px_color-mix(in_srgb,var(--color-card)_55%,transparent)] lg:size-9', className)}>
       <span className="absolute inset-[30%] rounded-full bg-sun" />
     </div>
   )
