@@ -44,55 +44,42 @@ describe('Lesson Session store', () => {
     expect(session()).toBeNull()
   })
 
-  it('checking an Activity counts attempts and keeps the best score', () => {
-    visitStep('mae-kong', 5)
-    recordActivityCheck('wordSelection', 5, 7, ['ลิง'])
-    recordActivityCheck('wordSelection', 7, 7, ['ลิง', 'ช้าง'])
-    recordActivityCheck('wordSelection', 3, 7, [])
-    expect(session()?.activities.wordSelection).toEqual({
-      status: 'completed',
-      bestScore: 7,
-      maxScore: 7,
-      attemptCount: 3,
-      answers: [],
-    })
-  })
-
-  it('leaving an Activity unchecked marks it skipped with score 0', () => {
-    visitStep('mae-kong', 5)
-    skipActivity('wordSelection', 7)
-    expect(session()?.activities.wordSelection).toEqual({
-      status: 'skipped',
-      bestScore: 0,
-      maxScore: 7,
-      attemptCount: 0,
-      answers: null,
-    })
-  })
-
-  it('skipping after a check keeps the checked result', () => {
-    visitStep('mae-kong', 5)
-    recordActivityCheck('wordSelection', 6, 7, ['ลิง'])
-    skipActivity('wordSelection', 7)
-    expect(session()?.activities.wordSelection).toMatchObject({ status: 'completed', bestScore: 6, attemptCount: 1 })
-  })
-
-  it('a check after skipping replaces the skip', () => {
-    visitStep('mae-kong', 5)
-    skipActivity('wordSelection', 7)
-    recordActivityCheck('wordSelection', 4, 7, ['นก'])
-    expect(session()?.activities.wordSelection).toMatchObject({ status: 'completed', bestScore: 4, attemptCount: 1 })
-  })
-
-  it('Activity results without a Session are ignored', () => {
-    recordActivityCheck('wordSelection', 7, 7, [])
-    skipActivity('wordSelection', 7)
-    expect(session()).toBeNull()
-  })
-
   it('persists the Session to localStorage', () => {
     visitStep('mae-kong', 3)
     const stored = JSON.parse(localStorage.getItem('thai-spelling:lesson-session') ?? 'null')
     expect(stored.state.session).toMatchObject({ lessonId: 'mae-kong', currentStep: 3, visitedSteps: [3] })
+  })
+
+  it('a check records the score and counts the attempt, keeping the best score', () => {
+    visitStep('mae-kong', 6)
+    recordActivityCheck('wordFilling', 4, 6, ['ลิง'])
+    recordActivityCheck('wordFilling', 6, 6, ['ช้าง'])
+    recordActivityCheck('wordFilling', 3, 6, ['รัง'])
+    expect(session()?.activities.wordFilling).toEqual({
+      status: 'completed',
+      bestScore: 6,
+      maxScore: 6,
+      attemptCount: 3,
+      answers: ['รัง'],
+    })
+  })
+
+  it('skipping an unchecked Activity records it as skipped with score 0', () => {
+    visitStep('mae-kong', 6)
+    skipActivity('wordFilling', 6)
+    expect(session()?.activities.wordFilling).toMatchObject({ status: 'skipped', bestScore: 0, maxScore: 6, attemptCount: 0 })
+  })
+
+  it('skipping never overwrites a checked result', () => {
+    visitStep('mae-kong', 6)
+    recordActivityCheck('wordFilling', 5, 6, [])
+    skipActivity('wordFilling', 6)
+    expect(session()?.activities.wordFilling).toMatchObject({ status: 'completed', bestScore: 5, attemptCount: 1 })
+  })
+
+  it('Activity results need a Session', () => {
+    recordActivityCheck('wordFilling', 5, 6, [])
+    skipActivity('wordFilling', 6)
+    expect(session()).toBeNull()
   })
 })

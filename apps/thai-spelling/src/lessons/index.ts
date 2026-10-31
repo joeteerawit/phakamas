@@ -1,7 +1,7 @@
 import { maeKong } from './mae-kong'
 import type { Lesson } from './types'
 
-export type { AudioClip, Lesson, LessonStep, VocabularyWord, WordChoice, WordSelectionActivity } from './types'
+export type { AudioClip, Lesson, LessonStep, SpottingWord, VocabularyWord, WordChoice, WordFilling, WordSelectionActivity } from './types'
 
 const lessons: Readonly<Record<string, Lesson>> = {
   [maeKong.id]: maeKong,

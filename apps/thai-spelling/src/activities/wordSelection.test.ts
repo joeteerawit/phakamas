@@ -37,8 +37,4 @@ describe('Step 5 word selection scoring (7 Decisions)', () => {
   it('selecting only the distractors scores 0', () => {
     expect(check('แมว', 'นก', 'บ้าน')).toEqual({ score: 0, wrong: ['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'แมว', 'นก', 'บ้าน'] })
   })
-
-  it('the Step 5 Activity max score is 7', () => {
-    expect(maeKong.steps[4]).toMatchObject({ activity: { id: 'wordSelection', maxScore: 7 } })
-  })
 })

@@ -1,9 +1,23 @@
-import type { Lesson, VocabularyWord, WordSelectionActivity } from './types'
+import type { AudioClip, Lesson, SpottingWord, VocabularyWord, WordSelectionActivity } from './types.ts'
 
-const word = (text: string, slug: string, image: string): VocabularyWord => ({
+const image = (name: string) => `/assets/images/vocabulary/${name}_3d.png`
+
+const word = (text: string, slug: string, picture: string): VocabularyWord => ({
   word: text,
-  image: `/assets/images/vocabulary/${image}_3d.png`,
+  image: image(picture),
   audio: { id: `vocabulary/${slug}`, text },
+})
+
+const ling = word('ลิง', 'ling', 'monkey')
+const chang = word('ช้าง', 'chang', 'elephant')
+const rang = word('รัง', 'rang', 'nest_with_eggs')
+const kangKeng = word('กางเกง', 'kang-keng', 'jeans')
+const dang = word('ดัง', 'dang', 'loudspeaker')
+
+// Syllable splits and the explanation need teacher review before release (spec Page 04 Rule).
+const spot = ({ audio }: { audio: AudioClip }, ...syllables: [text: string, final: number][]): SpottingWord => ({
+  syllables: syllables.map(([text, final]) => ({ text, final })),
+  audio,
 })
 
 const wordSelection = {
@@ -25,7 +39,7 @@ export const maeKong = {
     { title: 'ดูภาพเรียนรู้คำ' },
     { title: 'ฟังแล้วอ่านตาม' },
     { title: 'สังเกตตัวสะกด' },
-    { title: 'เลือกคำในมาตรา', activity: { id: 'wordSelection', maxScore: wordSelection.choices.length } },
+    { title: 'เลือกคำในมาตรา' },
     { title: 'เติมคำตรงภาพ' },
     { title: 'อ่านคำคล้องจอง' },
     { title: 'เกมจับคู่เสียง' },
@@ -37,13 +51,27 @@ export const maeKong = {
     text: 'สวัสดีเด็ก ๆ วันนี้เราจะมาเรียนรู้คำคล้องจองในมาตราแม่กงกัน พร้อมแล้วกดเริ่มเรียนได้เลย',
   },
   // ค้างคาว is a Supporting Word: คาว ends in ว, only ค้าง is แม่กง.
-  vocabulary: [
-    word('ลิง', 'ling', 'monkey'),
-    word('ช้าง', 'chang', 'elephant'),
-    word('รัง', 'rang', 'nest_with_eggs'),
-    word('กางเกง', 'kang-keng', 'jeans'),
-    word('ดัง', 'dang', 'loudspeaker'),
-    word('ค้างคาว', 'khang-khao', 'bat'),
-  ],
+  vocabulary: [ling, chang, rang, kangKeng, dang, word('ค้างคาว', 'khang-khao', 'bat')],
+  listenAndRepeat: [ling, chang, rang, kangKeng, dang],
+  spotting: {
+    heading: 'มาตราแม่กง (ง) มี ง เป็นตัวสะกด',
+    explanation: {
+      id: 'explanations/mae-kong',
+      text: 'เด็ก ๆ ลองสังเกตนะ คำว่า ลิง ช้าง รัง มีตัว ง อยู่ท้ายคำ เราเรียกว่าตัวสะกด คำที่มี ง เป็นตัวสะกด อยู่ในมาตราแม่กง ส่วนคำว่า กางเกง มีสองพยางค์ คือ กาง กับ เกง จึงมีตัว ง สะกดถึงสองตัวเลยจ้ะ',
+    },
+    words: [spot(ling, ['ลิง', 2]), spot(chang, ['ช้าง', 3]), spot(rang, ['รัง', 2]), spot(kangKeng, ['กาง', 2], ['เกง', 2])],
+  },
   wordSelection,
+  // Pictures are shuffled against the bank so the order gives nothing away.
+  wordFilling: {
+    bank: ['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'ดัง', 'ค้างคาว'],
+    pictures: [
+      { image: image('elephant'), answer: 'ช้าง' },
+      { image: image('loudspeaker'), answer: 'ดัง' },
+      { image: image('monkey'), answer: 'ลิง' },
+      { image: image('bat'), answer: 'ค้างคาว' },
+      { image: image('nest_with_eggs'), answer: 'รัง' },
+      { image: image('jeans'), answer: 'กางเกง' },
+    ],
+  },
 } as const satisfies Lesson

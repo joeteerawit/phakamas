@@ -25,24 +25,10 @@ export const Route = createFileRoute('/lesson/$lessonId/$step')({
 function StepPage() {
   const { lesson, stepNumber } = Route.useRouteContext()
   const visitStep = useLessonSession((state) => state.visitStep)
-  const skipActivity = useLessonSession((state) => state.skipActivity)
   useEffect(() => visitStep(lesson.id, stepNumber), [visitStep, lesson.id, stepNumber])
   const [feedback, setFeedback] = useState<Feedback | null>(null)
-  // A new Step starts without the previous Step's feedback.
-  const [feedbackStep, setFeedbackStep] = useState(stepNumber)
-  if (feedbackStep !== stepNumber) {
-    setFeedbackStep(stepNumber)
-    setFeedback(null)
-  }
-  const activity = lesson.steps[stepNumber - 1]?.activity
-
   return (
-    <StepLayout
-      lesson={lesson}
-      stepNumber={stepNumber}
-      feedback={feedback}
-      onNext={activity && (() => skipActivity(activity.id, activity.maxScore))}
-    >
+    <StepLayout lesson={lesson} stepNumber={stepNumber} feedback={feedback}>
       <StepContent lesson={lesson} stepNumber={stepNumber} onFeedback={setFeedback} />
     </StepLayout>
   )
