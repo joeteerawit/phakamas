@@ -114,7 +114,7 @@ Theme: การ์ตูนสวนธรรมชาติ สีเขีย
 **Route:** `/lesson/mae-kong/4`  
 **Objective:** สังเกต ง ตัวสะกด
 
-**UI:** Heading `มาตราแม่กง (ง) มี ง เป็นตัวสะกด`, การ์ตูนนกฮูกหรือครู, Card `ลิง`, `ช้าง`, `รัง`, `กางเกง` พร้อมเน้นอักษร ง, ปุ่ม `ฟังคำอธิบาย`, `แสดงตัวสะกด`
+**UI:** Heading `มาตราแม่กง (ง) มี ง เป็นตัวสะกด`, Mascot น้องลิง, Card `ลิง`, `ช้าง`, `รัง`, `กางเกง` พร้อมเน้นอักษร ง, ปุ่ม `ฟังคำอธิบาย`, `แสดงตัวสะกด`
 
 | Click/Event | Behavior |
 |---|---|
@@ -392,6 +392,8 @@ public/assets/
 ---
 
 ## 6. UI/UX
+
+> **Source of truth:** `apps/thai-spelling/design-system/thai-spelling/MASTER.md` (Claymorphism + garden, tokens, Mali/Anuphan, Lucide icons, Mascot น้องลิง, responsive layout, motion budget). The table below is the original brief.
 
 | Property | Spec |
 |---|---|

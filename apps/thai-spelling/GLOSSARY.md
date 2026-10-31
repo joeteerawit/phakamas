@@ -27,3 +27,7 @@ _Avoid_: Correct word, key word
 **Supporting Word** (คำประกอบ):
 A word used in a Lesson that is not wholly in its final-consonant group, e.g. ค้างคาว.
 _Avoid_: Distractor (that is a wrong choice inside an Activity)
+
+**Mascot** (น้องลิง):
+The single monkey character that guides the student through every Step of a Lesson.
+_Avoid_: Character, owl, teacher avatar
