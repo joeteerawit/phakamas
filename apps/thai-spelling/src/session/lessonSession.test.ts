@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { useLessonSession } from './lessonSession'
 
 const session = () => useLessonSession.getState().session
-const { visitStep, resetSession } = useLessonSession.getState()
+const { visitStep, resetSession, recordActivityCheck, skipActivity } = useLessonSession.getState()
 
 beforeEach(() => {
   resetSession()
@@ -41,6 +41,52 @@ describe('Lesson Session store', () => {
   it('resetSession clears the Session', () => {
     visitStep('mae-kong', 5)
     resetSession()
+    expect(session()).toBeNull()
+  })
+
+  it('checking an Activity counts attempts and keeps the best score', () => {
+    visitStep('mae-kong', 5)
+    recordActivityCheck('wordSelection', 5, 7, ['ลิง'])
+    recordActivityCheck('wordSelection', 7, 7, ['ลิง', 'ช้าง'])
+    recordActivityCheck('wordSelection', 3, 7, [])
+    expect(session()?.activities.wordSelection).toEqual({
+      status: 'completed',
+      bestScore: 7,
+      maxScore: 7,
+      attemptCount: 3,
+      answers: [],
+    })
+  })
+
+  it('leaving an Activity unchecked marks it skipped with score 0', () => {
+    visitStep('mae-kong', 5)
+    skipActivity('wordSelection', 7)
+    expect(session()?.activities.wordSelection).toEqual({
+      status: 'skipped',
+      bestScore: 0,
+      maxScore: 7,
+      attemptCount: 0,
+      answers: null,
+    })
+  })
+
+  it('skipping after a check keeps the checked result', () => {
+    visitStep('mae-kong', 5)
+    recordActivityCheck('wordSelection', 6, 7, ['ลิง'])
+    skipActivity('wordSelection', 7)
+    expect(session()?.activities.wordSelection).toMatchObject({ status: 'completed', bestScore: 6, attemptCount: 1 })
+  })
+
+  it('a check after skipping replaces the skip', () => {
+    visitStep('mae-kong', 5)
+    skipActivity('wordSelection', 7)
+    recordActivityCheck('wordSelection', 4, 7, ['นก'])
+    expect(session()?.activities.wordSelection).toMatchObject({ status: 'completed', bestScore: 4, attemptCount: 1 })
+  })
+
+  it('Activity results without a Session are ignored', () => {
+    recordActivityCheck('wordSelection', 7, 7, [])
+    skipActivity('wordSelection', 7)
     expect(session()).toBeNull()
   })
 

@@ -25,9 +25,21 @@ type LessonSessionStore = {
   session: LessonSession | null
   visitStep: (lessonId: string, step: number) => void
   resetSession: () => void
+  /** ตรวจคำตอบ: one more attempt; keeps the best score and the latest answers. */
+  recordActivityCheck: (activityId: string, score: number, maxScore: number, answers: unknown) => void
+  /** Next without checking: `skipped` with score 0, unless the Activity was already checked. */
+  skipActivity: (activityId: string, maxScore: number) => void
 }
 
 const COVER_STEP = 1
+
+/** Replaces one Activity's result; without a Session there is nothing to record. */
+const updateActivity =
+  (activityId: string, update: (old: ActivityResult | undefined) => ActivityResult) =>
+  ({ session }: LessonSessionStore) =>
+    session
+      ? { session: { ...session, activities: { ...session.activities, [activityId]: update(session.activities[activityId]) } } }
+      : {}
 
 export const useLessonSession = create<LessonSessionStore>()(
   persist(
@@ -48,6 +60,22 @@ export const useLessonSession = create<LessonSessionStore>()(
           }
         }),
       resetSession: () => set({ session: null }),
+      recordActivityCheck: (activityId, score, maxScore, answers) =>
+        set(
+          updateActivity(activityId, (old) => ({
+            status: 'completed',
+            bestScore: Math.max(score, old?.bestScore ?? 0),
+            maxScore,
+            attemptCount: (old?.attemptCount ?? 0) + 1,
+            answers,
+          })),
+        ),
+      skipActivity: (activityId, maxScore) =>
+        set(
+          updateActivity(activityId, (old) =>
+            old?.attemptCount ? old : { status: 'skipped', bestScore: 0, maxScore, attemptCount: 0, answers: null },
+          ),
+        ),
     }),
     { name: 'thai-spelling:lesson-session', version: 1, partialize: ({ session }) => ({ session }) },
   ),

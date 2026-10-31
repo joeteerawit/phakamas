@@ -24,14 +24,16 @@ type CardLook = {
   selected?: boolean
   /** Audio playing state: blue glow. */
   playing?: boolean
+  /** Marked wrong after a check: red border (pair it with a ✗ icon and text). */
+  wrong?: boolean
 }
 
 /** Class names for a clay card, also for card-shaped buttons. */
-export function cardClass({ tone = 'white', selected = false, playing = false }: CardLook = {}) {
+export function cardClass({ tone = 'white', selected = false, playing = false, wrong = false }: CardLook = {}) {
   return cx(
     'rounded-clay border-[3px] p-(--space-md) text-foreground shadow-clay',
     tones[tone],
-    selected ? 'border-highlight' : 'border-border',
+    wrong ? 'border-wrong' : selected ? 'border-highlight' : 'border-border',
     playing && 'outline-4 outline-offset-2 outline-secondary/50',
   )
 }

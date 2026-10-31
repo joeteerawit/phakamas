@@ -35,7 +35,7 @@ export function FeedbackToast({ feedback, className }: FeedbackToastProps) {
                 : { duration: 0.2, ease: 'easeOut' }
             }
             className={cx(
-              'pointer-events-auto flex w-full max-w-md items-center gap-(--space-sm) rounded-clay border-[3px] bg-card p-(--space-sm) pe-(--space-md) shadow-clay',
+              'flex w-full max-w-md items-center gap-(--space-sm) rounded-clay border-[3px] bg-card p-(--space-sm) pe-(--space-md) shadow-clay',
               feedback.kind === 'correct' ? 'border-correct' : 'border-wrong',
             )}
           >

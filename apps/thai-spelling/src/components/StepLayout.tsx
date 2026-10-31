@@ -14,6 +14,8 @@ type StepLayoutProps = {
   stepNumber: number
   /** Activity feedback shown in the toast; placeholder Steps pass none. */
   feedback?: Feedback | null
+  /** Runs when ถัดไป is pressed, before navigating. */
+  onNext?: () => void
   children: ReactNode
 }
 
@@ -22,7 +24,7 @@ type StepLayoutProps = {
  * < 1024px: compact header, progress bar, single column, Back/Next fixed to the bottom.
  * ≥ 1024px: everything inside a centred storybook panel on the garden.
  */
-export function StepLayout({ lesson, stepNumber, feedback = null, children }: StepLayoutProps) {
+export function StepLayout({ lesson, stepNumber, feedback = null, onNext, children }: StepLayoutProps) {
   const totalSteps = lesson.steps.length
   const isFirst = stepNumber === 1
   const isLast = stepNumber === totalSteps
@@ -118,6 +120,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
                 <Link
                   to="/lesson/$lessonId/$step"
                   params={stepParams(stepNumber + 1)}
+                  onClick={onNext}
                   className={`${buttonClass('primary', 'bar')} col-start-2 lg:ms-auto`}
                 >
                   ถัดไป

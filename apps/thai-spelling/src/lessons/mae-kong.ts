@@ -1,10 +1,19 @@
-import type { Lesson, VocabularyWord } from './types'
+import type { Lesson, VocabularyWord, WordSelectionActivity } from './types'
 
 const word = (text: string, slug: string, image: string): VocabularyWord => ({
   word: text,
   image: `/assets/images/vocabulary/${image}_3d.png`,
   audio: { id: `vocabulary/${slug}`, text },
 })
+
+const wordSelection = {
+  question: 'คำใดเป็นคำที่มี ง เป็นตัวสะกด (แม่กง)?',
+  choices: [
+    ...['ลิง', 'ช้าง', 'รัง', 'กางเกง'].map((word) => ({ word, correct: true })),
+    ...['แมว', 'นก', 'บ้าน'].map((word) => ({ word, correct: false })),
+  ],
+  praise: { id: 'feedback/keng-mak', text: 'เก่งมาก!' },
+} satisfies WordSelectionActivity
 
 /** แม่กง (ง). Step titles follow spec §1.1. */
 export const maeKong = {
@@ -16,7 +25,7 @@ export const maeKong = {
     { title: 'ดูภาพเรียนรู้คำ' },
     { title: 'ฟังแล้วอ่านตาม' },
     { title: 'สังเกตตัวสะกด' },
-    { title: 'เลือกคำในมาตรา' },
+    { title: 'เลือกคำในมาตรา', activity: { id: 'wordSelection', maxScore: wordSelection.choices.length } },
     { title: 'เติมคำตรงภาพ' },
     { title: 'อ่านคำคล้องจอง' },
     { title: 'เกมจับคู่เสียง' },
@@ -36,4 +45,5 @@ export const maeKong = {
     word('ดัง', 'dang', 'loudspeaker'),
     word('ค้างคาว', 'khang-khao', 'bat'),
   ],
+  wordSelection,
 } as const satisfies Lesson

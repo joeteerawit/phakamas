@@ -1,6 +1,22 @@
 /** One ordered stage of a Lesson. Its Step number is its 1-based position. */
 export type LessonStep = {
   title: string
+  /** The scored Activity on this Step; leaving with ถัดไป unchecked records it as skipped. */
+  activity?: { id: string; maxScore: number }
+}
+
+/** A word on the word-selection Step; `correct` = it belongs to this มาตรา. */
+export type WordChoice = {
+  word: string
+  correct: boolean
+}
+
+/** Step 5: pick the words of this มาตรา among distractors. */
+export type WordSelectionActivity = {
+  question: string
+  choices: readonly WordChoice[]
+  /** Played when every Decision is right. */
+  praise: AudioClip
 }
 
 /**
@@ -29,4 +45,5 @@ export type Lesson = {
   /** Teacher introduction played on the cover Step. */
   intro: AudioClip
   vocabulary: readonly VocabularyWord[]
+  wordSelection: WordSelectionActivity
 }
