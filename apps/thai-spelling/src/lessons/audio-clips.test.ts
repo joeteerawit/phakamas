@@ -22,6 +22,8 @@ describe('audioClips', () => {
       'rhyme/line-02',
       'rhyme/line-03',
       'rhyme/line-04',
+      'sentences/sentence-01',
+      'sentences/sentence-02',
     ])
   })
 

@@ -79,4 +79,8 @@ export const maeKong = {
     id: `rhyme/line-0${i + 1}`,
     text,
   })),
+  sentences: [
+    { images: [image('monkey'), image('elephant')], audio: { id: 'sentences/sentence-01', text: 'ลิงน้อยนั่งมองช้าง' } },
+    { images: [image('bat'), image('nest_with_eggs')], audio: { id: 'sentences/sentence-02', text: 'ค้างคาวบินกลับรัง' } },
+  ],
 } as const satisfies Lesson
