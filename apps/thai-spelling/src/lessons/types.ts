@@ -68,4 +68,6 @@ export type Lesson = {
   listenAndRepeat: readonly VocabularyWord[]
   spotting: Spotting
   rhymeMatching: RhymeMatching
+  /** The rhyme read on Step 7, one clip per line, in reading order. */
+  rhyme: readonly AudioClip[]
 }

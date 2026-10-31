@@ -18,6 +18,10 @@ describe('audioClips', () => {
       'explanations/mae-kong',
       'feedback/correct',
       'feedback/completed',
+      'rhyme/line-01',
+      'rhyme/line-02',
+      'rhyme/line-03',
+      'rhyme/line-04',
     ])
   })
 

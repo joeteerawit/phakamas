@@ -75,4 +75,8 @@ export const maeKong = {
       completed: { id: 'feedback/completed', text: 'เก่งมาก จับคู่ถูกครบแล้ว' },
     },
   },
+  rhyme: ['ลิงน้อยนั่งมอง', 'ช้างร้องเสียงดัง', 'นกบินกลับรัง', 'ฟังเพลงเพลินใจ'].map((text, i) => ({
+    id: `rhyme/line-0${i + 1}`,
+    text,
+  })),
 } as const satisfies Lesson

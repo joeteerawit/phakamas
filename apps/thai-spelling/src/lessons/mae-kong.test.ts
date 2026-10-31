@@ -92,4 +92,14 @@ describe('mae-kong lesson data', () => {
     expect(pictures.map((p) => p.answer).toSorted()).toEqual([...bank].sort())
     expect(pictures.map((p) => p.answer)).not.toEqual(bank)
   })
+
+  it('has the 4 rhyme lines with line-01..04 audio IDs (spec §2 Step 7, §5)', () => {
+    expect(maeKong.rhyme).toEqual([
+      { id: 'rhyme/line-01', text: 'ลิงน้อยนั่งมอง' },
+      { id: 'rhyme/line-02', text: 'ช้างร้องเสียงดัง' },
+      { id: 'rhyme/line-03', text: 'นกบินกลับรัง' },
+      { id: 'rhyme/line-04', text: 'ฟังเพลงเพลินใจ' },
+    ])
+  })
 })
+
