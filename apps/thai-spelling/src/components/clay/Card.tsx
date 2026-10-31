@@ -17,7 +17,7 @@ const tones: Record<CardTone, string> = {
 export const toneAt = (i: number): CardTone =>
   (['yellow', 'pink', 'sky', 'mint', 'lilac', 'peach'] as const)[i % 6] ?? 'yellow'
 
-type CardProps = ComponentProps<'div'> & {
+type CardLook = {
   /** Background tint; dark text stays ≥4.5:1 on every tone. */
   tone?: CardTone
   /** Selected state: pink border. */
@@ -26,18 +26,17 @@ type CardProps = ComponentProps<'div'> & {
   playing?: boolean
 }
 
-/** White clay card: 24px radius, 3px border, clay shadow (MASTER.md). */
-export function Card({ tone = 'white', selected = false, playing = false, className, ...props }: CardProps) {
-  return (
-    <div
-      className={cx(
-        'rounded-clay border-[3px] p-(--space-md) text-foreground shadow-clay',
-        tones[tone],
-        selected ? 'border-highlight' : 'border-border',
-        playing && 'outline-4 outline-offset-2 outline-secondary/50',
-        className,
-      )}
-      {...props}
-    />
+/** Class names for a clay card, also for card-shaped buttons. */
+export function cardClass({ tone = 'white', selected = false, playing = false }: CardLook = {}) {
+  return cx(
+    'rounded-clay border-[3px] p-(--space-md) text-foreground shadow-clay',
+    tones[tone],
+    selected ? 'border-highlight' : 'border-border',
+    playing && 'outline-4 outline-offset-2 outline-secondary/50',
   )
+}
+
+/** White clay card: 24px radius, 3px border, clay shadow (MASTER.md). */
+export function Card({ tone, selected, playing, className, ...props }: ComponentProps<'div'> & CardLook) {
+  return <div className={cx(cardClass({ tone, selected, playing }), className)} {...props} />
 }

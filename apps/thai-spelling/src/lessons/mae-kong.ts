@@ -1,4 +1,10 @@
-import type { Lesson } from './types'
+import type { Lesson, VocabularyWord } from './types'
+
+const word = (text: string, slug: string, image: string): VocabularyWord => ({
+  word: text,
+  image: `/assets/images/vocabulary/${image}_3d.png`,
+  audio: { id: `vocabulary/${slug}`, text },
+})
 
 /** แม่กง (ง). Step titles follow spec §1.1. */
 export const maeKong = {
@@ -16,5 +22,18 @@ export const maeKong = {
     { title: 'เกมจับคู่เสียง' },
     { title: 'ฝึกอ่านประโยค' },
     { title: 'สรุปและประเมิน' },
+  ],
+  intro: {
+    id: 'intro',
+    text: 'สวัสดีเด็ก ๆ วันนี้เราจะมาเรียนรู้คำคล้องจองในมาตราแม่กงกัน พร้อมแล้วกดเริ่มเรียนได้เลย',
+  },
+  // ค้างคาว is a Supporting Word: คาว ends in ว, only ค้าง is แม่กง.
+  vocabulary: [
+    word('ลิง', 'ling', 'monkey'),
+    word('ช้าง', 'chang', 'elephant'),
+    word('รัง', 'rang', 'nest_with_eggs'),
+    word('กางเกง', 'kang-keng', 'jeans'),
+    word('ดัง', 'dang', 'loudspeaker'),
+    word('ค้างคาว', 'khang-khao', 'bat'),
   ],
 } as const satisfies Lesson

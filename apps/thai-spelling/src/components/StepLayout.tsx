@@ -1,7 +1,8 @@
 import { Link } from '@tanstack/react-router'
 import { ChevronLeft, ChevronRight, House, Volume2, VolumeX } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { stopAudio, toggleMute, useAudio } from '../audio/audioManager'
 import type { Lesson } from '../lessons'
 import { buttonClass, iconButtonClass } from './clay/buttonClass'
 import { FeedbackToast, type Feedback } from './clay/FeedbackToast'
@@ -29,8 +30,9 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
 
   const direction = useStepDirection(stepNumber)
   const reduceMotion = useReducedMotion()
-  // Visual state only until audio lands.
-  const [muted, setMuted] = useState(false)
+  const muted = useAudio((state) => state.muted)
+  // AUD-004: leaving a Step stops its sound.
+  useEffect(() => stopAudio, [stepNumber])
 
   return (
     <div className="relative isolate min-h-dvh overflow-x-clip">
@@ -54,7 +56,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
               icon={muted ? VolumeX : Volume2}
               label="ปิดเสียง"
               aria-pressed={muted}
-              onClick={() => setMuted((value) => !value)}
+              onClick={toggleMute}
             />
           </header>
 

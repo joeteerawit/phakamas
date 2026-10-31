@@ -41,4 +41,19 @@ describe('mae-kong lesson data', () => {
       expect(parseStepNumber(maeKong, raw)).toBeUndefined()
     }
   })
+
+  it('has the intro clip and the 6 vocabulary words with audio IDs and Thai text (spec §2, §5)', () => {
+    expect(maeKong.intro).toEqual({
+      id: 'intro',
+      text: 'สวัสดีเด็ก ๆ วันนี้เราจะมาเรียนรู้คำคล้องจองในมาตราแม่กงกัน พร้อมแล้วกดเริ่มเรียนได้เลย',
+    })
+    expect(maeKong.vocabulary.map(({ word, audio }) => [word, audio.id, audio.text])).toEqual([
+      ['ลิง', 'vocabulary/ling', 'ลิง'],
+      ['ช้าง', 'vocabulary/chang', 'ช้าง'],
+      ['รัง', 'vocabulary/rang', 'รัง'],
+      ['กางเกง', 'vocabulary/kang-keng', 'กางเกง'],
+      ['ดัง', 'vocabulary/dang', 'ดัง'],
+      ['ค้างคาว', 'vocabulary/khang-khao', 'ค้างคาว'],
+    ])
+  })
 })
