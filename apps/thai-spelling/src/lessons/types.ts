@@ -83,4 +83,6 @@ export type Lesson = {
   spotting: Spotting
   wordSelection: WordSelectionActivity
   rhymeMatching: RhymeMatching
+  /** The rhyme read on Step 7, one clip per line, in reading order. */
+  rhyme: readonly AudioClip[]
 }
