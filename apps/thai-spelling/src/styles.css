@@ -91,6 +91,36 @@
     0%, 100% { opacity: 0.25; }
     50% { opacity: 1; }
   }
+
+  /* Ambient layer (#18). Transform/opacity only; elements opt out with motion-reduce:animate-none. */
+  --animate-cloud-drift: cloud-drift 100s linear infinite;
+  @keyframes cloud-drift {
+    from { transform: translateX(-420px); }
+    to { transform: translateX(1940px); }
+  }
+  --animate-sway: sway 4s ease-in-out infinite alternate;
+  @keyframes sway {
+    from { transform: rotate(-6deg); }
+    to { transform: rotate(6deg); }
+  }
+  /* One pass across the stage, then a pause off-screen: the bee shows up every 15 s. */
+  --animate-fly-across: fly-across 15s linear infinite;
+  @keyframes fly-across {
+    0% { transform: translateX(-160px); }
+    45%, 100% { transform: translateX(2080px); }
+  }
+  --animate-fly-bob: fly-bob 1.6s ease-in-out infinite alternate;
+  @keyframes fly-bob {
+    from { transform: translateY(-60px) rotate(-8deg); }
+    to { transform: translateY(60px) rotate(6deg); }
+  }
+  /* Shifts the shimmer stripes by exactly one 190px period so the loop is seamless. */
+  --animate-pond-shimmer: pond-shimmer 6s linear infinite;
+  @keyframes pond-shimmer {
+    0% { transform: translateX(0); opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { transform: translateX(-190px); opacity: 0.5; }
+  }
 }
 
 /* Spacing (Density 3). Used as e.g. `gap-(--space-sm)`. */
