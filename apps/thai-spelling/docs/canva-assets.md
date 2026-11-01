@@ -30,3 +30,10 @@ Cut-outs in #16 were matted exactly: the isolated elements were exported twice a
 | `ambient/flower-yellow.webp` | `MAHZj1fDy7E` | garden background flower head at stage 0,665, alpha from the red channel (`-level 72%,88%`; leaves are green), 1× | – (from #16 export) | #18 |
 | `ambient/flower-pink.webp` | `MAHZj1fDy7E` | garden background flower head at stage 10,865, same key, 1× | – (from #16 export) | #18 |
 | `rhyme/signboard.webp` | `MAHUniTBxhw` | page 7 group `LBNTJylk0ylldm3F` image `LBnwlLbYjBSclwsx` (signboard + posts, 1083×953 on stage), white/black matte, 2× | `DAHZp5aUNgc` | #26 |
+| `vocabulary/ngu.webp` | `MAG_N3G8Y1Q` | page 5 element `LBVpvjD8GY6rXmzK`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `vocabulary/ban.webp` | `MAGeNalcDeU` | page 5 element `LB3R9mXPhb30FNYF`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `vocabulary/kom.webp` | `MAFudUYRLgo` | page 5 element `LB6vnkq5SqR2sGfx`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `vocabulary/sung.webp` | `MAFqdKAp7eI` | page 5 element `LB1WVFYF1dZHBsfJ`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `vocabulary/lung.webp` | `MAHUGweZIyU` | page 5 element `LB1XDdZ5n3D9vytF`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `vocabulary/ngao.webp` | `MAG_z08XdUg` | page 5 element `LBlpbM3DX2HvVPmn`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `activities/tap-hint.webp` | `MAGyMQTn2pE` | page 5 element `LB7rk8jJlp4xhrXC` (hand pressing a red buzzer, used on every card), 2×, white/black matte | `DAHZp-jEM0g` | #24 |
