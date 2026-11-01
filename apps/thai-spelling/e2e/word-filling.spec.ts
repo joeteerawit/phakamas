@@ -116,6 +116,27 @@ test('no horizontal scroll on a 740×360 landscape phone', async ({ page }) => {
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(740)
 })
 
+test('chips, slots and controls are ≥44px tap targets on a 390px-tall landscape phone', async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 })
+  const targets = [bankWord(page, 'รัง'), slot(page, 1), check(page), page.getByRole('button', { name: 'ล้างคำตอบ' })]
+  for (const target of targets) {
+    const box = (await target.boundingBox())!
+    expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(44)
+  }
+})
+
+test('a placed chip flies to its slot; with reduced motion it jumps there', async ({ page }) => {
+  const transform = (n: number) => slot(page, n).locator('[data-word]').evaluate((el) => getComputedStyle(el).transform)
+  await place(page, 'ลิง', 1)
+  expect(await transform(1)).not.toBe('none')
+  await expect.poll(() => transform(1)).toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/)
+
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.reload()
+  await place(page, 'ช้าง', 2)
+  expect(await transform(2)).toBe('none')
+})
+
 test('each picture has a neutral screen-reader label that does not give the answer away', async ({ page }) => {
   const pictures = page.getByRole('img', { name: /^ภาพที่ \d$/ })
   await expect(pictures).toHaveCount(6)
