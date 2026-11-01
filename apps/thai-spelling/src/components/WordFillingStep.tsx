@@ -2,6 +2,7 @@ import { Check, RotateCcw, X } from 'lucide-react'
 import { animate, motion, useReducedMotion } from 'motion/react'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { celebrate } from './Stars'
 import { scoreFeedback, useClearFeedbackOnLeave } from '../activities/feedback'
 import { lessonActivity, useReportUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
@@ -98,6 +99,7 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
     setSelected(null)
     recordActivityCheck(activity.id, score, activity.maxScore, placed)
     onFeedback(scoreFeedback(score, activity.maxScore, 'กดลองอีกครั้งเพื่อแก้ช่องที่ผิด'))
+    celebrate(activity.id)
   }
   const retry = () => {
     snapshot()

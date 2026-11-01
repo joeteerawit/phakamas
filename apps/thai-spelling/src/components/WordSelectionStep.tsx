@@ -2,6 +2,7 @@ import { Check, ClipboardCheck, Pointer, RotateCcw, X } from 'lucide-react'
 import { motion, useReducedMotion, type TargetAndTransition } from 'motion/react'
 import { useState } from 'react'
 import { playClip } from '../audio/audioManager'
+import { celebrate } from './Stars'
 import { scoreFeedback, useClearFeedbackOnLeave } from '../activities/feedback'
 import { checkWordSelection } from '../activities/wordSelection'
 import type { WordChoice } from '../lessons'
@@ -21,7 +22,7 @@ const resultText: Record<Result, string> = { right: 'ถูกต้อง', wro
 
 /** Step 5: tap the picture cards of this มาตรา, ตรวจคำตอบ scores every choice, เริ่มใหม่ clears. */
 export function WordSelectionStep({ lesson, onFeedback }: ActivityStepProps) {
-  const { question, choices, praise } = lesson.wordSelection
+  const { question, choices } = lesson.wordSelection
   const activity = lessonActivity(lesson, 'wordSelection')
   const [selected, setSelected] = useState<ReadonlySet<string>>(() => new Set())
   // Results of the last check; editing a word clears its result. `round` replays the feedback animation.
@@ -62,7 +63,7 @@ export function WordSelectionStep({ lesson, onFeedback }: ActivityStepProps) {
     setUnchecked(false)
     recordActivityCheck(activity.id, result.score, activity.maxScore, [...selected])
     onFeedback(scoreFeedback(result.score, activity.maxScore, 'ลองใหม่นะ'))
-    if (result.score === activity.maxScore) playClip(praise)
+    celebrate(activity.id)
   }
 
   const restart = () => {

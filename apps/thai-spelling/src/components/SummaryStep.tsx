@@ -1,108 +1,117 @@
 import { Link } from '@tanstack/react-router'
-import { ChevronRight, RotateCcw, Star } from 'lucide-react'
+import { ChevronRight, RotateCcw } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
 import { useState } from 'react'
-import { lessonActivities } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
-import { Button } from './clay/Button'
-import { buttonClass, cx } from './clay/buttonClass'
-import { Card, cardClass, toneAt } from './clay/Card'
+import { lessonStars, MAX_STARS } from '../session/stars'
 import { ConfirmDialog } from './clay/ConfirmDialog'
-import { Mascot } from './Mascot'
+import { Confetti, JumpingMascot } from './Stars'
 import type { StepProps } from './stepProps'
 import { useRestartLesson } from './useRestartLesson'
 
-/** Step 10: review key words and rhyme pairs, each Activity's bestScore and the total. Reading Assessment is Phase 2. */
+const pressable =
+  'pointer-events-auto transition-transform duration-150 ease-out active:scale-95 motion-reduce:transition-none ' +
+  'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring'
+
+/** A row of Star slots, the first `stars` filled, popping in one by one unless motion is reduced. */
+function StarRow({ stars, slots, size }: { stars: number; slots: number; size: string }) {
+  const still = useReducedMotion()
+  return (
+    <span aria-hidden="true" className={`flex leading-none ${size}`}>
+      {Array.from({ length: slots }, (_, i) => (
+        <motion.span
+          key={i}
+          className={i < stars ? '' : 'opacity-25 grayscale'}
+          initial={still || i >= stars ? false : { scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 12, delay: 0.3 + i * 0.25 }}
+        >
+          ⭐
+        </motion.span>
+      ))}
+    </span>
+  )
+}
+
+/** Step 10 on the cover background: เก่งมาก! sign, total Stars, each Activity's Stars and เรียนอีกครั้ง. */
 export function SummaryStep({ lesson }: StepProps) {
+  const still = useReducedMotion()
   const results = useLessonSession((state) => state.session?.activities)
+  const { activities, total, max } = lessonStars(lesson, results)
   const restart = useRestartLesson(lesson.id)
   const [confirmReset, setConfirmReset] = useState(false)
 
-  const activities = lessonActivities(lesson).map((activity) => {
-    const result = results?.[activity.id]
-    return { ...activity, title: lesson.steps[activity.step - 1]?.title, score: result?.status === 'completed' ? result.bestScore : null }
-  })
-  const total = activities.reduce((sum, a) => sum + (a.score ?? 0), 0)
-  const max = activities.reduce((sum, a) => sum + a.maxScore, 0)
-
   return (
-    <section className="flex flex-1 flex-col items-center gap-(--space-lg)">
+    <section data-full-stage className="pointer-events-none absolute inset-0">
+      {!still && <Confetti loop />}
+      <JumpingMascot className="top-[470px] left-[60px] h-[480px] w-[507px]" />
 
-      <Card tone="mint" className="flex w-full max-w-3xl flex-col gap-(--space-sm)">
-        <h2 id="summary-words" className="font-heading text-heading font-semibold">คำสำคัญ</h2>
-        <ul aria-labelledby="summary-words" className="grid grid-cols-2 gap-(--space-sm) sm:grid-cols-3">
-          {lesson.vocabulary.map((item, i) => (
-            <li
-              key={item.word}
-              className={cx(cardClass({ tone: toneAt(i) }), 'flex min-w-0 items-center gap-(--space-xs) p-(--space-sm) font-heading text-heading font-bold lg:text-vocab')}
-            >
-              <img src={item.image} alt="" width={256} height={256} draggable={false} className="size-10 shrink-0 object-contain sm:size-12" />
-              {item.word}
-            </li>
-          ))}
-        </ul>
-      </Card>
+      <div className="absolute top-[135px] left-[640px] flex h-[245px] w-[640px] items-center justify-center bg-contain bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(/assets/canva/cover/sign.webp)' }}
+      >
+        <h2 className="-mt-[36px] rotate-[1.66deg] font-heading text-[100px] leading-[1.4] font-bold text-navy">เก่งมาก!</h2>
+      </div>
 
-      <Card tone="sky" className="flex w-full max-w-3xl flex-col gap-(--space-sm)">
-        <h2 id="summary-pairs" className="font-heading text-heading font-semibold">คู่คล้องจอง</h2>
-        <ul aria-labelledby="summary-pairs" className="flex flex-wrap gap-(--space-sm)">
-          {lesson.rhymeMatching.pairs.map(({ left, right }) => (
-            <li key={left} className="rounded-full border-[3px] border-border bg-card px-(--space-md) py-(--space-xs) font-heading text-heading font-bold shadow-clay">
-              {left} – {right}
-            </li>
-          ))}
-        </ul>
-      </Card>
+      <p className="absolute top-[392px] left-[560px] flex h-[100px] w-[800px] items-center justify-center gap-[24px] rounded-full border-[6px] border-card bg-cream font-heading text-[48px] font-bold text-navy">
+        ได้ {total}/{max} ดาว
+        <StarRow stars={total} slots={max} size="text-[44px]" />
+      </p>
 
-      <Card tone="yellow" className="flex w-full max-w-3xl flex-col gap-(--space-sm)">
-        <h2 id="summary-scores" className="font-heading text-heading font-semibold">คะแนนกิจกรรม</h2>
-        <ul aria-labelledby="summary-scores" className="flex flex-col gap-(--space-sm)">
-          {activities.map((activity) => (
+      <ul aria-label="ดาวแต่ละกิจกรรม" className="absolute top-[506px] left-[560px] flex w-[800px] flex-col gap-[10px]">
+        {activities.map((activity) => {
+          const title = lesson.steps[activity.step - 1]?.title
+          const result = results?.[activity.id]
+          return (
             <li
               key={activity.id}
-              className="flex flex-wrap items-center justify-between gap-(--space-sm) rounded-clay border-[3px] border-border bg-card p-(--space-sm) ps-(--space-md) shadow-clay"
+              className="flex h-[124px] items-center justify-between gap-[16px] rounded-full border-[6px] border-cream-border bg-card px-[36px] font-heading text-[40px] font-bold text-navy"
             >
-              <span className="font-semibold">{activity.title}</span>
-              {activity.score === null ? (
-                <span className="flex flex-wrap items-center gap-(--space-sm)">
-                  <span className="text-muted-foreground">ยังไม่ได้ทำ</span>
+              <span>{title}</span>
+              {result?.status === 'completed' ? (
+                <span className="flex items-center gap-[16px]">
+                  <span className="text-[30px] text-muted-foreground">{result.bestScore}/{activity.maxScore}</span>
+                  <span className="sr-only">{activity.stars} ดาว</span>
+                  <StarRow stars={activity.stars} slots={MAX_STARS} size="text-[52px]" />
+                </span>
+              ) : (
+                <span className="flex items-center gap-[16px]">
+                  <span className="text-[30px] text-muted-foreground">ยังไม่ได้ทำ</span>
                   <Link
                     to="/lesson/$lessonId/$step"
                     params={{ lessonId: lesson.id, step: String(activity.step) }}
-                    className={buttonClass('ghost')}
-                    aria-label={`ไปทำ ${activity.title}`}
+                    aria-label={`ไปทำ ${title}`}
+                    className={`${pressable} -my-[6px] flex h-[124px] items-center rounded-full border-4 border-card bg-pill ps-[24px] pe-[12px] text-[34px]`}
                   >
                     ไปทำ
-                    <ChevronRight aria-hidden="true" className="size-6" strokeWidth={2.75} />
+                    <ChevronRight aria-hidden="true" className="size-[44px]" strokeWidth={2.75} />
                   </Link>
-                </span>
-              ) : (
-                <span className="flex items-center gap-(--space-xs) font-heading text-heading font-bold">
-                  <Star aria-hidden="true" className="size-7 fill-accent text-on-accent" strokeWidth={2} />
-                  {activity.score}/{activity.maxScore}
                 </span>
               )}
             </li>
-          ))}
-        </ul>
-        <p className="flex items-center justify-center gap-(--space-sm) text-center font-heading text-heading font-bold">
-          <Mascot size="sm" decorative />
-          คะแนนรวม {total}/{max}
-        </p>
-      </Card>
+          )
+        })}
+      </ul>
 
-      <Button variant="ghost" size="lg" onClick={() => setConfirmReset(true)}>
-        <RotateCcw aria-hidden="true" className="size-7" strokeWidth={2.5} />
+      <button
+        type="button"
+        onClick={() => setConfirmReset(true)}
+        className={`${pressable} absolute top-[926px] left-[760px] flex h-[124px] w-[400px] items-center justify-center gap-[16px] rounded-full border-[6px] border-card bg-orange font-heading text-[48px] font-bold text-white shadow-[0_10px_0_#c2410c] active:translate-y-[6px] active:shadow-[0_4px_0_#c2410c]`}
+      >
+        <RotateCcw aria-hidden="true" className="size-[56px]" strokeWidth={2.75} />
         เรียนอีกครั้ง
-      </Button>
+      </button>
 
-      <ConfirmDialog
-        open={confirmReset}
-        message="ล้างความคืบหน้าและคะแนนทั้งหมด แล้วเริ่มเรียนใหม่ไหม?"
-        confirmLabel="ล้างและเริ่มใหม่"
-        cancelLabel="ยกเลิก"
-        onCancel={() => setConfirmReset(false)}
-        onConfirm={restart}
-      />
+      {/* The modal sits in the top layer but would still inherit the section's pointer-events: none. */}
+      <div className="pointer-events-auto">
+        <ConfirmDialog
+          open={confirmReset}
+          message="ล้างความคืบหน้าและคะแนนทั้งหมด แล้วเริ่มเรียนใหม่ไหม?"
+          confirmLabel="ล้างและเริ่มใหม่"
+          cancelLabel="ยกเลิก"
+          onCancel={() => setConfirmReset(false)}
+          onConfirm={restart}
+        />
+      </div>
     </section>
   )
 }

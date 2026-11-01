@@ -9,6 +9,7 @@ import { useLessonSession } from '../session/lessonSession'
 import { ConfirmDialog } from './clay/ConfirmDialog'
 import { FeedbackToast, type Feedback } from './clay/FeedbackToast'
 import { Stage, type Scene } from './stage/Stage'
+import { Celebration, endCelebration, StarCounter } from './Stars'
 
 /** Shared chrome exported from Canva (docs/canva-assets.md). */
 const CHROME = '/assets/canva/chrome'
@@ -45,6 +46,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
   const muted = useAudio((state) => state.muted)
   // AUD-004: leaving a Step stops its sound.
   useEffect(() => stopAudio, [stepNumber])
+  useEffect(() => endCelebration, [stepNumber])
 
   // Spec §4: ถัดไป completes a plain Step; on an Activity it saves partial work or, untouched, marks it skipped.
   // Back and Home never do either.
@@ -75,6 +77,8 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
           <h1 className="truncate font-heading text-[38px] leading-[1.4] font-bold text-navy">{title}</h1>
         </div>
       )}
+
+      {(activity || isLast) && <StarCounter lesson={lesson} />}
 
       {/* Design page 1 has no Step badge; the cover keeps it for screen readers. */}
       <p className={isFirst ? 'sr-only' : 'absolute top-[52px] left-1/2 -translate-x-1/2 rounded-full border-4 border-card bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold whitespace-nowrap text-navy'}>
@@ -160,6 +164,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
         }}
       />
 
+      <Celebration lesson={lesson} />
       <FeedbackToast feedback={feedback} className="absolute inset-x-0 bottom-[48px] z-30 flex justify-center" />
     </Stage>
   )

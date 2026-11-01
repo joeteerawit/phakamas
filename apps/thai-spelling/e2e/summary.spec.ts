@@ -55,15 +55,7 @@ test('Home leaves straight away once the answers are checked', async ({ page }) 
   await expect(dialog(page)).toHaveCount(0)
 })
 
-test('Step 10 reviews key words and rhyme pairs', async ({ page }) => {
-  await open(page, 10)
-  const words = page.getByRole('list', { name: 'คำสำคัญ' }).getByRole('listitem')
-  await expect(words).toHaveText(['ลิง', 'ช้าง', 'ดัง', 'รัง', 'ค่าง', 'ผึ้ง'])
-  const pairs = page.getByRole('list', { name: 'คู่คล้องจอง' }).getByRole('listitem')
-  await expect(pairs).toHaveText(['มอง – ร้อง', 'ดัง – ฟัง'])
-})
-
-test('TC-017: Step 10 shows each bestScore, ยังไม่ได้ทำ for the rest, total /20, and survives refresh', async ({ page }) => {
+test('TC-017: Step 10 shows each bestScore and Stars, ยังไม่ได้ทำ for the rest, total Stars /9, and survives refresh', async ({ page }) => {
   await open(page, 5)
   await selectAllCorrect(page)
   await nextLink(page).click() // Step 6
@@ -73,11 +65,11 @@ test('TC-017: Step 10 shows each bestScore, ยังไม่ได้ทำ fo
   await expect(scoreRow(page, 'แม่กงอยู่ไหน?')).toContainText('12/12')
   await expect(scoreRow(page, 'กล่องคำแม่กง')).toContainText('ยังไม่ได้ทำ')
   await expect(scoreRow(page, 'จับคู่ดูคำ')).toContainText('ยังไม่ได้ทำ')
-  await expect(page.getByText('คะแนนรวม 12/20')).toBeVisible()
+  await expect(page.getByText(/^ได้ 3\/9 ดาว/)).toBeVisible()
 
   await page.reload()
   await expect(scoreRow(page, 'แม่กงอยู่ไหน?')).toContainText('12/12')
-  await expect(page.getByText('คะแนนรวม 12/20')).toBeVisible()
+  await expect(page.getByText(/^ได้ 3\/9 ดาว/)).toBeVisible()
 
   await scoreRow(page, 'กล่องคำแม่กง').getByRole('link', { name: /ไปทำ/ }).click()
   await expect(page).toHaveURL(/\/lesson\/mae-kong\/6$/)
@@ -110,9 +102,8 @@ test('เรียนอีกครั้ง confirms, then clears the Session 
   expect(await activities(page)).toEqual({})
 })
 
-// fixme(#16): old Step content is scaled down inside the 1920×1080 stage; its Step reskin ticket restores ≥44px targets.
-test.fixme('Step 10 has no Reading Assessment and fits at 360px', async ({ page }) => {
-  await page.setViewportSize({ width: 740, height: 360 })
+test('Step 10 has no Reading Assessment and fits a 390px-tall phone', async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 })
   await open(page, 10)
   await expect(page.getByText(/ประเมิน|ผ่าน/).and(page.getByRole('button'))).toHaveCount(0)
   for (const target of [page.getByRole('button', { name: 'เรียนอีกครั้ง' }), page.getByRole('link', { name: /ไปทำ/ }).first()]) {

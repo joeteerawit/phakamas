@@ -2,6 +2,7 @@ import { Check, RotateCcw, Star, X } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { playClip } from '../audio/audioManager'
+import { celebrate } from './Stars'
 import { useClearFeedbackOnLeave } from '../activities/feedback'
 import { lessonActivity, useReportUncheckedWork, useUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
@@ -88,7 +89,7 @@ export function RhymeMatchingStep({ lesson, onFeedback }: ActivityStepProps) {
       return
     }
     recordActivityCheck(activity.id, pairs.length, activity.maxScore, { mistakes })
-    playClip(sounds.completed)
+    celebrate(activity.id, sounds.completed)
     setFeedback({ kind: 'correct', message: 'เก่งมาก! จับคู่ถูกครบแล้ว' })
   }
 
