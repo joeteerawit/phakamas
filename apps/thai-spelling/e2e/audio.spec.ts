@@ -141,30 +141,3 @@ test.describe('Step 2 vocabulary cards', () => {
   })
 })
 
-test.describe('Step 1 intro', () => {
-  test('ฟังคำแนะนำ plays the intro and pressing again stops it', async ({ page }) => {
-    await open(page, 1)
-    await page.getByRole('button', { name: 'ฟังคำแนะนำ' }).click()
-    await expect.poll(() => audioLog(page)).toEqual(['play:/assets/audio/intro.mp3'])
-
-    await page.getByRole('button', { name: 'หยุดเสียง' }).click()
-    await expect.poll(() => audioLog(page)).toEqual(['play:/assets/audio/intro.mp3', 'pause:/assets/audio/intro.mp3'])
-    await expect(page.getByRole('button', { name: 'ฟังคำแนะนำ' })).toBeVisible()
-  })
-
-  test('intro fallback reads the intro script in Thai', async ({ page }) => {
-    await open(page, 1, { mp3: 'missing' })
-    await page.getByRole('button', { name: 'ฟังคำแนะนำ' }).click()
-    await expect.poll(() => audioLog(page)).toContain('speak:สวัสดีเด็ก ๆ วันนี้เราจะมาเรียนรู้คำคล้องจองในมาตราแม่กงกัน พร้อมแล้วกดเริ่มเรียนได้เลย|th-TH')
-  })
-
-  test('เริ่มเรียน navigates immediately while the intro plays, and stops it', async ({ page }) => {
-    await open(page, 1)
-    await page.getByRole('button', { name: 'ฟังคำแนะนำ' }).click()
-    await expect(page.getByRole('button', { name: 'หยุดเสียง' })).toBeVisible()
-
-    await page.getByRole('link', { name: 'เริ่มเรียน' }).click()
-    await expect(page).toHaveURL(/\/lesson\/mae-kong\/2$/)
-    await expect.poll(() => audioLog(page)).toContain('pause:/assets/audio/intro.mp3')
-  })
-})

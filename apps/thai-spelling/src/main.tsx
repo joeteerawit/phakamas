@@ -4,6 +4,8 @@ import '@fontsource/anuphan/thai-600.css'
 import '@fontsource/mali/thai-600.css'
 import '@fontsource/mali/thai-700.css'
 import './styles.css'
+// Installs the background-music first-gesture listener on every entry route.
+import './audio/music'
 
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { StrictMode } from 'react'

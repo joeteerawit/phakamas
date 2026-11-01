@@ -26,6 +26,9 @@ export type LessonSession = {
 
 type LessonSessionStore = {
   session: LessonSession | null
+  /** Background music preference (cover speaker); outlives the Session, so เริ่มใหม่ keeps it. */
+  musicOn: boolean
+  setMusicOn: (on: boolean) => void
   visitStep: (lessonId: string, step: number) => void
   /** A press of ตรวจคำตอบ: counts the attempt and keeps the best score. */
   recordActivityCheck: (activityId: ActivityId, score: number, maxScore: number, answers: unknown) => void
@@ -49,6 +52,8 @@ export const useLessonSession = create<LessonSessionStore>()(
   persist(
     (set) => ({
       session: null,
+      musicOn: true,
+      setMusicOn: (musicOn) => set({ musicOn }),
       visitStep: (lessonId, step) =>
         set(({ session }) => {
           const current =
@@ -93,6 +98,6 @@ export const useLessonSession = create<LessonSessionStore>()(
       completeStep: (step) => set(({ session }) => (session ? { session: withCompletedStep(session, step) } : {})),
       resetSession: () => set({ session: null }),
     }),
-    { name: 'thai-spelling:lesson-session', version: 1, partialize: ({ session }) => ({ session }) },
+    { name: 'thai-spelling:lesson-session', version: 1, partialize: ({ session, musicOn }) => ({ session, musicOn }) },
   ),
 )
