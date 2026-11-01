@@ -10,8 +10,51 @@ test.describe('Step 2 vocabulary cards', () => {
     await expect(cards).toHaveCount(6)
     for (const [i, word] of ['ลิง', 'ช้าง', 'ดัง', 'รัง', 'ค่าง', 'ผึ้ง'].entries()) {
       await expect(cards.nth(i)).toHaveAccessibleName(new RegExp(`^${word} `))
-      await expect(cards.nth(i).locator('img')).toHaveJSProperty('complete', true)
+      await expect(cards.nth(i).locator('img[src*="/vocabulary/"]')).toHaveJSProperty('complete', true)
     }
+  })
+
+  test('cards sit where design page 2 puts them on the 1920×1080 stage', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 })
+    await open(page, 2)
+    await expect(page.getByText('คลิกที่ภาพเพื่อฟังเสียง')).toBeVisible()
+    for (const [i, left] of [137, 429, 720, 1011, 1302, 1594].entries()) {
+      // Polls because the cards pop in.
+      await expect
+        .poll(async () => {
+          const box = (await page.getByRole('list').getByRole('button').nth(i).boundingBox())!
+          return [box.x, box.y, box.width, box.height].map(Math.round)
+        })
+        .toEqual([left, 335, 255, 378])
+    }
+  })
+
+  test('cards are ≥44px tap targets on a 390px-tall landscape phone', async ({ page }) => {
+    await page.setViewportSize({ width: 844, height: 390 })
+    await open(page, 2)
+    const box = (await card(page, 'ลิง').boundingBox())!
+    expect(box.width).toBeGreaterThanOrEqual(44)
+    expect(box.height).toBeGreaterThanOrEqual(44)
+  })
+
+  test('the speaker shows pulsing sound waves only while the clip plays', async ({ page }) => {
+    await open(page, 2)
+    const waves = card(page, 'ลิง').getByTestId('sound-waves')
+    await expect(waves).toHaveCount(0)
+    await card(page, 'ลิง').click()
+    await expect(waves).toBeVisible()
+    await expect(waves.locator('path').first()).toHaveCSS('animation-name', 'sound-wave')
+    await endCurrent(page)
+    await expect(waves).toHaveCount(0)
+  })
+
+  test('reduced motion: the sound waves are a static highlight', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await open(page, 2)
+    await card(page, 'ลิง').click()
+    const waves = card(page, 'ลิง').getByTestId('sound-waves')
+    await expect(waves).toBeVisible()
+    await expect(waves.locator('path').first()).toHaveCSS('animation-name', 'none')
   })
 
   test('TC-002: tapping ลิง plays its audio ID and highlights the card', async ({ page }) => {

@@ -37,7 +37,7 @@ export function CoverStep({ lesson }: StepProps) {
   const introBusy = introStatus === 'loading' || introStatus === 'playing'
 
   return (
-    <section className="pointer-events-none absolute inset-0">
+    <section data-full-stage className="pointer-events-none absolute inset-0">
       <motion.img
         src={`${COVER}/tree-left.webp`}
         alt=""

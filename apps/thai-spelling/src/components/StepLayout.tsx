@@ -112,14 +112,8 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
       )}
 
       {/* shortcut: old Step content keeps its rem sizes and scrolls inside the stage; each Step's reskin ticket lays it out in stage pixels. */}
-      <main
-        className={
-          isFirst
-            ? // The cover lays itself out on the whole stage; only its own buttons take pointer events.
-              'pointer-events-none absolute inset-0 flex flex-col overflow-hidden'
-            : 'absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto'
-        }
-      >
+      {/* A reskinned Step marks its root data-full-stage and is laid out over the whole stage in design pixels. */}
+      <main className="absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto has-[[data-full-stage]]:pointer-events-none has-[[data-full-stage]]:inset-0 has-[[data-full-stage]]:overflow-hidden">
         <motion.div
           key={stepNumber}
           className="flex flex-1 flex-col"

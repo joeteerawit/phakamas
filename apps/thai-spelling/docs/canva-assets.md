@@ -24,3 +24,9 @@ Cut-outs in #16 were matted exactly: the isolated elements were exported twice a
 | `cover/bushes-right.webp` | `MAHZpwAoQVk` (layer of `MAHZj9KvLtU`) | page 1 background: front-right bushes; stage 1371,788 549×293 | `DAHZp4RGbTI` page 8 | #19 |
 | `cover/speaker-button.webp` | `MAFPfpE2q4Y` | page 1 element `LBL9RPzbsz59G4dQ`, 2× | `DAHZp4RGbTI` page 9 | #19 |
 | `cover/play-button.webp` | `MAGOM8A4fE4` | page 1 element `LBgqRJFwL9xqWXzT`, 2× | `DAHZp4RGbTI` page 10 | #19 |
+| `vocabulary/ling.webp` | `MAHFXi-h3qc` | page 2 element `LBpKYQxl5s3Cb1ny` (monkey), 2×, white/black matte | `DAHZp7SpMi8` | #21 |
+| `vocabulary/chang.webp` | `MAHF_isxkOw` | page 2 element `LBXFZBxj4WBjszlg` (elephant), 2×, white/black matte | `DAHZp7SpMi8` | #21 |
+| `vocabulary/dang.webp` | `MAHN8vKLDtM` | page 2 element `LBgr28HnzwQLNH3P` (megaphone), 2×, white/black matte | `DAHZp7SpMi8` | #21 |
+| `vocabulary/rang.webp` | `MAGlcZnrylg` | page 2 element `LBWPmwgQLfhQmbGr` (nest), 2×, white/black matte | `DAHZp7SpMi8` | #21 |
+| `vocabulary/khang.webp` | `MAHV1KAmQ9I` | page 2 element `LB8j0GGJw9VqSlfr` (langur), 2×, white/black matte | `DAHZp7SpMi8` | #21 |
+| `vocabulary/phueng.webp` | `MAHAz-S1CSc` | page 2 element `LB8CJfLNdTcKH4Tc` (bee), 2×, white/black matte | `DAHZp7SpMi8` | #21 |
