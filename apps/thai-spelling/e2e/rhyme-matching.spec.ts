@@ -1,8 +1,8 @@
-import { expect, type Locator, type Page, test } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
 import { audioLog, open } from './audioStub.js'
 
 const word = (page: Page, text: string) => page.getByRole('button', { name: new RegExp(`^${text}`) })
-const lines = (page: Page) => page.getByTestId('match-lines').locator('line')
+const lines = (page: Page) => page.getByTestId('match-lines').locator('path')
 const activity = (page: Page) =>
   page.evaluate(
     () => JSON.parse(localStorage.getItem('thai-spelling:lesson-session') ?? 'null')?.state.session.activities.rhymeMatching,
@@ -13,25 +13,34 @@ async function pair(page: Page, left: string, right: string) {
   await word(page, right).click()
 }
 
-async function drag(page: Page, from: Locator, to: Locator) {
-  const a = (await from.boundingBox())!
-  const b = (await to.boundingBox())!
-  await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2)
-  await page.mouse.down()
-  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 8 })
-  await page.mouse.up()
-}
-
 test.describe('Step 8 rhyme matching', () => {
-  test('shows มอง ดัง on the left and ร้อง ฟัง shuffled on the right', async ({ page }) => {
+  test('shows four buzzers as in design page 8: มอง ฟัง on top, ดัง ร้อง below', async ({ page }) => {
     await open(page, 8)
-    for (const text of ['มอง', 'ดัง', 'ร้อง', 'ฟัง']) await expect(word(page, text)).toBeVisible()
-    const right = await page.getByRole('group', { name: 'คำฝั่งขวา' }).getByRole('button').allInnerTexts()
-    // Shuffled so no word sits opposite its partner.
-    expect(right.map((t) => t.trim())).not.toEqual(['ร้อง', 'ฟัง'])
+    const box = async (text: string) => (await word(page, text).boundingBox())!
+    const [mong, fang, dang, rong] = await Promise.all([box('มอง'), box('ฟัง'), box('ดัง'), box('ร้อง')])
+    expect(mong.x).toBeLessThan(fang.x)
+    expect(dang.x).toBeLessThan(rong.x)
+    expect(mong.y).toBeLessThan(dang.y)
+    expect(fang.y).toBeLessThan(rong.y)
+    await expect(word(page, 'มอง').locator('img[src="/assets/canva/ui/buzzer.webp"]')).toBeAttached()
   })
 
-  test('TC-012: a wrong pair flashes red, its line vanishes, and the student can retry', async ({ page }) => {
+  test('pressing a buzzer plays its word and selects it', async ({ page }) => {
+    await open(page, 8)
+    await word(page, 'ฟัง').click()
+    await expect(word(page, 'ฟัง')).toHaveAttribute('aria-pressed', 'true')
+    await expect.poll(() => audioLog(page)).toContain('play:/assets/audio/vocabulary/fang.mp3')
+  })
+
+  test('with reduced motion a correct pair still draws its line', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await open(page, 8)
+    await pair(page, 'ร้อง', 'มอง')
+    await expect(word(page, 'มอง')).toContainText('จับคู่แล้ว')
+    await expect(lines(page)).toHaveCount(1)
+  })
+
+  test('TC-012: a wrong pair shakes, draws no line, and the student can retry', async ({ page }) => {
     await open(page, 8)
     await pair(page, 'ดัง', 'ร้อง')
     await expect(page.getByRole('status').filter({ hasText: 'ยังไม่ถูก' })).toBeVisible()
@@ -77,13 +86,6 @@ test.describe('Step 8 rhyme matching', () => {
     await expect(word(page, 'มอง')).toContainText('จับคู่แล้ว')
   })
 
-  test('drag from a left word to its rhyme draws a locked line', async ({ page }) => {
-    await open(page, 8)
-    await drag(page, word(page, 'มอง'), word(page, 'ร้อง'))
-    await expect(word(page, 'มอง')).toContainText('จับคู่แล้ว')
-    await expect(lines(page)).toHaveCount(1)
-  })
-
   test('เริ่มใหม่ clears every pair', async ({ page }) => {
     await open(page, 8)
     await pair(page, 'ดัง', 'ฟัง')
@@ -109,11 +111,10 @@ test.describe('Step 8 rhyme matching', () => {
     expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 1, maxScore: 2, attemptCount: 1 })
   })
 
-  // fixme(#16): old Step content is scaled down inside the 1920×1080 stage; its Step reskin ticket restores ≥44px targets.
-  test.fixme('no horizontal scroll at 360px and words are at least 44px', async ({ page }) => {
+  test('no horizontal scroll on a 740×360 phone and buzzers are at least 44px', async ({ page }) => {
     await page.setViewportSize({ width: 740, height: 360 })
     await open(page, 8)
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(740)
     const box = (await word(page, 'ร้อง').boundingBox())!
     expect(box.height).toBeGreaterThanOrEqual(44)
     expect(box.width).toBeGreaterThanOrEqual(44)
