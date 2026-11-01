@@ -66,8 +66,7 @@ test('browser Back keeps the Session intact', async ({ page }) => {
   expect(stored.state.session.visitedSteps).toEqual([1, 2, 3, 4])
 })
 
-// fixme(#16): old Step content is scaled down inside the 1920×1080 stage; its Step reskin ticket restores ≥44px targets.
-test.fixme('resume buttons fit at 360px with ≥44px targets and no horizontal scroll', async ({ page }) => {
+test('resume buttons fit at 360px with ≥44px targets and no horizontal scroll', async ({ page }) => {
   await page.setViewportSize({ width: 740, height: 360 })
   await page.goto('/lesson/mae-kong/5')
   await homeLink(page).click()

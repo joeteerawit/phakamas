@@ -31,8 +31,9 @@ test('Step 1 has no Back, and เริ่มเรียน goes to Step 2', as
 
 test('Next and Back move between Steps and update ขั้น X/10', async ({ page }) => {
   await page.goto('/lesson/mae-kong/1')
+  await expect(nextLink(page)).toHaveCount(0)
 
-  await nextLink(page).click()
+  await page.getByRole('link', { name: 'เริ่มเรียน' }).click()
   await expectStep(page, 2, 'ดูภาพเรียนรู้คำ')
   await nextLink(page).click()
   await expectStep(page, 3, 'ฟังแล้วอ่านตาม')

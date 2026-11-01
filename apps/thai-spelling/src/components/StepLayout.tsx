@@ -63,7 +63,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
   const navigate = useNavigate()
 
   return (
-    <Stage scene={scene}>
+    <Stage scene={isFirst ? 'cover' : scene}>
       {isFirst ? (
         // The cover's visible heading is the Lesson title; the Step title stays the h1.
         <h1 className="sr-only">{title}</h1>
@@ -76,7 +76,8 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
         </div>
       )}
 
-      <p className="absolute top-[52px] left-1/2 -translate-x-1/2 rounded-full border-4 border-card bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold whitespace-nowrap text-navy">
+      {/* Design page 1 has no Step badge; the cover keeps it for screen readers. */}
+      <p className={isFirst ? 'sr-only' : 'absolute top-[52px] left-1/2 -translate-x-1/2 rounded-full border-4 border-card bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold whitespace-nowrap text-navy'}>
         ขั้น {stepNumber}/{totalSteps}
       </p>
 
@@ -85,7 +86,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
         aria-label="ปิดเสียง"
         aria-pressed={muted}
         onClick={toggleMute}
-        className={`${pressable} top-[32px] left-[1620px] flex size-[122px] items-center justify-center rounded-full border-[6px] border-card bg-pill text-navy`}
+        className={`${pressable} z-10 top-[32px] left-[1620px] flex size-[122px] items-center justify-center rounded-full border-[6px] border-card bg-pill text-navy`}
       >
         {muted ? (
           <VolumeX aria-hidden="true" className="size-16" strokeWidth={2.5} />
@@ -111,7 +112,14 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
       )}
 
       {/* shortcut: old Step content keeps its rem sizes and scrolls inside the stage; each Step's reskin ticket lays it out in stage pixels. */}
-      <main className="absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto">
+      <main
+        className={
+          isFirst
+            ? // The cover lays itself out on the whole stage; only its own buttons take pointer events.
+              'pointer-events-none absolute inset-0 flex flex-col overflow-hidden'
+            : 'absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto'
+        }
+      >
         <motion.div
           key={stepNumber}
           className="flex flex-1 flex-col"
@@ -134,15 +142,18 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
             <img src={`${CHROME}/back-button.webp`} alt="" draggable={false} className={chromeImage} />
           </Link>
         )}
-        <Link
-          to="/lesson/$lessonId/$step"
-          params={stepParams(isLast ? 1 : stepNumber + 1)}
-          aria-label={isLast ? 'กลับหน้าแรก' : 'ถัดไป'}
-          onClick={isLast ? undefined : leaveViaNext}
-          className={`${pressable} top-[915px] left-[1738px] h-[152px] w-[148px]`}
-        >
-          <img src={`${CHROME}/next-button.webp`} alt="" draggable={false} className={chromeImage} />
-        </Link>
+        {/* The cover's own ▶ replaces Next. */}
+        {!isFirst && (
+          <Link
+            to="/lesson/$lessonId/$step"
+            params={stepParams(isLast ? 1 : stepNumber + 1)}
+            aria-label={isLast ? 'กลับหน้าแรก' : 'ถัดไป'}
+            onClick={isLast ? undefined : leaveViaNext}
+            className={`${pressable} top-[915px] left-[1738px] h-[152px] w-[148px]`}
+          >
+            <img src={`${CHROME}/next-button.webp`} alt="" draggable={false} className={chromeImage} />
+          </Link>
+        )}
       </nav>
 
       <ConfirmDialog
