@@ -4,7 +4,6 @@ import type { Feedback } from './clay/FeedbackToast'
 /** Props of every Activity Step; it reports feedback for the layout's toast. */
 export type ActivityStepProps = {
   lesson: Lesson
-  title: string
   onFeedback: (feedback: Feedback | null) => void
 }
 

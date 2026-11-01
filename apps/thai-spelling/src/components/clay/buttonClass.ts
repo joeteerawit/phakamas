@@ -38,7 +38,3 @@ export function buttonClass(variant: ButtonVariant = 'primary', size: ButtonSize
   return cx(base, variants[variant], sizes[size])
 }
 
-/** Class names for round icon-only clay buttons and links (48px compact, 56px desktop). */
-export function iconButtonClass(variant: ButtonVariant = 'ghost') {
-  return cx(base, variants[variant], 'size-12 lg:size-14')
-}

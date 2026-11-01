@@ -6,14 +6,13 @@ import type { Sentence } from '../lessons'
 import { Button } from './clay/Button'
 import { cx } from './clay/buttonClass'
 import { Card, cardClass, toneAt } from './clay/Card'
-import { WoodenSign } from './clay/WoodenSign'
 import { RecorderMessages } from './RecorderMessages'
 import type { StepProps } from './stepProps'
 
 const icon = 'size-7 shrink-0'
 
 /** Step 9: each sentence card plays only its own sentence; the student records the selected one. */
-export function SentenceStep({ lesson, title }: StepProps) {
+export function SentenceStep({ lesson }: StepProps) {
   const [selected, setSelected] = useState(0)
   useEffect(() => discardRecording, [])
 
@@ -27,7 +26,6 @@ export function SentenceStep({ lesson, title }: StepProps) {
 
   return (
     <section className="flex flex-1 flex-col items-center gap-(--space-lg)">
-      <WoodenSign>{title}</WoodenSign>
 
       <ul className="grid w-full max-w-3xl gap-(--space-md) sm:grid-cols-2">
         {lesson.sentences.map((sentence, i) => (

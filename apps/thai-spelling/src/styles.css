@@ -41,6 +41,14 @@
   --color-correct: #15803d;
   --color-wrong: #dc2626;
   --color-ring: #2563eb;
+  /* Canva garden (MASTER.md "Canva garden"), sampled from design DAHZj0Nxyxs. */
+  --color-navy: #1800ad;
+  --color-final: #ff3131;
+  --color-cream: #ffe98d;
+  --color-cream-border: #8a3a13;
+  --color-pill: #ffa3dc;
+  --color-letterbox-sky: #0ca4e7;
+  --color-letterbox-grass: #4c9a3c;
 
   --font-sans: 'Anuphan', ui-sans-serif, system-ui, sans-serif;
   --font-heading: 'Mali', 'Anuphan', ui-sans-serif, system-ui, sans-serif;
@@ -68,6 +76,14 @@
     0 6px 0 rgba(15, 23, 42, 0.12), 0 12px 24px rgba(15, 23, 42, 0.1),
     inset 0 -4px 0 rgba(15, 23, 42, 0.08), inset 0 2px 0 rgba(255, 255, 255, 0.7);
   --shadow-clay-pressed: 0 2px 0 rgba(15, 23, 42, 0.12), inset 0 2px 4px rgba(15, 23, 42, 0.12);
+
+  /* Rotate overlay: the phone turns to landscape, holds, and turns back. */
+  --animate-rotate-phone: rotate-phone 2.4s ease-in-out infinite;
+  @keyframes rotate-phone {
+    0%, 15% { transform: rotate(0deg); }
+    45%, 70% { transform: rotate(90deg); }
+    100% { transform: rotate(0deg); }
+  }
 }
 
 /* Spacing (Density 3). Used as e.g. `gap-(--space-sm)`. */
@@ -99,7 +115,7 @@
   html {
     color-scheme: light;
     -webkit-text-size-adjust: 100%;
-    background-color: var(--color-sky);
+    background-color: var(--color-letterbox-sky);
   }
 
   body {
@@ -109,7 +125,9 @@
     font-size: var(--text-body);
     line-height: 1.6;
     color: var(--color-foreground);
-    background-color: var(--color-grass);
+    background-color: var(--color-letterbox-grass);
+    /* The stage always fits the window; nothing may scroll the page. */
+    overflow: hidden;
   }
 
   @media (min-width: 64rem) {

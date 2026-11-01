@@ -42,9 +42,16 @@
 
 ### 1.3 Shared Layout
 
-ทุกหน้าการเรียนรู้มี Header (Home, ชื่อบทเรียน, หน้า X/10), Progress Bar, Content Area, ปุ่มย้อนกลับและถัดไป โดยหน้าแรกไม่แสดง Back และหน้าสุดท้ายใช้ปุ่มกลับเมนูหลักแทน Next
+ทุก Step อยู่บน **Stage ขนาดคงที่ 1920×1080** (ตาม Canva design `DAHZj0Nxyxs`) ที่ย่อ/ขยายตามขนาดหน้าต่างแบบคงสัดส่วน จัดกึ่งกลาง และเติมขอบ (letterbox) ด้วยสีฟ้า→เขียวของฉาก หน้าเว็บไม่มี scrollbar และไม่มี layout แยกสำหรับมือถือ บน Stage มี:
 
-Theme: การ์ตูนสวนธรรมชาติ สีเขียว ฟ้า เหลือง ชมพู ป้ายไม้ มุมโค้ง และฟอนต์ไทยขนาดใหญ่ แยกภาพพื้นหลังออกจาก HTML UI ที่คลิกได้
+- ป้ายไม้ชื่อ Step มุมซ้ายบน (ข้อความจาก Lesson data, สีน้ำเงิน `#1800ad`), ป้าย "ขั้น X/10", ปุ่มปิดเสียง และปุ่ม Home ไม้มุมขวาบน
+- ปุ่มย้อนกลับ (ลูกศรส้ม) มุมซ้ายล่าง และปุ่มถัดไปมุมขวาล่าง; หน้าแรกไม่มี Back และ Home; หน้าสุดท้ายปุ่มขวาล่างเป็น "กลับหน้าแรก"
+- **Home กลับไปหน้าปก (Step 1) และเก็บความคืบหน้า Session ไว้** (หน้าปกแสดง "เรียนต่อ (ขั้น X)"); ถ้ามีคำตอบที่ยังไม่ตรวจ ถามยืนยันก่อน
+- ฉากพื้นหลัง: สวน (ค่าเริ่มต้น) หรือสระน้ำ ที่ Step เลือกได้
+
+**หมุนจอ:** ถ้าหน้าต่างเป็นแนวตั้ง (สูง > กว้าง) แสดง overlay เต็มจอ (สีสวน, รูปโทรศัพท์หมุน 90° วนซ้ำ, น้องลิง, ข้อความ "กรุณาหมุนจอเป็นแนวนอน") ปิดกั้นการกดทุกอย่างด้านหลัง และหายไปทันทีเมื่อเป็นแนวนอน; ถ้าผู้ใช้ตั้ง reduced motion รูปโทรศัพท์ไม่หมุน
+
+Theme: Canva garden (ดู §6) ปุ่ม การ์ด และข้อความยังเป็น HTML UI ที่คลิกได้ แยกจากภาพพื้นหลัง
 
 ---
 
@@ -393,7 +400,7 @@ public/assets/
 
 ## 6. UI/UX
 
-> **Source of truth:** `apps/thai-spelling/design-system/thai-spelling/MASTER.md` (Claymorphism + garden, tokens, Mali/Anuphan, Lucide icons, Mascot น้องลิง, responsive layout, motion budget). The table below is the original brief.
+> **Source of truth:** Canva design `DAHZj0Nxyxs` ("คำคล้องจองพาเพลิน") and `apps/thai-spelling/design-system/thai-spelling/MASTER.md` section "Style: Canva garden" (1920×1080 stage, palette, Canva-exported chrome, rotate overlay, Mali/Anuphan, Mascot น้องลิง, motion budget). Assets exported from Canva are logged in `docs/canva-assets.md`. The table below is the original brief; the breakpoints no longer apply (one stage layout, portrait shows the rotate overlay).
 
 | Property | Spec |
 |---|---|

@@ -6,7 +6,6 @@ import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
 import { buttonClass, cx } from './clay/buttonClass'
 import { cardClass, toneAt } from './clay/Card'
-import { WoodenSign } from './clay/WoodenSign'
 import type { ActivityStepProps } from './stepProps'
 import { usePointerDrag } from './usePointerDrag'
 
@@ -14,7 +13,7 @@ import { usePointerDrag } from './usePointerDrag'
  * Step 6: place each bank word in the blank under its picture.
  * Tap-to-select (mouse, touch, keyboard) is the main path; Pointer-Events drag is a shortcut.
  */
-export function WordFillingStep({ lesson, title, onFeedback }: ActivityStepProps) {
+export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
   const { bank, pictures } = lesson.wordFilling
   const activity = lessonActivity(lesson, 'wordFilling')
   const [placed, setPlaced] = useState<(string | null)[]>(() => pictures.map(() => null))
@@ -81,7 +80,6 @@ export function WordFillingStep({ lesson, title, onFeedback }: ActivityStepProps
 
   return (
     <section className="flex flex-1 flex-col items-center gap-(--space-md)">
-      <WoodenSign>{title}</WoodenSign>
       <p className="text-center text-muted-foreground">แตะคำ แล้วแตะช่องใต้ภาพ หรือลากคำไปวาง</p>
 
       <div

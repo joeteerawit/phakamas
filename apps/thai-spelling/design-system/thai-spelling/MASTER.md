@@ -8,9 +8,26 @@
 
 ---
 
-## Style
+## Style: Canva garden
 
-**Claymorphism on a garden backdrop.** Soft 3D, chunky, toy-like: thick borders (3–4px), rounded 16–24px, double shadow (outer drop + inner highlight), soft press. Step headings sit on a **wooden sign**. Page background is a full-bleed sky → grass gradient.
+**Source of truth: Canva design `DAHZj0Nxyxs` ("คำคล้องจองพาเพลิน").** It replaces the earlier claymorphism direction; where this file and the design disagree, the design wins. Clay tokens below stay only until every Step is reskinned.
+
+- **Stage**: every Step is laid out on a fixed **1920×1080** stage (`components/stage/Stage.tsx`) scaled uniformly to fit the window, centred and letterboxed with the scene's sky → grass (`--color-letterbox-sky` `#0CA4E7` → `--color-letterbox-grass` `#4C9A3C`). Positions and sizes are **stage pixels copied from the Canva element coordinates**. No separate mobile layout.
+- **Scenes**: garden (default, design page 2 background) and pond (design page 3), WebP under `public/assets/canva/backgrounds/`.
+- **Shared chrome** (Canva exports under `public/assets/canva/chrome/`, logged in `docs/canva-assets.md`): wooden title sign top-left (47, 29, 382×115) with the Step title in navy; wooden Home top-right (1765, 23, 135×140); round orange Back bottom-left (29, 904, 158×163) and Next bottom-right (1738, 915, 148×152); orange speaker button for card audio.
+- **Rotate overlay**: a portrait window (height > width) is fully covered by a garden-coloured layer with a rotating phone, the Mascot and "กรุณาหมุนจอเป็นแนวนอน"; the stage behind is `inert`. Reduced motion stops the phone.
+- **Tap targets**: ≥ 44 CSS px on a 390px-tall landscape phone, i.e. **≥ 122 stage px**.
+
+| Role | Hex | CSS Variable |
+|------|-----|--------------|
+| Navy text (titles, words) | `#1800AD` | `--color-navy` |
+| Red final consonant (ง) | `#FF3131` | `--color-final` |
+| Word card cream | `#FFE98D` | `--color-cream` |
+| Card border, 4px dashed brown | `#8A3A13` | `--color-cream-border` |
+| Pink instruction pill (white 4px border) | `#FFA3DC` | `--color-pill` |
+| Orange buttons | Canva artwork (`chrome/*.webp`) | n/a |
+
+**Fonts**: the design uses a bold rounded Thai display face; keep **Mali** (headings, words, bold) and **Anuphan** (body). No Google Font is a closer self-hostable match.
 
 ## Color Tokens
 
@@ -83,19 +100,12 @@ Line-height 1.6 for Thai (stacked tone marks need room). Self-hosted only; no Go
 
 - **Button**: min height 56px (48px absolute minimum), pill radius, 3px border, `--shadow-clay`; press = translateY(4px) + `--shadow-clay-pressed` in 150ms; visible 3px focus ring; `cursor: pointer`.
 - **Card** (vocabulary, choice, sentence): white, radius 24px, 3px border, `--shadow-clay`, image + word + speaker; selected = pink border; playing = blue glow.
-- **Wooden sign**: Step heading on `--color-wood` plank with Mali white text.
-- **Step navigation bar**: Back / Next pills.
+- **Title sign, Home, Back, Next**: Canva artwork on the stage (see "Style: Canva garden").
 - **Feedback toast**: mascot + message + ✓/✗ icon, announced via `aria-live="polite"`.
 
-## Responsive Layout (mobile-first)
+## Layout
 
-| Width | Layout |
-|-------|--------|
-| < 768px | Compact header (home, ขั้น X/10, mute); progress bar; single-column content; vocabulary grid 2 columns; **Back/Next bar fixed to the bottom** (thumb zone, respects safe-area inset); content padded so nothing hides behind it |
-| 768–1023px | Vocabulary grid 3 columns; Back/Next bar still at bottom |
-| ≥ 1024px | Content inside a centred **storybook** panel, max-width ~1100px, on the full-bleed garden; Back/Next at the bottom of the storybook |
-
-Verify at 375, 768, 1024, 1440px. No horizontal scroll; zoom never disabled.
+One layout: the 1920×1080 stage (see "Style: Canva garden"). Verify at 1280×720, 1920×1080 and an 844×390 landscape phone; portrait shows the rotate overlay. The page never scrolls; zoom never disabled.
 
 ## Motion (Motion library, subtle)
 
@@ -113,15 +123,15 @@ Verify at 375, 768, 1024, 1440px. No horizontal scroll; zoom never disabled.
 - ❌ Text below 16px; gray-on-gray
 - ❌ Instant state changes (always 150–300ms)
 - ❌ Invisible focus states
-- ❌ Content hidden behind the fixed bottom bar
+- ❌ Content hidden behind the stage chrome (title sign, Home, Back, Next)
 
 ## Pre-Delivery Checklist (every UI ticket)
 
 - [ ] Built with the ui-ux-pro-max skill and this file
 - [ ] Lucide icons only for controls, each with a Thai `aria-label`
-- [ ] Touch targets ≥ 48px with ≥ 8px gaps
+- [ ] Touch targets ≥ 122 stage px (44 CSS px on a 390px-tall phone)
 - [ ] Text contrast ≥ 4.5:1
 - [ ] Visible focus; full keyboard path
 - [ ] `prefers-reduced-motion` respected
 - [ ] Right/wrong shown with icon + text, not colour alone
-- [ ] Checked at 375, 768, 1024, 1440px; no horizontal scroll
+- [ ] Checked at 1280×720, 1920×1080, 844×390 (landscape) and a portrait phone; no scrollbars

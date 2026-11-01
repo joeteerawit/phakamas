@@ -85,7 +85,7 @@ test('keyboard alone completes the Activity with full marks', async ({ page }) =
 })
 
 test('dragging a word onto a blank places it, and drags move it between blanks', async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 1400 }) // keep bank and blanks on screen for raw mouse input
+  await page.setViewportSize({ width: 2560, height: 1440 }) // keep bank and blanks inside the stage for raw mouse input
   const drag = async (from: Locator, to: Locator) => {
     const a = (await from.boundingBox())!
     const b = (await to.boundingBox())!
@@ -109,11 +109,11 @@ test('ถัดไป without checking records the Activity as skipped', async (
   expect(await activity(page)).toMatchObject({ status: 'skipped', bestScore: 0, maxScore: 6, attemptCount: 0 })
 })
 
-test('no horizontal scroll at 360px', async ({ page }) => {
-  await page.setViewportSize({ width: 360, height: 740 })
+test('no horizontal scroll on a 740×360 landscape phone', async ({ page }) => {
+  await page.setViewportSize({ width: 740, height: 360 })
   await place(page, 'กางเกง', 6)
   await check(page).click()
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(740)
 })
 
 test('each picture has a neutral screen-reader label that does not give the answer away', async ({ page }) => {

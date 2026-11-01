@@ -7,13 +7,12 @@ import { Button } from './clay/Button'
 import { buttonClass, cx } from './clay/buttonClass'
 import { Card, cardClass, toneAt } from './clay/Card'
 import { ConfirmDialog } from './clay/ConfirmDialog'
-import { WoodenSign } from './clay/WoodenSign'
 import { Mascot } from './Mascot'
 import type { StepProps } from './stepProps'
 import { useRestartLesson } from './useRestartLesson'
 
 /** Step 10: review key words and rhyme pairs, each Activity's bestScore and the total. Reading Assessment is Phase 2. */
-export function SummaryStep({ lesson, title }: StepProps) {
+export function SummaryStep({ lesson }: StepProps) {
   const results = useLessonSession((state) => state.session?.activities)
   const restart = useRestartLesson(lesson.id)
   const [confirmReset, setConfirmReset] = useState(false)
@@ -27,7 +26,6 @@ export function SummaryStep({ lesson, title }: StepProps) {
 
   return (
     <section className="flex flex-1 flex-col items-center gap-(--space-lg)">
-      <WoodenSign>{title}</WoodenSign>
 
       <Card tone="mint" className="flex w-full max-w-3xl flex-col gap-(--space-sm)">
         <h2 id="summary-words" className="font-heading text-heading font-semibold">คำสำคัญ</h2>

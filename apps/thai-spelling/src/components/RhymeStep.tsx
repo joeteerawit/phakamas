@@ -5,7 +5,6 @@ import { discardRecording, playRecording, startRecording, stopRecording, useReco
 import { Button } from './clay/Button'
 import { cx } from './clay/buttonClass'
 import { Card } from './clay/Card'
-import { WoodenSign } from './clay/WoodenSign'
 import { Mascot } from './Mascot'
 import { RecorderMessages } from './RecorderMessages'
 import type { StepProps } from './stepProps'
@@ -13,7 +12,7 @@ import type { StepProps } from './stepProps'
 const icon = 'size-7 shrink-0'
 
 /** Step 7: ฟังครูอ่าน plays every line in order; step mode plays one line at a time; the student records themself. */
-export function RhymeStep({ lesson, title }: StepProps) {
+export function RhymeStep({ lesson }: StepProps) {
   const lines = lesson.rhyme
   // Step mode's selected line; null outside step mode.
   const [stepLine, setStepLine] = useState<number | null>(null)
@@ -66,7 +65,6 @@ export function RhymeStep({ lesson, title }: StepProps) {
 
   return (
     <section className="flex flex-1 flex-col items-center gap-(--space-lg)">
-      <WoodenSign>{title}</WoodenSign>
 
       <Card tone="mint" className="flex w-full max-w-xl flex-col items-center gap-(--space-md) sm:flex-row sm:items-center">
         <Mascot size="md" decorative />

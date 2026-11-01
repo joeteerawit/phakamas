@@ -1,34 +1,43 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ChevronLeft, ChevronRight, House, Volume2, VolumeX } from 'lucide-react'
+import { Volume2, VolumeX } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { stopAudio, toggleMute, useAudio } from '../audio/audioManager'
 import type { Lesson } from '../lessons'
 import { lessonActivities, useUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
-import { buttonClass, iconButtonClass } from './clay/buttonClass'
 import { ConfirmDialog } from './clay/ConfirmDialog'
 import { FeedbackToast, type Feedback } from './clay/FeedbackToast'
-import { IconButton } from './clay/IconButton'
-import { GardenBackdrop } from './GardenBackdrop'
+import { Stage, type Scene } from './stage/Stage'
+
+/** Shared chrome exported from Canva (docs/canva-assets.md). */
+const CHROME = '/assets/canva/chrome'
 
 type StepLayoutProps = {
   lesson: Lesson
   stepNumber: number
   /** Activity feedback shown in the toast; placeholder Steps pass none. */
   feedback?: Feedback | null
+  /** Stage background; a Step may pick the pond scene. */
+  scene?: Scene
   children: ReactNode
 }
 
+const chromeImage = 'pointer-events-none size-full select-none object-contain'
+const pressable =
+  'absolute block transition-transform duration-150 ease-out active:scale-95 motion-reduce:transition-none ' +
+  'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring'
+
 /**
- * Shared Step layout (spec §1.3, MASTER.md "Responsive Layout").
- * < 1024px: compact header, progress bar, single column, Back/Next fixed to the bottom.
- * ≥ 1024px: everything inside a centred storybook panel on the garden.
+ * Shared Step layout (spec §1.3, MASTER.md "Canva garden"): every Step sits on the 1920×1080 stage
+ * with the title sign, Home, mute, Back and Next from the Canva design. Positions are stage pixels
+ * copied from design DAHZj0Nxyxs page 2.
  */
-export function StepLayout({ lesson, stepNumber, feedback = null, children }: StepLayoutProps) {
+export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garden', children }: StepLayoutProps) {
   const totalSteps = lesson.steps.length
   const isFirst = stepNumber === 1
   const isLast = stepNumber === totalSteps
+  const title = lesson.steps[stepNumber - 1]?.title
   const stepParams = (step: number) => ({ lessonId: lesson.id, step: String(step) })
 
   const direction = useStepDirection(stepNumber)
@@ -48,116 +57,93 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
     else skipActivity(activity.id, activity.maxScore)
   }
 
-  // TC-019: Home asks first while the Activity has unchecked answers.
+  // TC-019: Home asks first while the Activity has unchecked answers. Home keeps Session progress.
   const unchecked = useUncheckedWork((state) => state.unchecked)
   const [confirmHome, setConfirmHome] = useState(false)
   const navigate = useNavigate()
 
   return (
-    <div className="relative isolate min-h-dvh overflow-x-clip">
-      <GardenBackdrop />
-
-      <div className="mx-auto flex min-h-dvh w-full max-w-[1100px] flex-col lg:px-(--space-lg) lg:py-(--space-xl)">
-        <div className="flex flex-1 flex-col lg:rounded-storybook lg:border-[6px] lg:border-sun lg:bg-card lg:shadow-clay">
-          <header className="flex items-center gap-(--space-sm) px-(--space-md) pt-(--space-md) lg:px-(--space-xl) lg:pt-(--space-lg)">
-            <Link
-              to="/lesson/$lessonId/$step"
-              params={stepParams(1)}
-              aria-label="กลับไปขั้นแรก"
-              className={iconButtonClass()}
-              onClick={(event) => {
-                if (!unchecked) return
-                event.preventDefault()
-                setConfirmHome(true)
-              }}
-            >
-              <House aria-hidden="true" className="size-7" strokeWidth={2.5} />
-            </Link>
-
-            <div className="flex min-w-0 flex-1 items-center justify-center gap-(--space-md) lg:justify-between lg:ps-(--space-sm)">
-              <p className="hidden min-w-0 truncate font-heading text-heading font-semibold lg:block">{lesson.title}</p>
-              <p className="flex min-h-12 shrink-0 items-center rounded-full border-[3px] border-border bg-sun px-(--space-md) font-semibold whitespace-nowrap shadow-clay">
-                ขั้น {stepNumber}/{totalSteps}
-              </p>
-            </div>
-
-            <IconButton
-              icon={muted ? VolumeX : Volume2}
-              label="ปิดเสียง"
-              aria-pressed={muted}
-              onClick={toggleMute}
-            />
-          </header>
-
-          <div className="px-(--space-md) pt-(--space-md) lg:px-(--space-xl)">
-            <div
-              role="progressbar"
-              aria-label="ความคืบหน้าบทเรียน"
-              aria-valuemin={1}
-              aria-valuemax={totalSteps}
-              aria-valuenow={stepNumber}
-              aria-valuetext={`ขั้น ${stepNumber} จาก ${totalSteps}`}
-              className="h-4 w-full overflow-hidden rounded-full border-2 border-border bg-card"
-            >
-              <div
-                className="h-full w-full origin-left rounded-full bg-linear-to-r from-red via-sun to-hill-deep transition-transform duration-250 ease-out motion-reduce:transition-none"
-                style={{ transform: `scaleX(${stepNumber / totalSteps})` }}
-              />
-            </div>
-          </div>
-
-          <main className="flex flex-1 flex-col overflow-x-clip px-(--space-md) pt-(--space-lg) pb-bottom-bar lg:px-(--space-xl) lg:pb-(--space-lg)">
-            <motion.div
-              key={stepNumber}
-              className="flex flex-1 flex-col"
-              initial={reduceMotion ? false : { opacity: 0, x: direction * 48 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-            >
-              {children}
-            </motion.div>
-          </main>
-
-          <nav
-            aria-label="เปลี่ยนขั้น"
-            className="fixed inset-x-0 bottom-0 z-20 border-t-[3px] border-border bg-card/95 px-(--space-md) pt-(--space-sm) pb-safe-area backdrop-blur-sm lg:static lg:z-auto lg:rounded-b-storybook lg:bg-transparent lg:px-(--space-xl) lg:py-(--space-md) lg:backdrop-blur-none"
-          >
-            {/* Phones: two equal columns, Next always on the right. Desktop: pills at either end. */}
-            <div className="mx-auto grid max-w-[1100px] grid-cols-2 items-center gap-(--space-sm) lg:flex lg:justify-between">
-              {!isFirst && (
-                <Link
-                  to="/lesson/$lessonId/$step"
-                  params={stepParams(stepNumber - 1)}
-                  className={`${buttonClass('ghost', 'bar')} col-start-1`}
-                >
-                  <ChevronLeft aria-hidden="true" className="size-6" strokeWidth={2.75} />
-                  ย้อนกลับ
-                </Link>
-              )}
-              {isLast ? (
-                <Link
-                  to="/lesson/$lessonId/$step"
-                  params={stepParams(1)}
-                  className={`${buttonClass('primary', 'bar')} col-start-2 lg:ms-auto`}
-                >
-                  <House aria-hidden="true" className="hidden size-6 sm:block" strokeWidth={2.5} />
-                  กลับหน้าแรก
-                </Link>
-              ) : (
-                <Link
-                  to="/lesson/$lessonId/$step"
-                  params={stepParams(stepNumber + 1)}
-                  onClick={leaveViaNext}
-                  className={`${buttonClass('primary', 'bar')} col-start-2 lg:ms-auto`}
-                >
-                  ถัดไป
-                  <ChevronRight aria-hidden="true" className="size-6" strokeWidth={2.75} />
-                </Link>
-              )}
-            </div>
-          </nav>
+    <Stage scene={scene}>
+      {isFirst ? (
+        // The cover's visible heading is the Lesson title; the Step title stays the h1.
+        <h1 className="sr-only">{title}</h1>
+      ) : (
+        <div
+          className="absolute top-[29px] left-[47px] flex h-[115px] w-[382px] items-center justify-center bg-contain bg-center bg-no-repeat px-[24px]"
+          style={{ backgroundImage: `url(${CHROME}/title-sign.webp)` }}
+        >
+          <h1 className="truncate font-heading text-[38px] leading-[1.4] font-bold text-navy">{title}</h1>
         </div>
-      </div>
+      )}
+
+      <p className="absolute top-[52px] left-1/2 -translate-x-1/2 rounded-full border-4 border-card bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold whitespace-nowrap text-navy">
+        ขั้น {stepNumber}/{totalSteps}
+      </p>
+
+      <button
+        type="button"
+        aria-label="ปิดเสียง"
+        aria-pressed={muted}
+        onClick={toggleMute}
+        className={`${pressable} top-[32px] left-[1620px] flex size-[122px] items-center justify-center rounded-full border-[6px] border-card bg-pill text-navy`}
+      >
+        {muted ? (
+          <VolumeX aria-hidden="true" className="size-16" strokeWidth={2.5} />
+        ) : (
+          <Volume2 aria-hidden="true" className="size-16" strokeWidth={2.5} />
+        )}
+      </button>
+
+      {!isFirst && (
+        <Link
+          to="/lesson/$lessonId/$step"
+          params={stepParams(1)}
+          aria-label="กลับไปขั้นแรก"
+          className={`${pressable} top-[23px] left-[1765px] h-[140px] w-[135px]`}
+          onClick={(event) => {
+            if (!unchecked) return
+            event.preventDefault()
+            setConfirmHome(true)
+          }}
+        >
+          <img src={`${CHROME}/home-button.webp`} alt="" draggable={false} className={chromeImage} />
+        </Link>
+      )}
+
+      {/* shortcut: old Step content keeps its rem sizes and scrolls inside the stage; each Step's reskin ticket lays it out in stage pixels. */}
+      <main className="absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto">
+        <motion.div
+          key={stepNumber}
+          className="flex flex-1 flex-col"
+          initial={reduceMotion ? false : { opacity: 0, x: direction * 48 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+        >
+          {children}
+        </motion.div>
+      </main>
+
+      <nav aria-label="เปลี่ยนขั้น">
+        {!isFirst && (
+          <Link
+            to="/lesson/$lessonId/$step"
+            params={stepParams(stepNumber - 1)}
+            aria-label="ย้อนกลับ"
+            className={`${pressable} top-[904px] left-[29px] h-[163px] w-[158px]`}
+          >
+            <img src={`${CHROME}/back-button.webp`} alt="" draggable={false} className={chromeImage} />
+          </Link>
+        )}
+        <Link
+          to="/lesson/$lessonId/$step"
+          params={stepParams(isLast ? 1 : stepNumber + 1)}
+          aria-label={isLast ? 'กลับหน้าแรก' : 'ถัดไป'}
+          onClick={isLast ? undefined : leaveViaNext}
+          className={`${pressable} top-[915px] left-[1738px] h-[152px] w-[148px]`}
+        >
+          <img src={`${CHROME}/next-button.webp`} alt="" draggable={false} className={chromeImage} />
+        </Link>
+      </nav>
 
       <ConfirmDialog
         open={confirmHome}
@@ -171,11 +157,8 @@ export function StepLayout({ lesson, stepNumber, feedback = null, children }: St
         }}
       />
 
-      <FeedbackToast
-        feedback={feedback}
-        className="fixed inset-x-0 bottom-above-bar z-30 flex justify-center px-(--space-md) lg:bottom-(--space-xl)"
-      />
-    </div>
+      <FeedbackToast feedback={feedback} className="absolute inset-x-0 bottom-[48px] z-30 flex justify-center" />
+    </Stage>
   )
 }
 

@@ -10,9 +10,9 @@ import { Button } from './clay/Button'
 import { cx } from './clay/buttonClass'
 import { cardClass } from './clay/Card'
 import type { Feedback } from './clay/FeedbackToast'
-import { WoodenSign } from './clay/WoodenSign'
 import type { ActivityStepProps } from './stepProps'
 import { usePointerDrag } from './usePointerDrag'
+import { useStageScale } from './stage/Stage'
 
 const WRONG_FLASH_MS = 700
 const TOAST_MS = 2500
@@ -35,7 +35,7 @@ function shuffleRights(pairs: RhymeMatching['pairs']) {
 }
 
 /** Step 8: link each left word to its rhyme by tap-tap (primary, keyboard too) or by dragging a line. */
-export function RhymeMatchingStep({ lesson, title, onFeedback }: ActivityStepProps) {
+export function RhymeMatchingStep({ lesson, onFeedback }: ActivityStepProps) {
   const { pairs, sounds } = lesson.rhymeMatching
   const activity = lessonActivity(lesson, 'rhymeMatching')
   const [rights, setRights] = useState(() => shuffleRights(pairs))
@@ -114,6 +114,7 @@ export function RhymeMatchingStep({ lesson, title, onFeedback }: ActivityStepPro
   }
 
   // Line anchors: each left word's right edge, each right word's left edge, relative to the board.
+  const scale = useStageScale()
   const board = useRef<HTMLDivElement>(null)
   const nodes = useRef(new Map<string, HTMLElement>())
   const [anchors, setAnchors] = useState<ReadonlyMap<string, Point>>(() => new Map())
@@ -126,7 +127,10 @@ export function RhymeMatchingStep({ lesson, title, onFeedback }: ActivityStepPro
       for (const [word, node] of nodes.current) {
         const rect = node.getBoundingClientRect()
         const isLeft = pairs.some((pair) => pair.left === word)
-        next.set(word, { x: (isLeft ? rect.right : rect.left) - origin.left, y: rect.top + rect.height / 2 - origin.top })
+        next.set(word, {
+          x: ((isLeft ? rect.right : rect.left) - origin.left) / scale,
+          y: (rect.top + rect.height / 2 - origin.top) / scale,
+        })
       }
       setAnchors(next)
     }
@@ -134,7 +138,7 @@ export function RhymeMatchingStep({ lesson, title, onFeedback }: ActivityStepPro
     const observer = new ResizeObserver(measure)
     observer.observe(element)
     return () => observer.disconnect()
-  }, [rights, pairs])
+  }, [rights, pairs, scale])
 
   // Drag a line from a left word; dropping on a right word tries the pair. A short press stays a tap.
   const drag = usePointerDrag((word, x, y) => {
@@ -210,7 +214,6 @@ export function RhymeMatchingStep({ lesson, title, onFeedback }: ActivityStepPro
 
   return (
     <section className="flex flex-1 flex-col items-center gap-(--space-lg)">
-      <WoodenSign>{title}</WoodenSign>
       <p className="max-w-md text-center text-body-lg">แตะคำทางซ้าย แล้วแตะคำที่คล้องจองกันทางขวา หรือลากเส้นเชื่อมก็ได้</p>
 
       <div ref={board} className="relative flex w-full max-w-xl justify-between">

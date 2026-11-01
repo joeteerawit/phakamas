@@ -11,7 +11,6 @@ import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
 import { buttonClass, cx } from './clay/buttonClass'
 import { Card, cardClass, toneAt, type CardTone } from './clay/Card'
-import { WoodenSign } from './clay/WoodenSign'
 import { Mascot } from './Mascot'
 import { WordFillingStep } from './WordFillingStep'
 import { RhymeMatchingStep } from './RhymeMatchingStep'
@@ -21,7 +20,7 @@ import { SentenceStep } from './SentenceStep'
 import type { ActivityStepProps, StepProps } from './stepProps'
 import { useRestartLesson } from './useRestartLesson'
 
-type StepContentProps = Omit<ActivityStepProps, 'title'> & { stepNumber: number }
+type StepContentProps = ActivityStepProps & { stepNumber: number }
 
 /** Each Step's component, in Step order; Activity Steps are numbered in session/activities. */
 const stepComponents: Record<number, ComponentType<ActivityStepProps>> = {
@@ -42,10 +41,10 @@ export function StepContent({ lesson, stepNumber, onFeedback }: StepContentProps
   const step = lesson.steps[stepNumber - 1]
   const Step = stepComponents[stepNumber]
   if (!step || !Step) return null
-  return <Step lesson={lesson} title={step.title} onFeedback={onFeedback} />
+  return <Step lesson={lesson} onFeedback={onFeedback} />
 }
 
-function CoverStep({ lesson, title }: StepProps) {
+function CoverStep({ lesson }: StepProps) {
   // Bumped on each tap; the Mascot waves once per bump.
   const [waveCount, setWaveCount] = useState(0)
   const wave = () => setWaveCount((count) => count + 1)
@@ -56,9 +55,6 @@ function CoverStep({ lesson, title }: StepProps) {
 
   return (
     <section className="flex flex-1 flex-col items-center justify-center gap-(--space-md) text-center lg:flex-row lg:gap-(--space-xl) lg:text-start">
-      {/* The Step title stays the h1 (spec §1.3); the Lesson title is the visible cover heading. */}
-      <h1 className="sr-only">{title}</h1>
-
       <WavingMascot waveCount={waveCount} onTap={wave} />
 
       <div className="flex flex-col items-center gap-(--space-sm) lg:items-start">
@@ -124,12 +120,11 @@ const cardLabels: Record<AudioStatus | 'visited', { icon: LucideIcon; text: stri
 }
 
 /** Step 2: picture cards; tapping a card highlights it and plays its word. */
-function VocabularyStep({ lesson, title }: StepProps) {
+function VocabularyStep({ lesson }: StepProps) {
   const [visited, setVisited] = useState<ReadonlySet<string>>(() => new Set())
 
   return (
     <section className="flex flex-1 flex-col items-center gap-(--space-xl)">
-      <WoodenSign>{title}</WoodenSign>
       <ul className="grid w-full max-w-3xl grid-cols-2 gap-(--space-md) md:grid-cols-3">
         {lesson.vocabulary.map((item, i) => (
           <li key={item.audio.id}>
@@ -203,7 +198,7 @@ const wordStatusText: Partial<Record<AudioStatus, string>> = {
  * Step 3: one big word at a time, played only on demand. When its sound
  * ends the Mascot says ถึงตาหนูอ่านแล้ว; hearing every word earns a star.
  */
-function ListenRepeatStep({ lesson, title }: StepProps) {
+function ListenRepeatStep({ lesson }: StepProps) {
   const words = lesson.listenAndRepeat
   const reduceMotion = useReducedMotion()
   const [index, setIndex] = useState(0)
@@ -235,7 +230,6 @@ function ListenRepeatStep({ lesson, title }: StepProps) {
 
   return (
     <section className="flex flex-1 flex-col items-center gap-(--space-md)">
-      <WoodenSign>{title}</WoodenSign>
 
       <nav aria-label="ลำดับคำ" className="flex w-full max-w-xl flex-col items-center gap-(--space-xs)">
         <p className="font-semibold text-muted-foreground">
@@ -336,7 +330,7 @@ function ListenRepeatStep({ lesson, title }: StepProps) {
 }
 
 /** Step 4: tap a card (or แสดงตัวสะกด for all) to highlight each final ง at its data position. */
-function SpottingStep({ lesson, title }: StepProps) {
+function SpottingStep({ lesson }: StepProps) {
   const { heading, explanation, words } = lesson.spotting
   const [showAll, setShowAll] = useState(false)
   const [tapped, setTapped] = useState<ReadonlySet<string>>(() => new Set())
@@ -347,7 +341,6 @@ function SpottingStep({ lesson, title }: StepProps) {
 
   return (
     <section className="flex flex-1 flex-col items-center gap-(--space-xl)">
-      <WoodenSign>{title}</WoodenSign>
       <div className="flex flex-col items-center gap-(--space-sm) text-center sm:flex-row sm:text-start">
         <Mascot size="sm" />
         <h2 className="font-heading text-heading font-semibold">{heading}</h2>
@@ -430,7 +423,7 @@ function SpottingCard({ item, tone, highlighted, onPlay }: SpottingCardProps) {
 }
 
 /** Step 5: select the words of this มาตรา, ตรวจคำตอบ scores every choice, เริ่มใหม่ clears. */
-function WordSelectionStep({ lesson, title, onFeedback }: ActivityStepProps) {
+function WordSelectionStep({ lesson, onFeedback }: ActivityStepProps) {
   const { question, choices, praise } = lesson.wordSelection
   const activity = lessonActivity(lesson, 'wordSelection')
   const [selected, setSelected] = useState<ReadonlySet<string>>(() => new Set())
@@ -476,7 +469,6 @@ function WordSelectionStep({ lesson, title, onFeedback }: ActivityStepProps) {
   return (
     // max-lg:pb-40 lets the buttons scroll above the fixed feedback toast on phones.
     <section className="flex flex-1 flex-col items-center gap-(--space-lg) max-lg:pb-40">
-      <WoodenSign>{title}</WoodenSign>
       <p className="text-center font-heading text-heading font-semibold">{question}</p>
       <ul className="grid w-full max-w-3xl grid-cols-2 gap-(--space-md) sm:grid-cols-3 md:grid-cols-4">
         {choices.map(({ word }, i) => (

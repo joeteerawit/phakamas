@@ -1,9 +1,10 @@
 import { useRef, useState, type PointerEvent } from 'react'
+import { useStageScale } from './stage/Stage'
 
 /** Pointer travel (px) before a press becomes a drag instead of a tap. */
 const DRAG_THRESHOLD = 8
 
-/** The dragged item: pointer position (relative to `container()`, else the viewport) and travel. */
+/** The dragged item: pointer position (relative to `container()`, else the viewport) and travel, in stage pixels. */
 export type Drag = { id: string; x: number; y: number; dx: number; dy: number }
 
 /**
@@ -17,6 +18,7 @@ export function usePointerDrag(
   const start = useRef<{ id: string; x: number; y: number; moved: boolean } | null>(null)
   const justDropped = useRef(false)
   const [dragging, setDragging] = useState<Drag | null>(null)
+  const scale = useStageScale()
 
   const end = () => {
     start.current = null
@@ -39,7 +41,8 @@ export function usePointerDrag(
         if (!s.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return
         s.moved = true
         const origin = container?.()?.getBoundingClientRect() ?? { left: 0, top: 0 }
-        setDragging({ id, x: e.clientX - origin.left, y: e.clientY - origin.top, dx, dy })
+        // The stage is CSS-scaled; client pixels ÷ scale = stage pixels.
+        setDragging({ id, x: (e.clientX - origin.left) / scale, y: (e.clientY - origin.top) / scale, dx: dx / scale, dy: dy / scale })
       },
       onPointerUp: (e: PointerEvent<HTMLElement>) => {
         const moved = start.current?.moved

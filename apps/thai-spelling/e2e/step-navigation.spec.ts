@@ -11,7 +11,6 @@ async function expectStep(page: Page, step: number, title: string) {
   await expect(page).toHaveURL(stepUrl(step))
   await expect(stepBadge(page)).toHaveText(`ขั้น ${step}/10`)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(title)
-  await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', String(step))
 }
 
 test('/ redirects to Step 1, the cover', async ({ page }) => {
@@ -69,14 +68,3 @@ for (const path of ['/lesson/mae-kong/99', '/lesson/mae-kong/0', '/lesson/mae-ko
   })
 }
 
-test('no horizontal scroll at 360px wide', async ({ page }) => {
-  await page.setViewportSize({ width: 360, height: 740 })
-  for (const step of [1, 2, 10]) {
-    await page.goto(`/lesson/mae-kong/${step}`)
-    await expect(stepBadge(page)).toHaveText(`ขั้น ${step}/10`)
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    )
-    expect(overflow, `Step ${step} overflows horizontally`).toBe(0)
-  }
-})
