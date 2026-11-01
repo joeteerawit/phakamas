@@ -21,3 +21,4 @@ Cut-outs in #16 were matted exactly: the isolated elements were exported twice a
 | `vocabulary/rang.webp` | `MAGlcZnrylg` | page 2 element `LBWPmwgQLfhQmbGr` (nest), 2×, white/black matte | `DAHZp7SpMi8` | #21 |
 | `vocabulary/khang.webp` | `MAHV1KAmQ9I` | page 2 element `LB8j0GGJw9VqSlfr` (langur), 2×, white/black matte | `DAHZp7SpMi8` | #21 |
 | `vocabulary/phueng.webp` | `MAHAz-S1CSc` | page 2 element `LB8CJfLNdTcKH4Tc` (bee), 2×, white/black matte | `DAHZp7SpMi8` | #21 |
+| `ui/buzzer.webp` | `MAHNWn7XIMk` | page 8 element `LBmV70pD2RJFh1Vg` (red 3D buzzer, Step 3 record button), white/black matte at 2× | `DAHZp_MBBaQ` | #22 |
