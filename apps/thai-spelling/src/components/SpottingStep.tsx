@@ -1,6 +1,5 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { playClip } from '../audio/audioManager'
 import type { SpottingWord } from '../lessons'
 import { cx } from './clay/buttonClass'
@@ -10,7 +9,7 @@ import type { StepProps } from './stepProps'
 const PART_MS = 500
 const CARD_LEFTS = [251, 744, 1237]
 const SPEAKER = '/assets/canva/chrome/speaker-button.webp'
-const picture = (word: SpottingWord) => `/assets/canva/spotting/${word.audio.id.split('/').pop()}.webp`
+const picture = (word: SpottingWord) => `/assets/canva/vocabulary/${word.audio.id.split('/').pop()}.webp`
 
 const pressable =
   'pointer-events-auto cursor-pointer select-none transition-transform duration-150 ease-out active:scale-95 motion-reduce:transition-none ' +
@@ -26,8 +25,6 @@ export function SpottingStep({ lesson }: StepProps) {
   const [setIndex, setSetIndex] = useState(0)
   const [direction, setDirection] = useState(1)
   const [sweep, setSweep] = useState<{ word: SpottingWord; part: number } | null>(null)
-  // shortcut: renders into the stage to use design coordinates; move to a StepLayout full-stage slot once one exists.
-  const [stage, setStage] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
     if (!sweep) return
@@ -46,11 +43,8 @@ export function SpottingStep({ lesson }: StepProps) {
     setSweep({ word, part: 0 })
   }
 
-  if (!stage) return <span hidden ref={(el) => {
-          if (el) setStage(el.closest<HTMLElement>('[data-testid="stage"]'))
-        }} />
-  return createPortal(
-    <section aria-label="คำในมาตราแม่กง" className="pointer-events-none absolute inset-0">
+  return (
+    <section data-full-stage aria-label="คำในมาตราแม่กง" className="relative size-full">
       <div role="group" aria-label="เลือกชุดคำ" className="absolute top-[30px] left-[1150px] flex gap-[24px]">
         {sets.map((_, i) => (
           <button
@@ -99,8 +93,7 @@ export function SpottingStep({ lesson }: StepProps) {
           ))}
         </motion.ul>
       </AnimatePresence>
-    </section>,
-    stage,
+    </section>
   )
 }
 
@@ -157,7 +150,7 @@ function SpottingCard({ word, left, activePart, onPlay }: SpottingCardProps) {
       <p
         data-testid={`spelling-${text}`}
         style={{ left }}
-        className="absolute top-[845px] flex min-h-[119px] w-[432px] flex-wrap items-center justify-center rounded-[48px] border-4 border-dashed border-foreground bg-card px-[24px] font-heading text-[50px] leading-[1.4] font-bold text-foreground"
+        className="absolute top-[845px] flex min-h-[119px] w-[432px] flex-wrap items-center justify-center rounded-[48px] border-4 border-dashed border-foreground bg-card px-[12px] font-heading text-[46px] leading-[1.4] font-bold text-foreground"
       >
         {word.spelling.map((part, i) => (
           <span key={i} className="whitespace-nowrap">

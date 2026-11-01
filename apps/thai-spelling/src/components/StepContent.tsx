@@ -3,7 +3,7 @@ import { Check, ChevronRight, Circle, ClipboardCheck, RotateCcw, Square, Star, V
 import { AnimatePresence, motion, useReducedMotion, type Variants } from 'motion/react'
 import { useEffect, useState, type ComponentType } from 'react'
 import { playClip, stopAudio, useAudio, useClipStatus, type AudioStatus } from '../audio/audioManager'
-import type { AudioClip, VocabularyWord } from '../lessons'
+import type { AudioClip } from '../lessons'
 import { scoreFeedback, useClearFeedbackOnLeave } from '../activities/feedback'
 import { checkWordSelection } from '../activities/wordSelection'
 import { activitySteps, lessonActivity, useReportUncheckedWork } from '../session/activities'
@@ -18,6 +18,7 @@ import { RhymeStep } from './RhymeStep'
 import { SummaryStep } from './SummaryStep'
 import { SentenceStep } from './SentenceStep'
 import { SpottingStep } from './SpottingStep'
+import { VocabularyStep } from './VocabularyStep'
 import type { ActivityStepProps, StepProps } from './stepProps'
 import { useRestartLesson } from './useRestartLesson'
 
@@ -109,83 +110,6 @@ function ClipButton({ clip, label }: { clip: AudioClip; label: string }) {
       <Icon aria-hidden="true" className={cx('size-7', status === 'loading' && 'motion-safe:animate-pulse')} strokeWidth={2.5} />
       {text}
     </Button>
-  )
-}
-
-const cardLabels: Record<AudioStatus | 'visited', { icon: LucideIcon; text: string }> = {
-  idle: { icon: Volume2, text: 'แตะฟังเสียง' },
-  visited: { icon: Check, text: 'ฟังแล้ว' },
-  loading: { icon: Volume2, text: 'กำลังโหลด' },
-  playing: { icon: Volume2, text: 'กำลังเล่น' },
-  error: { icon: RotateCcw, text: 'ลองอีกครั้ง' },
-}
-
-/** Step 2: picture cards; tapping a card highlights it and plays its word. */
-function VocabularyStep({ lesson }: StepProps) {
-  const [visited, setVisited] = useState<ReadonlySet<string>>(() => new Set())
-
-  return (
-    <section className="flex flex-1 flex-col items-center gap-(--space-xl)">
-      <ul className="grid w-full max-w-3xl grid-cols-2 gap-(--space-md) md:grid-cols-3">
-        {lesson.vocabulary.map((item, i) => (
-          <li key={item.audio.id}>
-            <VocabularyCard
-              item={item}
-              tone={toneAt(i)}
-              visited={visited.has(item.audio.id)}
-              onPlay={() => {
-                setVisited((old) => new Set(old).add(item.audio.id))
-                playClip(item.audio)
-              }}
-            />
-          </li>
-        ))}
-      </ul>
-    </section>
-  )
-}
-
-type VocabularyCardProps = {
-  item: VocabularyWord
-  tone: CardTone
-  visited: boolean
-  onPlay: () => void
-}
-
-function VocabularyCard({ item, tone, visited, onPlay }: VocabularyCardProps) {
-  const status = useClipStatus(item.audio.id)
-  const active = status === 'loading' || status === 'playing'
-  const { icon: Icon, text } = cardLabels[status === 'idle' && visited ? 'visited' : status]
-
-  return (
-    <button
-      type="button"
-      onClick={onPlay}
-      className={cx(
-        cardClass({ tone, selected: active, playing: status === 'playing' }),
-        'flex w-full cursor-pointer select-none flex-col items-center gap-(--space-xs) p-(--space-sm) sm:p-(--space-md)',
-        'transition-[transform,box-shadow] duration-150 ease-out active:translate-y-1 active:shadow-clay-pressed motion-reduce:transition-none',
-        'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring',
-      )}
-    >
-      <img
-        src={item.image}
-        alt=""
-        width={256}
-        height={256}
-        draggable={false}
-        className="pointer-events-none size-20 object-contain sm:size-28"
-      />
-      <span className="font-heading text-vocab font-bold lg:text-vocab-lg">{item.word}</span>
-      <span className="flex items-center gap-(--space-xs) font-semibold">
-        <Icon
-          aria-hidden="true"
-          className={cx('size-6 shrink-0', active && 'motion-safe:animate-pulse')}
-          strokeWidth={2.5}
-        />
-        {text}
-      </span>
-    </button>
   )
 }
 
