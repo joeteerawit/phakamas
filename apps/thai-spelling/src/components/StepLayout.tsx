@@ -20,6 +20,8 @@ type StepLayoutProps = {
   feedback?: Feedback | null
   /** Stage background; a Step may pick the pond scene. */
   scene?: Scene
+  /** The Step lays itself out in stage pixels over the whole stage instead of the scrolling content area. */
+  fullStage?: boolean
   children: ReactNode
 }
 
@@ -33,7 +35,7 @@ const pressable =
  * with the title sign, Home, mute, Back and Next from the Canva design. Positions are stage pixels
  * copied from design DAHZj0Nxyxs page 2.
  */
-export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garden', children }: StepLayoutProps) {
+export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garden', fullStage = false, children }: StepLayoutProps) {
   const totalSteps = lesson.steps.length
   const isFirst = stepNumber === 1
   const isLast = stepNumber === totalSteps
@@ -111,7 +113,13 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
       )}
 
       {/* shortcut: old Step content keeps its rem sizes and scrolls inside the stage; each Step's reskin ticket lays it out in stage pixels. */}
-      <main className="absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto">
+      <main
+        className={
+          fullStage
+            ? 'pointer-events-none absolute inset-0 flex flex-col'
+            : 'absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto'
+        }
+      >
         <motion.div
           key={stepNumber}
           className="flex flex-1 flex-col"

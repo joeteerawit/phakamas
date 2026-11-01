@@ -50,6 +50,9 @@ export function playClip(clip: AudioClip) {
   element.play().catch(fallback)
 }
 
+/** Length in ms of the mp3 playing now; NaN when unknown (speech fallback, metadata not loaded yet). */
+export const clipDurationMs = () => (audio?.duration ?? NaN) * 1000
+
 export function stopAudio() {
   playToken++
   audio?.pause()

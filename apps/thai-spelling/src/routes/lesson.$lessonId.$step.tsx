@@ -28,7 +28,13 @@ function StepPage() {
   useEffect(() => visitStep(lesson.id, stepNumber), [visitStep, lesson.id, stepNumber])
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   return (
-    <StepLayout lesson={lesson} stepNumber={stepNumber} feedback={feedback}>
+    <StepLayout
+      lesson={lesson}
+      stepNumber={stepNumber}
+      feedback={feedback}
+      scene={stepNumber === 7 ? 'pond' : undefined}
+      fullStage={stepNumber === 7}
+    >
       <StepContent lesson={lesson} stepNumber={stepNumber} onFeedback={setFeedback} />
     </StepLayout>
   )

@@ -1,17 +1,34 @@
-import { ChevronLeft, ChevronRight, ListOrdered, Mic, Play, RotateCcw, Square, Volume2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ListOrdered, Mic, Play, RotateCcw, Square, Volume2, type LucideIcon } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
-import { playClip, stopAudio, useAudio } from '../audio/audioManager'
+import { clipDurationMs, playClip, stopAudio, useAudio } from '../audio/audioManager'
 import { discardRecording, playRecording, startRecording, stopRecording, useRecorder } from '../audio/recorder'
-import { Button } from './clay/Button'
+import type { RhymeLine } from '../lessons/types'
 import { cx } from './clay/buttonClass'
-import { Card } from './clay/Card'
-import { Mascot } from './Mascot'
 import { RecorderMessages } from './RecorderMessages'
 import type { StepProps } from './stepProps'
 
-const icon = 'size-7 shrink-0'
+const segmenter = new Intl.Segmenter('th', { granularity: 'word' })
 
-/** Step 7: ฟังครูอ่าน plays every line in order; step mode plays one line at a time; the student records themself. */
+/** The words of a Thai line (Thai has no spaces between words). */
+export const splitWords = (text: string) =>
+  [...segmenter.segment(text)].filter((s) => s.isWordLike).map((s) => s.segment)
+
+/** Which word a karaoke highlight is on, `elapsed` ms into a clip of `duration` ms, words spread evenly. */
+export const karaokeWord = (elapsed: number, duration: number, wordCount: number) =>
+  Math.min(Math.floor((elapsed / duration) * wordCount), wordCount - 1)
+
+// Speech fallback has no known length; Thai TTS reads roughly this fast.
+const FALLBACK_WORD_MS = 300
+
+// Colours sampled from design DAHZj0Nxyxs page 7.
+const NAVY = '#1800ad'
+const RHYME_RED = '#ff3131'
+
+/**
+ * Step 7 (design page 7): the rhyme on the swaying signboard in the pond. ฟังครูอ่าน plays every line in
+ * order; step mode (or tapping a line) plays one line; the playing line's words light up karaoke-style.
+ */
 export function RhymeStep({ lesson }: StepProps) {
   const lines = lesson.rhyme
   // Step mode's selected line; null outside step mode.
@@ -20,6 +37,7 @@ export function RhymeStep({ lesson }: StepProps) {
   const sequence = useRef<number | null>(null)
   // The line หยุดเสียง paused ฟังครูอ่าน on; the next ฟังครูอ่าน resumes there.
   const paused = useRef<number | null>(null)
+  const reduceMotion = useReducedMotion()
 
   const audio = useAudio()
   const playingIndex = lines.findIndex((line) => line.id === audio.clipId)
@@ -64,61 +82,52 @@ export function RhymeStep({ lesson }: StepProps) {
   }
 
   return (
-    <section className="flex flex-1 flex-col items-center gap-(--space-lg)">
-
-      <Card tone="mint" className="flex w-full max-w-xl flex-col items-center gap-(--space-md) sm:flex-row sm:items-center">
-        <Mascot size="md" decorative />
-        <ol aria-label="บทคล้องจอง" className="flex w-full flex-col gap-(--space-sm)">
-          {lines.map((line, i) => {
-            const current = i === highlighted
-            return (
-              <li
-                key={line.id}
-                aria-current={current}
-                className={cx(
-                  'flex items-center gap-(--space-sm) rounded-2xl border-[3px] px-(--space-xs) font-heading text-body-lg font-semibold whitespace-nowrap transition-colors sm:px-(--space-sm) sm:text-heading duration-200 motion-reduce:transition-none',
-                  current ? 'border-highlight bg-tint-yellow' : 'border-transparent',
-                )}
+    <section className="absolute inset-0 *:pointer-events-auto">
+      {/* Signboard on its posts: design element LBnwlLbYjBSclwsx, swaying around the post base. */}
+      <motion.div
+        data-testid="rhyme-sign"
+        className="absolute top-[72px] left-[419px] h-[953px] w-[1083px] origin-bottom bg-contain bg-no-repeat"
+        style={{ backgroundImage: 'url(/assets/canva/rhyme/signboard.webp)' }}
+        animate={reduceMotion ? undefined : { rotate: [-1.5, 1.5] }}
+        transition={{ duration: 3, ease: 'easeInOut', repeat: Infinity, repeatType: 'mirror' }}
+      >
+        {/* 60px, not the design's 69px: the app heading font is wider than the Canva one and would overflow the board. */}
+        <ol aria-label="บทคล้องจอง" className="absolute inset-x-[40px] top-[241px] grid grid-cols-[auto_auto] justify-center gap-x-[32px]">
+          {lines.map((line, i) => (
+            <li key={line.id} aria-current={i === highlighted} className={i % 2 ? 'justify-self-start' : 'justify-self-end'}>
+              <button
+                type="button"
+                onClick={() => goToLine(i)}
+                className="min-h-[124px] rounded-[24px] px-[8px] font-heading text-[60px] leading-[1.4] font-bold whitespace-nowrap focus-visible:outline-8 focus-visible:outline-ring"
               >
-                <Volume2 aria-hidden="true" className={cx(icon, !current && 'invisible')} strokeWidth={2.5} />
-                {line.text}
-              </li>
-            )
-          })}
+                <LineWords line={line} playing={playingIndex === i && audio.status === 'playing'} reduceMotion={!!reduceMotion} />
+              </button>
+            </li>
+          ))}
         </ol>
-      </Card>
+      </motion.div>
 
       {playingIndex >= 0 && audio.status === 'error' && (
-        <p role="status" className="font-semibold">
+        <p role="status" className="absolute top-[150px] left-1/2 -translate-x-1/2 rounded-full bg-pill px-[32px] font-heading text-[36px] font-semibold whitespace-nowrap text-navy">
           เปิดเสียงไม่ได้ กด “ฟังครูอ่าน” เพื่อลองอีกครั้ง
         </p>
       )}
 
-      <div className="flex flex-wrap justify-center gap-(--space-sm)">
-        <Button variant="secondary" onClick={playAll}>
-          <Volume2 aria-hidden="true" className={icon} strokeWidth={2.5} />
-          ฟังครูอ่าน
-        </Button>
-        <Button variant="secondary" onClick={() => goToLine(stepLine ?? 0)}>
-          <ListOrdered aria-hidden="true" className={icon} strokeWidth={2.5} />
-          อ่านตามทีละวรรค
-        </Button>
-        <Button variant="ghost" onClick={pause} disabled={!busy}>
-          <Square aria-hidden="true" className={icon} strokeWidth={2.5} />
-          หยุดเสียง
-        </Button>
+      <div className="absolute top-[260px] left-[200px] flex w-[200px] flex-col items-center gap-[20px]">
+        <RoundButton label="ฟังครูอ่าน" icon={Volume2} onClick={playAll} tone="bg-orange" large />
+        <RoundButton label="อ่านตามทีละวรรค" icon={ListOrdered} onClick={() => goToLine(stepLine ?? 0)} />
+        <RoundButton label="หยุดเสียง" icon={Square} onClick={pause} disabled={!busy} />
       </div>
 
       {stepLine !== null && (
-        <div className="flex flex-wrap justify-center gap-(--space-sm)">
-          <Button variant="ghost" onClick={() => goToLine(stepLine - 1)} disabled={stepLine === 0}>
-            <ChevronLeft aria-hidden="true" className={icon} strokeWidth={2.5} />
-            วรรคก่อนหน้า
-          </Button>
-          <Button variant="ghost" onClick={() => goToLine(stepLine + 1)} disabled={stepLine === lines.length - 1}>
-            วรรคถัดไป
-            <ChevronRight aria-hidden="true" className={icon} strokeWidth={2.5} />
-          </Button>
+        <div className="absolute top-[790px] left-[760px] flex gap-[140px]">
+          <RoundButton label="วรรคก่อนหน้า" icon={ChevronLeft} onClick={() => goToLine(stepLine - 1)} disabled={stepLine === 0} />
+          <RoundButton
+            label="วรรคถัดไป"
+            icon={ChevronRight}
+            onClick={() => goToLine(stepLine + 1)}
+            disabled={stepLine === lines.length - 1}
+          />
         </div>
       )}
 
@@ -127,36 +136,97 @@ export function RhymeStep({ lesson }: StepProps) {
   )
 }
 
-/** ลองอ่านเอง → หยุดบันทึก → ฟังเสียงตัวเอง / อัดใหม่. */
+/** One rhyme line as words: rhyme words in red, the karaoke word lit while the line plays. */
+function LineWords({ line, playing, reduceMotion }: { line: RhymeLine; playing: boolean; reduceMotion: boolean }) {
+  const words = splitWords(line.text)
+  const current = useKaraokeWord(playing, words.length)
+  return words.map((word, i) => {
+    const rhyme = line.rhymeWords.includes(word)
+    const active = i === current
+    return (
+      <motion.span
+        key={i}
+        data-active={active}
+        className={cx('inline-block rounded-[16px] transition-colors duration-150', active && 'bg-tint-yellow')}
+        style={{ color: rhyme ? RHYME_RED : NAVY }}
+        animate={{ scale: active && rhyme && !reduceMotion ? 1.15 : 1 }}
+      >
+        {word}
+      </motion.span>
+    )
+  })
+}
+
+/** Index of the word being read while `playing`, else null; words spread evenly over the clip. */
+function useKaraokeWord(playing: boolean, wordCount: number) {
+  const [word, setWord] = useState(0)
+  useEffect(() => {
+    if (!playing) return
+    const start = performance.now()
+    const clip = clipDurationMs()
+    const duration = clip > 0 ? clip : wordCount * FALLBACK_WORD_MS
+    let frame = 0
+    const tick = () => {
+      setWord(karaokeWord(performance.now() - start, duration, wordCount))
+      frame = requestAnimationFrame(tick)
+    }
+    tick()
+    return () => cancelAnimationFrame(frame)
+  }, [playing, wordCount])
+  return playing ? word : null
+}
+
+type RoundButtonProps = {
+  label: string
+  icon: LucideIcon
+  onClick: () => void
+  disabled?: boolean
+  /** Circle colour class. */
+  tone?: string
+  large?: boolean
+}
+
+/** A round icon button in stage pixels with its caption underneath; ≥ 122 stage px stays ≥ 44 CSS px on a 390px-tall phone. */
+function RoundButton({ label, icon: Icon, onClick, disabled, tone = 'bg-pill', large }: RoundButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex flex-col items-center gap-[6px] transition-transform duration-150 active:scale-95 disabled:opacity-50 motion-reduce:transition-none focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring"
+    >
+      <span
+        className={cx(
+          'flex items-center justify-center rounded-full border-[6px] border-card text-navy shadow-lg',
+          tone,
+          large ? 'size-[150px]' : 'size-[124px]',
+        )}
+      >
+        <Icon aria-hidden="true" className={large ? 'size-[80px]' : 'size-[64px]'} strokeWidth={2.5} />
+      </span>
+      <span className="rounded-full bg-pill px-[16px] font-heading text-[28px] leading-[1.5] font-bold whitespace-nowrap text-navy">
+        {label}
+      </span>
+    </button>
+  )
+}
+
+/** ลองอ่านเอง → หยุดบันทึก → ฟังเสียงตัวเอง / อัดใหม่, on the right of the pond. */
 function RecorderControls() {
   const status = useRecorder((state) => state.status)
 
   return (
-    <div className="flex w-full max-w-xl flex-col items-center gap-(--space-sm)">
-      <div className="flex flex-wrap justify-center gap-(--space-sm)">
-        {status === 'recording' ? (
-          <Button onClick={stopRecording}>
-            <Square aria-hidden="true" className={icon} strokeWidth={2.5} />
-            หยุดบันทึก
-          </Button>
-        ) : status === 'ready' ? (
-          <>
-            <Button onClick={playRecording}>
-              <Play aria-hidden="true" className={icon} strokeWidth={2.5} />
-              ฟังเสียงตัวเอง
-            </Button>
-            <Button variant="ghost" onClick={discardRecording}>
-              <RotateCcw aria-hidden="true" className={icon} strokeWidth={2.5} />
-              อัดใหม่
-            </Button>
-          </>
-        ) : (
-          <Button onClick={() => void startRecording()} disabled={status === 'requesting'}>
-            <Mic aria-hidden="true" className={icon} strokeWidth={2.5} />
-            ลองอ่านเอง
-          </Button>
-        )}
-      </div>
+    <div className="absolute top-[260px] left-[1520px] flex w-[200px] flex-col items-center gap-[20px] font-heading text-[28px] text-navy">
+      {status === 'recording' ? (
+        <RoundButton label="หยุดบันทึก" icon={Square} onClick={stopRecording} tone="bg-red" />
+      ) : status === 'ready' ? (
+        <>
+          <RoundButton label="ฟังเสียงตัวเอง" icon={Play} onClick={playRecording} tone="bg-hill" />
+          <RoundButton label="อัดใหม่" icon={RotateCcw} onClick={discardRecording} />
+        </>
+      ) : (
+        <RoundButton label="ลองอ่านเอง" icon={Mic} onClick={() => void startRecording()} disabled={status === 'requesting'} tone="bg-hill" />
+      )}
 
       <RecorderMessages />
     </div>

@@ -15,3 +15,4 @@ Cut-outs in #16 were matted exactly: the isolated elements were exported twice a
 | `chrome/back-button.webp` | `MAFPfldnN0Q` | page 2 element `LBwcGvQ30V4Y063w`, 2× | `DAHZp7scFx0` | #16 |
 | `chrome/next-button.webp` | `MAFPfuzgHok` | page 2 element `LBMFjjkZFMf64RCq`, 2× | `DAHZp7scFx0` | #16 |
 | `chrome/speaker-button.webp` | `MAFpnzvPH6I` | page 2 element `LB7kxc07M2dGz9qG` (71 px on stage, exported at 2× = 142 px; re-export larger if a Step shows it above ~140 px) | `DAHZp7scFx0` | #16 |
+| `rhyme/signboard.webp` | `MAHUniTBxhw` | page 7 group `LBNTJylk0ylldm3F` image `LBnwlLbYjBSclwsx` (signboard + posts, 1083×953 on stage), white/black matte, 2× | `DAHZp5aUNgc` | #26 |

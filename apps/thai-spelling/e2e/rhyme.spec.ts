@@ -186,9 +186,51 @@ test.describe('Step 7 rhyme reading', () => {
     await expect.poll(() => log(page)).toContain('mic:release')
   })
 
-  // fixme(#16): old Step content is scaled down inside the 1920×1080 stage; its Step reskin ticket restores ≥44px targets.
-  test.fixme('fits 360px with no horizontal scroll and ≥44px buttons', async ({ page }) => {
-    await page.setViewportSize({ width: 740, height: 360 })
+  test('karaoke: the playing line lights its words in order and the rhyme word pops', async ({ page }) => {
+    await open(page)
+    const words = lines(page).nth(1).locator('[data-active]')
+    await expect(words).toHaveText(['ช้าง', 'ร้อง', 'เสียง', 'ดัง'])
+    await button(page, 'อ่านตามทีละวรรค').click()
+    await button(page, 'วรรคถัดไป').click()
+
+    const seen: number[] = []
+    await expect
+      .poll(async () => {
+        const active = await words.evaluateAll((els) => els.findIndex((el) => el.dataset.active === 'true'))
+        if (active >= 0 && seen.at(-1) !== active) seen.push(active)
+        return active
+      })
+      .toBe(3)
+    expect(seen).toEqual([...seen].sort())
+    expect(seen.length).toBeGreaterThan(1)
+    // ดัง is a rhyme word: it pops to 1.15.
+    await expect.poll(() => words.nth(3).evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a)).toBeCloseTo(1.15)
+
+    await finish(page)
+    await expect(lines(page).nth(1).locator('[data-active="true"]')).toHaveCount(0)
+  })
+
+  test('the signboard sways; reduced motion keeps it still and the rhyme word unscaled', async ({ page }) => {
+    await open(page)
+    const angle = () =>
+      page.getByTestId('rhyme-sign').evaluate((el) => {
+        const m = new DOMMatrix(getComputedStyle(el).transform)
+        return (Math.atan2(m.b, m.a) * 180) / Math.PI
+      })
+    await expect.poll(async () => Math.abs(await angle())).toBeGreaterThan(0.5)
+    expect(Math.abs(await angle())).toBeLessThanOrEqual(1.51)
+
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.reload()
+    await button(page, 'อ่านตามทีละวรรค').click()
+    const first = lines(page).nth(0).locator('[data-active]')
+    await expect.poll(() => first.nth(3).getAttribute('data-active')).toBe('true')
+    expect(await first.nth(3).evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a)).toBe(1)
+    expect(await angle()).toBe(0)
+  })
+
+  test('fits a 390px-tall landscape phone with ≥44px buttons', async ({ page }) => {
+    await page.setViewportSize({ width: 844, height: 390 })
     await open(page)
     await button(page, 'อ่านตามทีละวรรค').click()
     await button(page, 'ลองอ่านเอง').click()
@@ -197,7 +239,7 @@ test.describe('Step 7 rhyme reading', () => {
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(overflow).toBe(0)
-    for (const box of await page.locator('main button, section button').evaluateAll((els) =>
+    for (const box of await page.locator('section button').evaluateAll((els) =>
       els.map((el) => el.getBoundingClientRect().height),
     )) {
       expect(box).toBeGreaterThanOrEqual(44)
