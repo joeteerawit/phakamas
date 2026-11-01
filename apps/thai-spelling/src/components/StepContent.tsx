@@ -1,8 +1,8 @@
 import { Link } from '@tanstack/react-router'
-import { Check, ChevronRight, Circle, ClipboardCheck, Eye, RotateCcw, Square, Star, Volume2, X, type LucideIcon } from 'lucide-react'
-import { AnimatePresence, motion, useReducedMotion, type Variants } from 'motion/react'
-import { useEffect, useState, type ComponentType } from 'react'
-import { playClip, stopAudio, useAudio, useClipStatus, type AudioStatus } from '../audio/audioManager'
+import { Check, Circle, ClipboardCheck, Eye, RotateCcw, Square, Volume2, X, type LucideIcon } from 'lucide-react'
+import { motion, useReducedMotion, type Variants } from 'motion/react'
+import { useState, type ComponentType } from 'react'
+import { playClip, stopAudio, useClipStatus, type AudioStatus } from '../audio/audioManager'
 import type { AudioClip, SpottingWord } from '../lessons'
 import { scoreFeedback, useClearFeedbackOnLeave } from '../activities/feedback'
 import { checkWordSelection } from '../activities/wordSelection'
@@ -10,7 +10,7 @@ import { activitySteps, lessonActivity, useReportUncheckedWork } from '../sessio
 import { useLessonSession } from '../session/lessonSession'
 import { Button } from './clay/Button'
 import { buttonClass, cx } from './clay/buttonClass'
-import { Card, cardClass, toneAt, type CardTone } from './clay/Card'
+import { cardClass, toneAt, type CardTone } from './clay/Card'
 import { Mascot } from './Mascot'
 import { WordFillingStep } from './WordFillingStep'
 import { RhymeMatchingStep } from './RhymeMatchingStep'
@@ -18,6 +18,7 @@ import { RhymeStep } from './RhymeStep'
 import { SummaryStep } from './SummaryStep'
 import { SentenceStep } from './SentenceStep'
 import { VocabularyStep } from './VocabularyStep'
+import { ListenRepeatStep } from './ListenRepeatStep'
 import type { ActivityStepProps, StepProps } from './stepProps'
 import { useRestartLesson } from './useRestartLesson'
 
@@ -120,146 +121,6 @@ const cardLabels: Record<AudioStatus | 'visited', { icon: LucideIcon; text: stri
   error: { icon: RotateCcw, text: 'ลองอีกครั้ง' },
 }
 
-const wordStatusText: Partial<Record<AudioStatus, string>> = {
-  loading: 'กำลังโหลด',
-  playing: 'กำลังเล่น',
-  error: 'เล่นเสียงไม่ได้ ลองอีกครั้ง',
-}
-
-/**
- * Step 3: one big word at a time, played only on demand. When its sound
- * ends the Mascot says ถึงตาหนูอ่านแล้ว; hearing every word earns a star.
- */
-function ListenRepeatStep({ lesson }: StepProps) {
-  const words = lesson.listenAndRepeat
-  const reduceMotion = useReducedMotion()
-  const [index, setIndex] = useState(0)
-  const [heard, setHeard] = useState<ReadonlySet<string>>(() => new Set())
-  const [endedId, setEndedId] = useState<string | null>(null)
-  const current = words[index] ?? words[0]!
-  const status = useClipStatus(current.audio.id)
-  const complete = words.every((item) => heard.has(item.audio.id))
-
-  // A clip ended on its own (playing → idle, same clip); stopAudio clears clipId instead.
-  useEffect(
-    () =>
-      useAudio.subscribe((next, prev) => {
-        if (prev.status !== 'playing' || next.status !== 'idle' || !next.clipId || next.clipId !== prev.clipId) return
-        const id = next.clipId
-        setHeard((old) => new Set(old).add(id))
-        setEndedId(id)
-      }),
-    [],
-  )
-
-  const goTo = (i: number) => {
-    stopAudio()
-    setEndedId(null)
-    setIndex(i)
-  }
-  const yourTurn = endedId === current.audio.id && status === 'idle'
-  const statusText = wordStatusText[status]
-
-  return (
-    <section className="flex flex-1 flex-col items-center gap-(--space-md)">
-
-      <nav aria-label="ลำดับคำ" className="flex w-full max-w-xl flex-col items-center gap-(--space-xs)">
-        <p className="font-semibold text-muted-foreground">
-          คำที่ {index + 1}/{words.length}
-        </p>
-        <ol className="flex flex-wrap justify-center gap-(--space-sm)">
-          {words.map((item, i) => (
-            <li key={item.audio.id}>
-              <button
-                type="button"
-                aria-current={i === index ? 'step' : undefined}
-                onClick={() => goTo(i)}
-                className={cx(
-                  buttonClass(i === index ? 'primary' : 'ghost'),
-                  'min-h-12 px-(--space-sm) sm:px-(--space-md)',
-                )}
-              >
-                {item.word}
-                {heard.has(item.audio.id) && (
-                  <>
-                    <Check aria-hidden="true" className="size-5" strokeWidth={3} />
-                    <span className="sr-only"> (ฟังแล้ว)</span>
-                  </>
-                )}
-              </button>
-            </li>
-          ))}
-        </ol>
-      </nav>
-
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={current.audio.id}
-          data-testid="listen-word"
-          initial={reduceMotion ? false : { opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={reduceMotion ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, x: -40, transition: { duration: 0.15 } }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-          className={cx(
-            cardClass({ tone: toneAt(index), selected: status !== 'idle' && status !== 'error', playing: status === 'playing' }),
-            'flex w-full max-w-md flex-col items-center gap-(--space-xs)',
-          )}
-        >
-          <img
-            src={current.image}
-            alt=""
-            width={256}
-            height={256}
-            draggable={false}
-            className="size-36 object-contain sm:size-48"
-          />
-          <h2 className="font-heading text-vocab-lg font-bold">{current.word}</h2>
-          <p className="min-h-8 font-semibold">{statusText}</p>
-        </motion.div>
-      </AnimatePresence>
-
-      <div className="flex w-full flex-col items-stretch gap-(--space-sm) sm:w-auto sm:flex-row sm:justify-center">
-        <Button variant="secondary" size="lg" onClick={() => playClip(current.audio)}>
-          <Volume2
-            aria-hidden="true"
-            className={cx('size-7', status !== 'idle' && status !== 'error' && 'motion-safe:animate-pulse')}
-            strokeWidth={2.5}
-          />
-          {heard.has(current.audio.id) ? 'ฟังอีกครั้ง' : 'ฟังเสียง'}
-        </Button>
-        <Button variant="ghost" size="lg" disabled={index === words.length - 1} onClick={() => goTo(index + 1)}>
-          คำถัดไป
-          <ChevronRight aria-hidden="true" className="size-7" strokeWidth={2.5} />
-        </Button>
-      </div>
-
-      <div role="status" aria-live="polite" className="flex w-full max-w-md flex-col items-center gap-(--space-sm)">
-        {yourTurn && (
-          <p className="flex items-center gap-(--space-sm) rounded-clay border-[3px] border-border bg-card p-(--space-xs) pe-(--space-md) font-heading text-heading font-bold shadow-clay">
-            <Mascot size="sm" decorative />
-            ถึงตาหนูอ่านแล้ว
-          </p>
-        )}
-        {complete && (
-          <Card tone="yellow" className="flex w-full flex-col items-center gap-(--space-sm) text-center">
-            <motion.span
-              initial={reduceMotion ? false : { scale: 0.4, rotate: -30 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: 'spring', duration: 0.4, bounce: 0.5 }}
-            >
-              <Star aria-hidden="true" className="size-14 fill-accent text-on-accent" strokeWidth={2} />
-            </motion.span>
-            <p className="font-heading text-heading font-bold">ฟังครบ {words.length} คำแล้ว เก่งมาก!</p>
-            <Button variant="ghost" onClick={() => goTo(0)}>
-              <RotateCcw aria-hidden="true" className="size-6" strokeWidth={2.5} />
-              ฝึกอีกรอบ
-            </Button>
-          </Card>
-        )}
-      </div>
-    </section>
-  )
-}
 
 /** Step 4: tap a card (or แสดงตัวสะกด for all) to highlight each final ง at its data position. */
 function SpottingStep({ lesson }: StepProps) {

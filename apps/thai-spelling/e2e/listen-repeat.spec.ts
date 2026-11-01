@@ -1,5 +1,10 @@
 import { expect, type Page, test } from '@playwright/test'
-import { audioLog, endCurrent, open } from './audioStub.js'
+import { audioLog, endCurrent, type Mic, open as openStep, stubMic } from './audioStub.js'
+
+async function open(page: Page, step: number, mic: Mic = 'allow') {
+  await page.addInitScript(stubMic, mic)
+  await openStep(page, step)
+}
 
 const words = [
   ['ลิง', 'ling'],
@@ -12,6 +17,8 @@ const words = [
 
 const wordCard = (page: Page) => page.getByTestId('listen-word')
 const listenButton = (page: Page) => page.getByRole('button', { name: /^(ฟังเสียง|ฟังอีกครั้ง)$/ })
+const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true })
+const playedRecording = (entries: string[]) => entries.some((entry) => /^play:https?:/.test(entry))
 const nextWord = (page: Page) => page.getByRole('button', { name: 'คำถัดไป' })
 const progressWord = (page: Page, word: string) =>
   page.getByRole('navigation', { name: 'ลำดับคำ' }).getByRole('button', { name: new RegExp(`^${word}`) })
@@ -92,14 +99,60 @@ test.describe('Step 3 listen and repeat', () => {
     await expect(done).toBeVisible()
   })
 
-  // fixme(#16): old Step content is scaled down inside the 1920×1080 stage; its Step reskin ticket restores ≥44px targets.
-  test.fixme('no horizontal scroll at 360px and targets are at least 44px', async ({ page }) => {
-    await page.setViewportSize({ width: 740, height: 360 })
+  test('sits on the pond scene with a cream word card', async ({ page }) => {
     await open(page, 3)
+    await expect(page.getByTestId('stage')).toHaveCSS('background-image', /pond\.webp/)
+    await expect(wordCard(page)).toHaveCSS('background-color', 'rgb(255, 233, 141)')
+  })
+
+  test('คำก่อนหน้า goes back a word and is disabled on the first', async ({ page }) => {
+    await open(page, 3)
+    await expect(button(page, 'คำก่อนหน้า')).toBeDisabled()
+    await nextWord(page).click()
+    await expect(page.getByText('คำที่ 2/6')).toBeVisible()
+    await button(page, 'คำก่อนหน้า').click()
+    await expect(wordCard(page).getByRole('heading')).toHaveText('ลิง')
+  })
+
+  test('the red buzzer records, counts down, and the child can play it back', async ({ page }) => {
+    await open(page, 3)
+    await expect(button(page, 'ฟังเสียงตัวเอง')).toHaveCount(0)
+    await button(page, 'ลองอ่านเอง').click()
+    await expect(button(page, 'หยุดบันทึก')).toBeVisible()
+    await expect(page.getByTestId('record-time')).toHaveText(/^(30|29) วินาที$/)
+    await button(page, 'หยุดบันทึก').click()
+
+    await button(page, 'ฟังเสียงตัวเอง').click()
+    await expect.poll(async () => playedRecording(await audioLog(page))).toBe(true)
+    expect(await audioLog(page)).toEqual(expect.arrayContaining(['mic:request', 'record:start', 'record:stop', 'mic:release']))
+  })
+
+  test('changing word throws the recording away', async ({ page }) => {
+    await open(page, 3)
+    await button(page, 'ลองอ่านเอง').click()
+    await button(page, 'หยุดบันทึก').click()
+    await expect(button(page, 'ฟังเสียงตัวเอง')).toBeVisible()
+    await nextWord(page).click()
+    await expect(button(page, 'ฟังเสียงตัวเอง')).toHaveCount(0)
+    await expect(button(page, 'ลองอ่านเอง')).toBeVisible()
+  })
+
+  test('a denied microphone shows the friendly message', async ({ page }) => {
+    await open(page, 3, 'deny')
+    await button(page, 'ลองอ่านเอง').click()
+    await expect(page.getByRole('alert')).toContainText('ยังไม่ได้อนุญาตให้ใช้ไมโครโฟน')
+  })
+
+  test('no horizontal scroll on a 390px-tall landscape phone and targets are at least 44px', async ({ page }) => {
+    await page.setViewportSize({ width: 844, height: 390 })
+    await open(page, 3)
+    await hear(page)
+    await button(page, 'ลองอ่านเอง').click()
+    await button(page, 'หยุดบันทึก').click()
     await expect(wordCard(page)).toBeVisible()
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360)
-    for (const button of await page.getByRole('main').getByRole('button').all()) {
-      const box = await button.boundingBox()
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(844)
+    for (const target of await page.getByRole('main').getByRole('button').all()) {
+      const box = await target.boundingBox()
       expect(box?.height).toBeGreaterThanOrEqual(44)
       expect(box?.width).toBeGreaterThanOrEqual(44)
     }
