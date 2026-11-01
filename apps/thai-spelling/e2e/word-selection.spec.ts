@@ -125,9 +125,27 @@ test('Next after checking keeps the checked result', async ({ page }) => {
   expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 5, attemptCount: 1 })
 })
 
-// fixme(#16): old Step content is scaled down inside the 1920×1080 stage; its Step reskin ticket restores ≥44px targets.
-test.fixme('fits 360px with ≥44px targets, keyboard toggles a choice', async ({ page }) => {
-  await page.setViewportSize({ width: 740, height: 360 })
+test('each card shows its Canva picture and tapping it plays the word', async ({ page }) => {
+  await open(page)
+  await expect(choice(page, 'งู').locator('img').first()).toHaveAttribute('src', '/assets/canva/vocabulary/ngu.webp')
+  await expect(choice(page, 'เงา').locator('img').first()).toHaveAttribute('src', '/assets/canva/vocabulary/ngao.webp')
+  await choice(page, 'บ้าน').click()
+  await expect.poll(() => played(page)).toContain('/assets/audio/vocabulary/ban.mp3')
+})
+
+test('checking marks right, wrong and missed cards', async ({ page }) => {
+  await open(page)
+  for (const word of ['ลิง', 'งู']) await choice(page, word).click()
+  await check(page).click()
+  await expect(choice(page, 'ลิง')).toHaveAttribute('data-result', 'right')
+  await expect(choice(page, 'ลิง')).toContainText('ถูกต้อง')
+  await expect(choice(page, 'งู')).toHaveAttribute('data-result', 'wrong')
+  await expect(choice(page, 'ช้าง')).toHaveAttribute('data-result', 'missed')
+  await expect(choice(page, 'เงา')).not.toHaveAttribute('data-result')
+})
+
+test('fits a 390px-tall phone with ≥44px targets, keyboard toggles a choice', async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 })
   await open(page)
   for (const word of [...MAE_KONG, ...DISTRACTORS]) {
     expect((await choice(page, word).boundingBox())!.height).toBeGreaterThanOrEqual(44)
@@ -147,4 +165,13 @@ test.fixme('fits 360px with ≥44px targets, keyboard toggles a choice', async (
   await expect(toast(page)).toContainText('/12')
   await page.getByRole('button', { name: 'เริ่มใหม่' }).click()
   await expect(choice(page, 'รัง')).toHaveAttribute('aria-pressed', 'false')
+})
+
+test('reduced motion still shows the result states', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await open(page)
+  await choice(page, 'งู').click()
+  await check(page).click()
+  await expect(choice(page, 'งู')).toHaveAttribute('data-result', 'wrong')
+  await expect(choice(page, 'งู')).toContainText('เลือกผิด')
 })

@@ -15,3 +15,10 @@ Cut-outs in #16 were matted exactly: the isolated elements were exported twice a
 | `chrome/back-button.webp` | `MAFPfldnN0Q` | page 2 element `LBwcGvQ30V4Y063w`, 2× | `DAHZp7scFx0` | #16 |
 | `chrome/next-button.webp` | `MAFPfuzgHok` | page 2 element `LBMFjjkZFMf64RCq`, 2× | `DAHZp7scFx0` | #16 |
 | `chrome/speaker-button.webp` | `MAFpnzvPH6I` | page 2 element `LB7kxc07M2dGz9qG` (71 px on stage, exported at 2× = 142 px; re-export larger if a Step shows it above ~140 px) | `DAHZp7scFx0` | #16 |
+| `vocabulary/ngu.webp` | `MAG_N3G8Y1Q` | page 5 element `LBVpvjD8GY6rXmzK`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `vocabulary/ban.webp` | `MAGeNalcDeU` | page 5 element `LB3R9mXPhb30FNYF`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `vocabulary/kom.webp` | `MAFudUYRLgo` | page 5 element `LB6vnkq5SqR2sGfx`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `vocabulary/sung.webp` | `MAFqdKAp7eI` | page 5 element `LB1WVFYF1dZHBsfJ`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `vocabulary/lung.webp` | `MAHUGweZIyU` | page 5 element `LB1XDdZ5n3D9vytF`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `vocabulary/ngao.webp` | `MAG_z08XdUg` | page 5 element `LBlpbM3DX2HvVPmn`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `activities/tap-hint.webp` | `MAGyMQTn2pE` | page 5 element `LB7rk8jJlp4xhrXC` (hand pressing a red buzzer, used on every card), 2×, white/black matte | `DAHZp-jEM0g` | #24 |
