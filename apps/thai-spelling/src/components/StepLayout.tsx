@@ -112,7 +112,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
 
       {/* shortcut: old Step content keeps its rem sizes and scrolls inside the stage; each Step's reskin ticket lays it out in stage pixels. */}
       {/* A reskinned Step marks its root data-full-stage and is laid out over the whole stage in design pixels. */}
-      <main className="absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto has-[[data-full-stage]]:pointer-events-none has-[[data-full-stage]]:inset-0">
+      <main className="absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto has-[[data-full-stage]]:pointer-events-none has-[[data-full-stage]]:inset-0 has-[[data-full-stage]]:overflow-hidden">
         {/* #18: the old Step slides out and the next slides in, in the travel direction; a fade with reduced motion. */}
         <AnimatePresence mode="wait" initial={false} custom={{ direction, reduceMotion }}>
           <StepSlide key={stepNumber} travel={{ direction, reduceMotion }}>

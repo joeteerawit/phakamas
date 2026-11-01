@@ -29,3 +29,4 @@ Cut-outs in #16 were matted exactly: the isolated elements were exported twice a
 | `ambient/cloud-3.webp` | `MAHZj5W9nK8` | pond background (page 3) cloud at stage 930,268, cut out of `backgrounds/pond.webp`, same key, 1× | – (from #16 export) | #18 |
 | `ambient/flower-yellow.webp` | `MAHZj1fDy7E` | garden background flower head at stage 0,665, alpha from the red channel (`-level 72%,88%`; leaves are green), 1× | – (from #16 export) | #18 |
 | `ambient/flower-pink.webp` | `MAHZj1fDy7E` | garden background flower head at stage 10,865, same key, 1× | – (from #16 export) | #18 |
+| `rhyme/signboard.webp` | `MAHUniTBxhw` | page 7 group `LBNTJylk0ylldm3F` image `LBnwlLbYjBSclwsx` (signboard + posts, 1083×953 on stage), white/black matte, 2× | `DAHZp5aUNgc` | #26 |
