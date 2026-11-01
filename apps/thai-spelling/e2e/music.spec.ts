@@ -12,6 +12,9 @@ test.describe('Background music', () => {
     expect(await musicState(page)).toBeNull()
 
     await page.getByRole('link', { name: 'เริ่มเรียน' }).click()
+    // Ducked under the teacher intro that the first ▶ plays, then back up.
+    await expect.poll(() => musicState(page)).toEqual({ paused: false, loop: true, volume: 0.06 })
+    await endCurrent(page)
     await expect.poll(() => musicState(page)).toEqual({ paused: false, loop: true, volume: 0.25 })
   })
 
