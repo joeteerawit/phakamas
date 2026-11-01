@@ -52,10 +52,10 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
   // Back and Home never do either.
   const activity = lessonActivities(lesson).find((a) => a.step === stepNumber)
   const leaveViaNext = () => {
-    const { completeStep, recordActivityCheck, skipActivity } = useLessonSession.getState()
+    const { completeStep, savePartialActivity, skipActivity } = useLessonSession.getState()
     if (!activity) return completeStep(stepNumber)
     const { partial } = useUncheckedWork.getState()
-    if (partial) recordActivityCheck(activity.id, partial.score, activity.maxScore, partial.answers)
+    if (partial) savePartialActivity(activity.id, partial.score, activity.maxScore, partial.answers)
     else skipActivity(activity.id, activity.maxScore)
   }
 

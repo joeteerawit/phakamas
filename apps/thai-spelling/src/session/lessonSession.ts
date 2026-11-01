@@ -9,6 +9,8 @@ export type ActivityResult = {
   maxScore: number
   attemptCount: number
   answers: unknown
+  /** Saved by ถัดไป before a check (e.g. Step 8's pairs so far): finished, not scored, so at most 1 Star. */
+  partial?: boolean
 }
 
 /** One student's run through a Lesson in this browser. */
@@ -32,6 +34,8 @@ type LessonSessionStore = {
   visitStep: (lessonId: string, step: number) => void
   /** A press of ตรวจคำตอบ: counts the attempt and keeps the best score. */
   recordActivityCheck: (activityId: ActivityId, score: number, maxScore: number, answers: unknown) => void
+  /** ถัดไป with unchecked work: completed but `partial`. Never overwrites a checked result. */
+  savePartialActivity: (activityId: ActivityId, score: number, maxScore: number, answers: unknown) => void
   /** Leaving an Activity unchecked: skipped, score 0. Never overwrites a checked result. */
   skipActivity: (activityId: ActivityId, maxScore: number) => void
   /** The student touched the Activity without checking it. Never overwrites a checked result. */
@@ -74,10 +78,26 @@ export const useLessonSession = create<LessonSessionStore>()(
           const old = session.activities[activityId]
           const result: ActivityResult = {
             status: 'completed',
+            // A partial save's score was never checked, so it is not a best score to keep.
+            bestScore: Math.max(old?.partial ? 0 : (old?.bestScore ?? 0), score),
+            maxScore,
+            attemptCount: (old?.attemptCount ?? 0) + 1,
+            answers,
+          }
+          const next = { ...session, activities: { ...session.activities, [activityId]: result } }
+          return { session: withCompletedStep(next, activitySteps[activityId]) }
+        }),
+      savePartialActivity: (activityId, score, maxScore, answers) =>
+        set(({ session }) => {
+          const old = session?.activities[activityId]
+          if (!session || (old?.status === 'completed' && !old.partial)) return {}
+          const result: ActivityResult = {
+            status: 'completed',
             bestScore: Math.max(old?.bestScore ?? 0, score),
             maxScore,
             attemptCount: (old?.attemptCount ?? 0) + 1,
             answers,
+            partial: true,
           }
           const next = { ...session, activities: { ...session.activities, [activityId]: result } }
           return { session: withCompletedStep(next, activitySteps[activityId]) }

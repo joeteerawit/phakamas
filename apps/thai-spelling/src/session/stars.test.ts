@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { maeKong } from '../lessons/mae-kong'
-import type { ActivityResult } from './lessonSession'
+import { useLessonSession, type ActivityResult } from './lessonSession'
 import { activityStars, lessonStars } from './stars'
 
 const result = (status: ActivityResult['status'], bestScore: number, maxScore = 10): ActivityResult => ({
@@ -42,5 +42,38 @@ describe('lessonStars', () => {
       ['wordFilling', 2],
       ['rhymeMatching', 0],
     ])
+  })
+})
+
+describe('Stars from work saved by ถัดไป without a check', () => {
+  const { visitStep, resetSession, recordActivityCheck, savePartialActivity } = useLessonSession.getState()
+  const stars = () => activityStars(useLessonSession.getState().session?.activities.rhymeMatching)
+  beforeEach(() => {
+    resetSession()
+    visitStep('mae-kong', 8)
+  })
+
+  it('gives at most 1 Star, however high the partial score', () => {
+    savePartialActivity('rhymeMatching', 2, 2, { mistakes: 0 })
+    expect(stars()).toBe(1)
+  })
+
+  it('a later check still earns 3/2/1 from its score', () => {
+    savePartialActivity('rhymeMatching', 1, 2, { mistakes: 0 })
+    recordActivityCheck('rhymeMatching', 2, 2, { mistakes: 0 })
+    expect(stars()).toBe(3)
+  })
+
+  it('a later check is scored on its own, not on the partial score', () => {
+    savePartialActivity('rhymeMatching', 2, 2, { mistakes: 0 })
+    recordActivityCheck('rhymeMatching', 1, 2, { mistakes: 0 })
+    expect(stars()).toBe(1)
+    expect(useLessonSession.getState().session?.activities.rhymeMatching?.bestScore).toBe(1)
+  })
+
+  it('never lowers a checked result', () => {
+    recordActivityCheck('rhymeMatching', 2, 2, { mistakes: 0 })
+    savePartialActivity('rhymeMatching', 1, 2, { mistakes: 3 })
+    expect(stars()).toBe(3)
   })
 })
