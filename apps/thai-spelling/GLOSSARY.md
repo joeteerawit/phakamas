@@ -28,6 +28,10 @@ _Avoid_: Correct word, key word
 A word used in a Lesson that is not wholly in its final-consonant group, e.g. ค้างคาว.
 _Avoid_: Distractor (that is a wrong choice inside an Activity)
 
+**Star** (ดาว):
+The reward a student earns in an Activity according to their score; the Lesson's Stars add up on the summary Step.
+_Avoid_: Point, coin, badge
+
 **Mascot** (น้องลิง):
 The single monkey character that guides the student through every Step of a Lesson.
 _Avoid_: Character, owl, teacher avatar
