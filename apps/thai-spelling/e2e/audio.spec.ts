@@ -8,7 +8,7 @@ test.describe('Step 2 vocabulary cards', () => {
     await open(page, 2)
     const cards = page.getByRole('list').getByRole('button')
     await expect(cards).toHaveCount(6)
-    for (const [i, word] of ['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'ดัง', 'ค้างคาว'].entries()) {
+    for (const [i, word] of ['ลิง', 'ช้าง', 'ดัง', 'รัง', 'ค่าง', 'ผึ้ง'].entries()) {
       await expect(cards.nth(i)).toHaveAccessibleName(new RegExp(`^${word} `))
       await expect(cards.nth(i).locator('img')).toHaveJSProperty('complete', true)
     }
@@ -47,11 +47,11 @@ test.describe('Step 2 vocabulary cards', () => {
 
   test('missing mp3 falls back to Web Speech reading the Thai text', async ({ page }) => {
     await open(page, 2, { mp3: 'missing' })
-    await card(page, 'กางเกง').click()
+    await card(page, 'ผึ้ง').click()
     await expect
       .poll(() => audioLog(page))
-      .toEqual(['play:/assets/audio/vocabulary/kang-keng.mp3', 'speak:กางเกง|th-TH'])
-    await expect(card(page, 'กางเกง')).toContainText('กำลังเล่น')
+      .toEqual(['play:/assets/audio/vocabulary/phueng.mp3', 'speak:ผึ้ง|th-TH'])
+    await expect(card(page, 'ผึ้ง')).toContainText('กำลังเล่น')
   })
 
   test('no Thai voice shows retry, and retry plays once a voice exists', async ({ page }) => {
@@ -67,10 +67,10 @@ test.describe('Step 2 vocabulary cards', () => {
 
   test('changing Step stops the sound', async ({ page }) => {
     await open(page, 2)
-    await card(page, 'ค้างคาว').click()
-    await expect(card(page, 'ค้างคาว')).toContainText('กำลังเล่น')
+    await card(page, 'ค่าง').click()
+    await expect(card(page, 'ค่าง')).toContainText('กำลังเล่น')
     await page.getByRole('link', { name: 'ถัดไป' }).click()
-    await expect.poll(() => audioLog(page)).toContain('pause:/assets/audio/vocabulary/khang-khao.mp3')
+    await expect.poll(() => audioLog(page)).toContain('pause:/assets/audio/vocabulary/khang.mp3')
   })
 
   test('page unload stops the sound', async ({ page }) => {

@@ -1,96 +1,110 @@
-import type { AudioClip, Lesson, SpottingWord, VocabularyWord, WordSelectionActivity } from './types.ts'
+import type { Lesson, SpottingWord, VocabularyWord, WordSelectionActivity } from './types.ts'
 
-const image = (name: string) => `/assets/images/vocabulary/${name}_3d.png`
+// shortcut: some pictures are emoji or blank placeholders, the Step tickets overwrite them with Canva exports.
+const image = (slug: string) => `/assets/canva/vocabulary/${slug}.webp`
 
-const word = (text: string, slug: string, picture: string): VocabularyWord => ({
+const word = (text: string, slug: string): VocabularyWord => ({
   word: text,
-  image: image(picture),
+  image: image(slug),
   audio: { id: `vocabulary/${slug}`, text },
 })
 
-const ling = word('ลิง', 'ling', 'monkey')
-const chang = word('ช้าง', 'chang', 'elephant')
-const rang = word('รัง', 'rang', 'nest_with_eggs')
-const kangKeng = word('กางเกง', 'kang-keng', 'jeans')
-const dang = word('ดัง', 'dang', 'loudspeaker')
+const ling = word('ลิง', 'ling')
+const chang = word('ช้าง', 'chang')
+const dang = word('ดัง', 'dang')
+const rang = word('รัง', 'rang')
+const khang = word('ค่าง', 'khang')
+const phueng = word('ผึ้ง', 'phueng')
 
-// Syllable splits and the explanation need teacher review before release (spec Page 04 Rule).
-const spot = ({ audio }: { audio: AudioClip }, ...syllables: [text: string, final: number][]): SpottingWord => ({
-  syllables: syllables.map(([text, final]) => ({ text, final })),
+// One-syllable words: `final` is the index of the ง; the spelling line is copied from the design.
+const spot = ({ audio }: VocabularyWord, final: number, spelling: string): SpottingWord => ({
+  syllables: [{ text: audio.text, final }],
+  spelling: spelling.split('-'),
   audio,
 })
 
+// Design order, two rows of six. งู and เงา start with ง but do not end in it.
 const wordSelection = {
-  question: 'คำใดเป็นคำที่มี ง เป็นตัวสะกด (แม่กง)?',
+  question: 'แม่กงอยู่ไหน?',
+  instruction: 'แตะภาพคำที่มี ง เป็นตัวสะกด',
   choices: [
-    ...['ลิง', 'ช้าง', 'รัง', 'กางเกง'].map((word) => ({ word, correct: true })),
-    ...['แมว', 'นก', 'บ้าน'].map((word) => ({ word, correct: false })),
+    { ...word('งู', 'ngu'), correct: false },
+    { ...dang, correct: true },
+    { ...word('บ้าน', 'ban'), correct: false },
+    { ...word('ก้ม', 'kom'), correct: false },
+    { ...word('สูง', 'sung'), correct: true },
+    { ...phueng, correct: true },
+    { ...ling, correct: true },
+    { ...chang, correct: true },
+    { ...word('ลุง', 'lung'), correct: true },
+    { ...rang, correct: true },
+    { ...khang, correct: true },
+    { ...word('เงา', 'ngao'), correct: false },
   ],
   praise: { id: 'feedback/keng-mak', text: 'เก่งมาก!' },
 } satisfies WordSelectionActivity
 
-/** แม่กง (ง). Step titles follow spec §1.1. */
+/** แม่กง (ง). Content follows the Canva design DAHZj0Nxyxs. */
 export const maeKong = {
   id: 'mae-kong',
   title: 'คำคล้องจองพาเพลิน',
-  subtitle: 'มาตราแม่กง (ง)',
+  subtitle: 'แม่ กง (ง)',
+  course: 'วิชาภาษาไทย ชั้นประถมศึกษาปีที่ ๒',
   steps: [
     { title: 'หน้าปก' },
     { title: 'ดูภาพเรียนรู้คำ' },
     { title: 'ฟังแล้วอ่านตาม' },
     { title: 'สังเกตตัวสะกด' },
-    { title: 'เลือกคำในมาตรา' },
-    { title: 'เติมคำตรงภาพ' },
-    { title: 'อ่านคำคล้องจอง' },
-    { title: 'เกมจับคู่เสียง' },
-    { title: 'ฝึกอ่านประโยค' },
+    { title: 'แม่กงอยู่ไหน?' },
+    { title: 'กล่องคำแม่กง' },
+    { title: 'อ่านร้องคล้องคำ' },
+    { title: 'จับคู่ดูคำ' },
+    { title: 'อ่านออก บอกได้' },
     { title: 'สรุปและประเมิน' },
   ],
   intro: {
     id: 'intro',
     text: 'สวัสดีเด็ก ๆ วันนี้เราจะมาเรียนรู้คำคล้องจองในมาตราแม่กงกัน พร้อมแล้วกดเริ่มเรียนได้เลย',
   },
-  // ค้างคาว is a Supporting Word: คาว ends in ว, only ค้าง is แม่กง.
-  vocabulary: [ling, chang, rang, kangKeng, dang, word('ค้างคาว', 'khang-khao', 'bat')],
-  listenAndRepeat: [ling, chang, rang, kangKeng, dang],
+  vocabulary: [ling, chang, dang, rang, khang, phueng],
+  listenAndRepeat: [ling, chang, dang, rang, khang, phueng],
   spotting: {
     heading: 'มาตราแม่กง (ง) มี ง เป็นตัวสะกด',
     explanation: {
       id: 'explanations/mae-kong',
-      text: 'เด็ก ๆ ลองสังเกตนะ คำว่า ลิง ช้าง รัง มีตัว ง อยู่ท้ายคำ เราเรียกว่าตัวสะกด คำที่มี ง เป็นตัวสะกด อยู่ในมาตราแม่กง ส่วนคำว่า กางเกง มีสองพยางค์ คือ กาง กับ เกง จึงมีตัว ง สะกดถึงสองตัวเลยจ้ะ',
+      text: 'เด็ก ๆ ลองสังเกตนะ คำว่า ลิง ช้าง ดัง รัง ค่าง ผึ้ง มีตัว ง อยู่ท้ายคำ เราเรียกว่าตัวสะกด คำที่มี ง เป็นตัวสะกด อยู่ในมาตราแม่กงจ้ะ',
     },
-    words: [spot(ling, ['ลิง', 2]), spot(chang, ['ช้าง', 3]), spot(rang, ['รัง', 2]), spot(kangKeng, ['กาง', 2], ['เกง', 2])],
-  },
-  wordSelection,
-  // Pictures are shuffled against the bank so the order gives nothing away.
-  wordFilling: {
-    bank: ['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'ดัง', 'ค้างคาว'],
-    pictures: [
-      { image: image('elephant'), answer: 'ช้าง' },
-      { image: image('loudspeaker'), answer: 'ดัง' },
-      { image: image('monkey'), answer: 'ลิง' },
-      { image: image('bat'), answer: 'ค้างคาว' },
-      { image: image('nest_with_eggs'), answer: 'รัง' },
-      { image: image('jeans'), answer: 'กางเกง' },
+    sets: [
+      [spot(ling, 2, 'ลอ-อิ-งอ-ลิง'), spot(chang, 3, 'ชอ-อา-งอ-ชาง-ไม้โท-ช้าง'), spot(dang, 2, 'ดอ-อะ-งอ-ดัง')],
+      [spot(rang, 2, 'รอ-อะ-งอ-รัง'), spot(khang, 3, 'คอ-อา-งอ-คาง-ไม้เอก-ค่าง'), spot(phueng, 3, 'ผอ-อึ-งอ-ผึง-ไม้โท-ผึ้ง')],
     ],
   },
+  wordSelection,
+  // Pictures and bank in design order; they differ, so the order gives nothing away.
+  wordFilling: {
+    instruction: 'เลือกคำในกล่องคำเติมในช่องว่างให้ถูกต้อง',
+    bank: ['รัง', 'ดัง', 'ผึ้ง', 'ลิง', 'ช้าง', 'ค่าง'],
+    pictures: [ling, chang, dang, rang, khang, phueng].map(({ word, image }) => ({ image, answer: word })),
+  },
   rhymeMatching: {
+    // Design shows the buttons as มอง, ฟัง / ดัง, ร้อง.
     pairs: [
+      { left: 'มอง', right: 'ร้อง' },
       { left: 'ดัง', right: 'ฟัง' },
-      { left: 'รัง', right: 'นั่ง' },
-      { left: 'กาง', right: 'วาง' },
     ],
     sounds: {
       correct: { id: 'feedback/correct', text: 'ถูกต้อง' },
       completed: { id: 'feedback/completed', text: 'เก่งมาก จับคู่ถูกครบแล้ว' },
     },
   },
-  rhyme: ['ลิงน้อยนั่งมอง', 'ช้างร้องเสียงดัง', 'นกบินกลับรัง', 'ฟังเพลงเพลินใจ'].map((text, i) => ({
-    id: `rhyme/line-0${i + 1}`,
-    text,
-  })),
+  rhyme: [
+    { id: 'rhyme/line-01', text: 'ลิงน้อยนั่งมอง', rhymeWords: ['มอง'] },
+    { id: 'rhyme/line-02', text: 'ช้างร้องเสียงดัง', rhymeWords: ['ร้อง', 'ดัง'] },
+    { id: 'rhyme/line-03', text: 'นกบินกลับรัง', rhymeWords: ['รัง'] },
+    { id: 'rhyme/line-04', text: 'ฟังเพลงเพลินใจ', rhymeWords: ['ฟัง'] },
+  ],
   sentences: [
-    { images: [image('monkey'), image('elephant')], audio: { id: 'sentences/sentence-01', text: 'ลิงน้อยนั่งมองช้าง' } },
-    { images: [image('bat'), image('nest_with_eggs')], audio: { id: 'sentences/sentence-02', text: 'ค้างคาวบินกลับรัง' } },
+    { images: [image('ling'), image('chang')], audio: { id: 'sentences/sentence-01', text: 'ลิงน้อยนั่งมองช้าง' } },
+    { images: [image('bang')], audio: { id: 'sentences/sentence-02', text: 'บ่างวิ่งไล่ตามมา' } },
   ],
 } as const satisfies Lesson

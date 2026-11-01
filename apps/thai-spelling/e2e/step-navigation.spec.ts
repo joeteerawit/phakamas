@@ -16,8 +16,8 @@ async function expectStep(page: Page, step: number, title: string) {
 test('/ redirects to Step 1, the cover', async ({ page }) => {
   await page.goto('/')
   await expectStep(page, 1, 'หน้าปก')
-  await expect(page.getByText('มาตราแม่กง (ง)')).toBeVisible()
-  await expect(page.getByText('วิชาภาษาไทย ชั้นประถมศึกษาปีที่ 2')).toBeVisible()
+  await expect(page.getByText('แม่ กง (ง)')).toBeVisible()
+  await expect(page.getByText('วิชาภาษาไทย ชั้นประถมศึกษาปีที่ ๒')).toBeVisible()
 })
 
 test('Step 1 has no Back, and เริ่มเรียน goes to Step 2', async ({ page }) => {

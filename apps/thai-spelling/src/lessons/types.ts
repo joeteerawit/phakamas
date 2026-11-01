@@ -15,7 +15,7 @@ export type AudioClip = {
 /** A picture card on the vocabulary Step. */
 export type VocabularyWord = {
   word: string
-  /** Fluent Emoji 3D picture under /assets/images/vocabulary/. */
+  /** Picture under /assets/canva/vocabulary/. */
   image: string
   audio: AudioClip
 }
@@ -29,6 +29,8 @@ export type Syllable = {
 /** A word on the final-consonant Step. Positions are explicit, never found by searching. */
 export type SpottingWord = {
   syllables: readonly Syllable[]
+  /** Spelling read aloud part by part, e.g. ลอ, อิ, งอ, ลิง. */
+  spelling: readonly string[]
   audio: AudioClip
 }
 
@@ -36,26 +38,28 @@ export type SpottingWord = {
 export type Spotting = {
   heading: string
   explanation: AudioClip
-  words: readonly SpottingWord[]
+  /** Words shown a set at a time, in order. */
+  sets: readonly (readonly SpottingWord[])[]
 }
 
 /** The word-filling Activity: drag or tap bank words into the blank under each picture. */
 export type WordFilling = {
+  instruction: string
   /** Word Bank, in display order. */
   bank: readonly string[]
   /** Pictures in display order; `answer` is the bank word that belongs in its blank. */
   pictures: readonly { image: string; answer: string }[]
 }
 
-/** A word on the word-selection Step; `correct` = it belongs to this มาตรา. */
-export type WordChoice = {
-  word: string
+/** A picture card on the word-selection Step; `correct` = it belongs to this มาตรา. */
+export type WordChoice = VocabularyWord & {
   correct: boolean
 }
 
 /** Step 5: pick the words of this มาตรา among distractors. */
 export type WordSelectionActivity = {
   question: string
+  instruction: string
   choices: readonly WordChoice[]
   /** Played when every Decision is right. */
   praise: AudioClip
@@ -68,9 +72,14 @@ export type RhymeMatching = {
   sounds: { correct: AudioClip; completed: AudioClip }
 }
 
+/** A line of the Step 7 rhyme; `rhymeWords` are the words in it the UI highlights. */
+export type RhymeLine = AudioClip & {
+  rhymeWords: readonly string[]
+}
+
 /** A sentence on Step 9, illustrated by several pictures side by side. */
 export type Sentence = {
-  /** Fluent Emoji 3D pictures under /assets/images/vocabulary/. */
+  /** Pictures under /assets/canva/vocabulary/. */
   images: readonly string[]
   /** `text` is the sentence shown on its card. */
   audio: AudioClip
@@ -81,6 +90,8 @@ export type Lesson = {
   id: string
   title: string
   subtitle: string
+  /** Subject and grade line on the cover. */
+  course: string
   steps: readonly LessonStep[]
   /** Teacher introduction played on the cover Step. */
   intro: AudioClip
@@ -92,7 +103,7 @@ export type Lesson = {
   wordSelection: WordSelectionActivity
   rhymeMatching: RhymeMatching
   /** The rhyme read on Step 7, one clip per line, in reading order. */
-  rhyme: readonly AudioClip[]
+  rhyme: readonly RhymeLine[]
   /** Step 9 ฝึกอ่านประโยค, in display order. */
   sentences: readonly Sentence[]
 }

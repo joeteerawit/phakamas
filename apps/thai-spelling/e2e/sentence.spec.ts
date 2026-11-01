@@ -13,9 +13,9 @@ test.describe('Step 9 sentence reading', () => {
   test('shows 2 sentence cards with pictures', async ({ page }) => {
     await open(page)
     await expect(sentence(page, 1)).toContainText('ลิงน้อยนั่งมองช้าง')
-    await expect(sentence(page, 2)).toContainText('ค้างคาวบินกลับรัง')
+    await expect(sentence(page, 2)).toContainText('บ่างวิ่งไล่ตามมา')
     await expect(sentence(page, 1).locator('img')).toHaveCount(2)
-    await expect(sentence(page, 2).locator('img')).toHaveCount(2)
+    await expect(sentence(page, 2).locator('img')).toHaveCount(1)
   })
 
   test('TC-014: sentence 2 speaker plays only sentence 2', async ({ page }) => {

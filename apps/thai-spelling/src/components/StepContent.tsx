@@ -62,7 +62,7 @@ function CoverStep({ lesson }: StepProps) {
         <p className="rounded-full border-[3px] border-border bg-tint-pink px-(--space-md) font-heading text-heading font-semibold text-foreground shadow-clay">
           {lesson.subtitle}
         </p>
-        <p className="text-muted-foreground">วิชาภาษาไทย ชั้นประถมศึกษาปีที่ 2</p>
+        <p className="text-muted-foreground">{lesson.course}</p>
 
         <div className="mt-(--space-md) flex w-full flex-col items-stretch gap-(--space-md) sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
           {resumeStep ? (
@@ -331,7 +331,8 @@ function ListenRepeatStep({ lesson }: StepProps) {
 
 /** Step 4: tap a card (or แสดงตัวสะกด for all) to highlight each final ง at its data position. */
 function SpottingStep({ lesson }: StepProps) {
-  const { heading, explanation, words } = lesson.spotting
+  const { heading, explanation, sets } = lesson.spotting
+  const words = sets.flat()
   const [showAll, setShowAll] = useState(false)
   const [tapped, setTapped] = useState<ReadonlySet<string>>(() => new Set())
   const toggleAll = () => {
