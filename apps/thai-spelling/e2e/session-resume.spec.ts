@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { expectTapTarget } from './tapTarget.js'
 
 const stepBadge = (page: Page) => page.getByText(/^ขั้น \d+\/10$/)
 const nextLink = (page: Page) => page.getByRole('link', { name: 'ถัดไป' })
@@ -70,10 +71,7 @@ test('resume buttons fit at 360px with ≥44px targets and no horizontal scroll'
   await page.setViewportSize({ width: 740, height: 360 })
   await page.goto('/lesson/mae-kong/5')
   await homeLink(page).click()
-  for (const target of [resumeLink(page), restartButton(page)]) {
-    const box = await target.boundingBox()
-    expect(box!.height).toBeGreaterThanOrEqual(44)
-  }
+  for (const target of [resumeLink(page), restartButton(page)]) await expectTapTarget(target)
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   expect(overflow).toBe(0)
 })

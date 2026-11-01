@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { expectTapTarget } from './tapTarget.js'
 
 const MAE_KONG = ['ดัง', 'สูง', 'ผึ้ง', 'ลิง', 'ช้าง', 'ลุง', 'รัง', 'ค่าง']
 const DISTRACTORS = ['งู', 'บ้าน', 'ก้ม', 'เงา']
@@ -147,12 +148,8 @@ test('checking marks right, wrong and missed cards', async ({ page }) => {
 test('fits a 390px-tall phone with ≥44px targets, keyboard toggles a choice', async ({ page }) => {
   await page.setViewportSize({ width: 844, height: 390 })
   await open(page)
-  for (const word of [...MAE_KONG, ...DISTRACTORS]) {
-    expect((await choice(page, word).boundingBox())!.height).toBeGreaterThanOrEqual(44)
-  }
-  for (const name of ['ตรวจคำตอบ', 'เริ่มใหม่']) {
-    expect((await page.getByRole('button', { name }).boundingBox())!.height).toBeGreaterThanOrEqual(44)
-  }
+  for (const word of [...MAE_KONG, ...DISTRACTORS]) await expectTapTarget(choice(page, word))
+  for (const name of ['ตรวจคำตอบ', 'เริ่มใหม่']) await expectTapTarget(page.getByRole('button', { name }))
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   expect(overflow).toBe(0)
 

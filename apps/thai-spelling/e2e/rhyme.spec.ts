@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { expectTapTarget } from './tapTarget.js'
 import { audioLog, endCurrent, type Mic, open as openStep, stubMic } from './audioStub.js'
 
 async function open(page: Page, mic: Mic = 'allow') {
@@ -239,10 +240,6 @@ test.describe('Step 7 rhyme reading', () => {
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(overflow).toBe(0)
-    for (const box of await page.locator('section button').evaluateAll((els) =>
-      els.map((el) => el.getBoundingClientRect().height),
-    )) {
-      expect(box).toBeGreaterThanOrEqual(44)
-    }
+    for (const target of await page.locator('section button').all()) await expectTapTarget(target)
   })
 })

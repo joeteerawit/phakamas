@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { expectTapTarget } from './tapTarget.js'
 import { audioLog, endCurrent, open, setStub } from './audioStub.js'
 
 const card = (page: Page, word: string) => page.getByRole('button', { name: new RegExp(`^${word} `) })
@@ -32,9 +33,7 @@ test.describe('Step 2 vocabulary cards', () => {
   test('cards are ≥44px tap targets on a 390px-tall landscape phone', async ({ page }) => {
     await page.setViewportSize({ width: 844, height: 390 })
     await open(page, 2)
-    const box = (await card(page, 'ลิง').boundingBox())!
-    expect(box.width).toBeGreaterThanOrEqual(44)
-    expect(box.height).toBeGreaterThanOrEqual(44)
+    await expectTapTarget(card(page, 'ลิง'))
   })
 
   test('the speaker shows pulsing sound waves only while the clip plays', async ({ page }) => {

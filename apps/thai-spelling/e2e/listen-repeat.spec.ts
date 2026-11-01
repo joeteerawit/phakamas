@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { expectTapTarget } from './tapTarget.js'
 import { audioLog, endCurrent, type Mic, open as openStep, stubMic } from './audioStub.js'
 
 async function open(page: Page, step: number, mic: Mic = 'allow') {
@@ -152,9 +153,7 @@ test.describe('Step 3 listen and repeat', () => {
     await expect(wordCard(page)).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(844)
     for (const target of await page.getByRole('main').getByRole('button').all()) {
-      const box = await target.boundingBox()
-      expect(box?.height).toBeGreaterThanOrEqual(44)
-      expect(box?.width).toBeGreaterThanOrEqual(44)
+      await expectTapTarget(target)
     }
   })
 })

@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { expectTapTarget } from './tapTarget.js'
 import { audioLog, open } from './audioStub.js'
 
 const card = (page: Page, word: string) => page.getByRole('button', { name: `ฟังคำว่า ${word}` })
@@ -56,9 +57,7 @@ test.describe('Step 4 final-consonant spotting', () => {
     await page.setViewportSize({ width: 844, height: 390 })
     await open(page, 4)
     for (const target of [setButton(page, 1), setButton(page, 2), page.getByRole('button', { name: 'ฟังคำอธิบาย' }), card(page, 'ลิง')]) {
-      const box = await target.boundingBox()
-      expect(box?.height).toBeGreaterThanOrEqual(44)
-      expect(box?.width).toBeGreaterThanOrEqual(44)
+      await expectTapTarget(target)
     }
   })
 })

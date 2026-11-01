@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
+import { expectTapTarget } from './tapTarget.js'
 import { audioLog, open } from './audioStub.js'
 
 const playLink = (page: Page) => page.getByRole('link', { name: 'เริ่มเรียน' })
@@ -63,8 +64,6 @@ test('cover buttons are at least 44px on a 390px-tall landscape phone', async ({
   await page.setViewportSize({ width: 844, height: 390 })
   await page.goto('/lesson/mae-kong/1')
   for (const target of [playLink(page), page.getByRole('button', { name: 'ปิดเพลง' })]) {
-    const box = (await target.boundingBox())!
-    expect(box.width).toBeGreaterThanOrEqual(44)
-    expect(box.height).toBeGreaterThanOrEqual(44)
+    await expectTapTarget(target)
   }
 })

@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { expectTapTarget } from './tapTarget.js'
 
 const stage = (page: Page) => page.getByTestId('stage')
 const rotateOverlay = (page: Page) => page.getByRole('dialog', { name: 'กรุณาหมุนจอเป็นแนวนอน' })
@@ -33,13 +34,8 @@ for (const viewport of [
 test('chrome buttons are at least 44px on a 390px-tall landscape phone', async ({ page }) => {
   await page.setViewportSize({ width: 844, height: 390 })
   await page.goto('/lesson/mae-kong/5')
-  for (const name of ['กลับไปขั้นแรก', 'ย้อนกลับ', 'ถัดไป']) {
-    const box = (await page.getByRole('link', { name }).boundingBox())!
-    expect(box.height, name).toBeGreaterThanOrEqual(44)
-    expect(box.width, name).toBeGreaterThanOrEqual(44)
-  }
-  const mute = (await page.getByRole('button', { name: 'ปิดเสียง' }).boundingBox())!
-  expect(mute.height).toBeGreaterThanOrEqual(44)
+  for (const name of ['กลับไปขั้นแรก', 'ย้อนกลับ', 'ถัดไป']) await expectTapTarget(page.getByRole('link', { name }))
+  await expectTapTarget(page.getByRole('button', { name: 'ปิดเสียง' }))
 })
 
 test('Home keeps Session progress: the cover offers to resume', async ({ page }) => {

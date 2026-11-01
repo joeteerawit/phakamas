@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
+import { expectTapTarget } from './tapTarget.js'
 
 // Picture order on Step 6 (src/lessons/mae-kong.ts wordFilling.pictures).
 const ANSWERS = ['ลิง', 'ช้าง', 'ดัง', 'รัง', 'ค่าง', 'ผึ้ง']
@@ -119,10 +120,7 @@ test('no horizontal scroll on a 740×360 landscape phone', async ({ page }) => {
 test('chips, slots and controls are ≥44px tap targets on a 390px-tall landscape phone', async ({ page }) => {
   await page.setViewportSize({ width: 844, height: 390 })
   const targets = [bankWord(page, 'รัง'), slot(page, 1), check(page), page.getByRole('button', { name: 'ล้างคำตอบ' })]
-  for (const target of targets) {
-    const box = (await target.boundingBox())!
-    expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(44)
-  }
+  for (const target of targets) await expectTapTarget(target)
 })
 
 test('a placed chip flies to its slot; with reduced motion it jumps there', async ({ page }) => {

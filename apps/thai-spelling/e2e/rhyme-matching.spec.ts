@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { expectTapTarget } from './tapTarget.js'
 import { audioLog, open } from './audioStub.js'
 
 const word = (page: Page, text: string) => page.getByRole('button', { name: new RegExp(`^${text}`) })
@@ -117,8 +118,6 @@ test.describe('Step 8 rhyme matching', () => {
     await page.setViewportSize({ width: 740, height: 360 })
     await open(page, 8)
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(740)
-    const box = (await word(page, 'ร้อง').boundingBox())!
-    expect(box.height).toBeGreaterThanOrEqual(44)
-    expect(box.width).toBeGreaterThanOrEqual(44)
+    await expectTapTarget(word(page, 'ร้อง'))
   })
 })

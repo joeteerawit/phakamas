@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { expectTapTarget } from './tapTarget.js'
 import { open } from './audioStub.js'
 
 const MAE_KONG = ['ดัง', 'สูง', 'ผึ้ง', 'ลิง', 'ช้าง', 'ลุง', 'รัง', 'ค่าง']
@@ -107,7 +108,7 @@ test('Step 10 has no Reading Assessment and fits a 390px-tall phone', async ({ p
   await open(page, 10)
   await expect(page.getByText(/ประเมิน|ผ่าน/).and(page.getByRole('button'))).toHaveCount(0)
   for (const target of [page.getByRole('button', { name: 'เรียนอีกครั้ง' }), page.getByRole('link', { name: /ไปทำ/ }).first()]) {
-    expect((await target.boundingBox())!.height).toBeGreaterThanOrEqual(44)
+    await expectTapTarget(target)
   }
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   expect(overflow).toBe(0)
