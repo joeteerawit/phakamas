@@ -84,6 +84,13 @@
     45%, 70% { transform: rotate(90deg); }
     100% { transform: rotate(0deg); }
   }
+
+  /* Step 2 speaker: sound-wave arcs pulse while a clip plays. */
+  --animate-sound-wave: sound-wave 0.9s ease-in-out infinite;
+  @keyframes sound-wave {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 1; }
+  }
 }
 
 /* Spacing (Density 3). Used as e.g. `gap-(--space-sm)`. */
