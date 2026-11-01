@@ -68,6 +68,8 @@ export type WordSelectionActivity = {
 /** The rhyme-matching Activity: link each left word to the word it rhymes with. */
 export type RhymeMatching = {
   pairs: readonly { left: string; right: string }[]
+  /** One buzzer per word, in design reading order (top-left, top-right, bottom-left, bottom-right). */
+  words: readonly AudioClip[]
   /** Played when a pair locks, and when every pair is matched. */
   sounds: { correct: AudioClip; completed: AudioClip }
 }
