@@ -15,10 +15,10 @@ const stageButton = 'min-h-[136px]! px-[48px]! text-[44px]!'
 /** Karaoke pace: one word every 500 ms while the sentence plays (no word timings in the audio). */
 const WORD_MS = 500
 
-// Boards at design DAHZj0Nxyxs page 9 coordinates, minus the StepLayout content origin (200, 180).
+// Boards at design DAHZj0Nxyxs page 9 coordinates (stage pixels).
 const boards = [
-  { left: 251, top: 75 },
-  { left: 265, top: 396 },
+  { left: 452, top: 255 },
+  { left: 466, top: 576 },
 ]
 
 /** Step 9: tapping a board plays only its sentence; the student records the selected one. */
@@ -35,7 +35,7 @@ export function SentenceStep({ lesson }: StepProps) {
   }
 
   return (
-    <section className="relative flex-1">
+    <section data-full-stage className="relative size-full">
       <ul>
         {lesson.sentences.map((sentence, i) => (
           <li key={sentence.audio.id} className="absolute" style={boards[i % boards.length]}>
@@ -83,7 +83,7 @@ function SentenceBoard({ sentence, index, selected, onPlay }: SentenceBoardProps
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay, x: { delay, type: 'spring', stiffness: 120, damping: 16 }, opacity: { delay, duration: 0.2 } }}
       className={cx(
-        'relative block h-[285px] w-[934px] cursor-pointer select-none',
+        'pointer-events-auto relative block h-[285px] w-[934px] cursor-pointer select-none',
         'transition-[filter] duration-150 active:brightness-95 motion-reduce:transition-none',
         'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring',
         selected && 'drop-shadow-[0_0_18px_#ffffff]',
@@ -133,7 +133,7 @@ function SentenceRecorder({ number }: { number: number }) {
   }
 
   return (
-    <div className="absolute inset-x-0 top-[712px] flex h-[152px] items-center justify-center gap-[24px] rounded-full border-[6px] border-card bg-pill/90 px-[32px] text-[36px] text-navy">
+    <div className="pointer-events-auto absolute inset-x-[200px] top-[892px] flex h-[152px] items-center justify-center gap-[24px] rounded-full border-[6px] border-card bg-pill/90 px-[32px] text-[36px] text-navy">
       <h2 className="font-heading text-[44px] font-bold whitespace-nowrap">บันทึกประโยคที่ {number}</h2>
       <div className="flex items-center gap-[16px]">
         {!practising ? (
