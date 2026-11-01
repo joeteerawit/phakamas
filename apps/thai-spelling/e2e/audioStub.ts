@@ -42,8 +42,12 @@ function stubAudio(opts: StubOptions) {
       if (stub.opts.mp3 === 'missing') return Promise.reject(new DOMException('no file', 'NotSupportedError'))
       if (stub.opts.mp3 === 'pending') return new Promise<void>(() => {})
       this.paused = false
-      stub.finish = () => this.onended?.()
-      setTimeout(() => this.onplaying?.())
+      stub.finish = () => {
+        this.paused = true
+        this.onended?.()
+      }
+      // Like a real element, an mp3 that already ended never reports playing.
+      setTimeout(() => !this.paused && this.onplaying?.())
       return Promise.resolve()
     }
     pause() {
