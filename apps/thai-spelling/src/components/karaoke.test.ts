@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { karaokeWord, splitWords } from './RhymeStep'
+import { karaokeWord, splitWords } from './karaoke'
 
 describe('splitWords', () => {
   it('splits a rhyme line into its Thai words', () => {

@@ -30,16 +30,17 @@ describe('Step 9 sentence boards', () => {
     expect(within(board(2)).getByRole('presentation')).toHaveAttribute('src', '/assets/canva/vocabulary/bang.webp')
   })
 
-  it('highlights the words one by one, evenly timed, while the sentence plays', () => {
+  it('highlights the words one by one, evenly over the clip, while the sentence plays', () => {
     render(<SentenceStep lesson={maeKong} />)
     fireEvent.click(board(2))
     expect(highlighted()).toBeNull()
 
     act(() => useAudio.setState({ clipId: 'sentences/sentence-02', status: 'playing' }))
     expect(highlighted()).toBe('บ่าง')
-    act(() => vi.advanceTimersByTime(500))
+    // No clip length in tests, so 300 ms per word; 320 lands on the first animation frame past it.
+    act(() => vi.advanceTimersByTime(320))
     expect(highlighted()).toBe('วิ่ง')
-    act(() => vi.advanceTimersByTime(500 * 10))
+    act(() => vi.advanceTimersByTime(300 * 10))
     expect(highlighted()).toBe('มา')
 
     act(() => useAudio.setState({ status: 'idle' }))

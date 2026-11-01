@@ -6,14 +6,13 @@ import { discardRecording, playRecording, startRecording, stopRecording, useReco
 import type { Sentence } from '../lessons'
 import { Button } from './clay/Button'
 import { cx } from './clay/buttonClass'
+import { splitWords, useKaraokeWord } from './karaoke'
 import { RecorderMessages } from './RecorderMessages'
 import type { StepProps } from './stepProps'
 
 const icon = 'size-[56px] shrink-0'
 // Stage-scale recorder buttons: ≥ 44 CSS px tall on a 360px-tall landscape phone.
 const stageButton = 'min-h-[136px]! px-[48px]! text-[44px]!'
-/** Karaoke pace: one word every 500 ms while the sentence plays (no word timings in the audio). */
-const WORD_MS = 500
 
 // Boards at design DAHZj0Nxyxs page 9 coordinates (stage pixels).
 const boards = [
@@ -49,27 +48,13 @@ export function SentenceStep({ lesson }: StepProps) {
   )
 }
 
-const words = (text: string) => [...new Intl.Segmenter('th', { granularity: 'word' }).segment(text)].map((s) => s.segment)
-
-/** Index of the word to highlight while `playing`, advancing evenly; -1 when not playing. */
-function useKaraoke(playing: boolean, count: number) {
-  const [word, setWord] = useState(0)
-  useEffect(() => {
-    if (!playing) return
-    setWord(0)
-    const timer = setInterval(() => setWord((w) => Math.min(w + 1, count - 1)), WORD_MS)
-    return () => clearInterval(timer)
-  }, [playing, count])
-  return playing ? word : -1
-}
-
 type SentenceBoardProps = { sentence: Sentence; index: number; selected: boolean; onPlay: () => void }
 
 function SentenceBoard({ sentence, index, selected, onPlay }: SentenceBoardProps) {
   const playing = useClipStatus(sentence.audio.id) === 'playing'
   const reduceMotion = useReducedMotion()
-  const text = words(sentence.audio.text)
-  const current = useKaraoke(playing, text.length)
+  const text = splitWords(sentence.audio.text)
+  const current = useKaraokeWord(playing, text.length)
   const delay = index * 0.35
 
   return (
