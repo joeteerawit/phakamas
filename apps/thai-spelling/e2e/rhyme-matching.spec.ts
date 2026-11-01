@@ -23,17 +23,17 @@ async function drag(page: Page, from: Locator, to: Locator) {
 }
 
 test.describe('Step 8 rhyme matching', () => {
-  test('shows ดัง รัง กาง on the left and ฟัง นั่ง วาง shuffled on the right', async ({ page }) => {
+  test('shows มอง ดัง on the left and ร้อง ฟัง shuffled on the right', async ({ page }) => {
     await open(page, 8)
-    for (const text of ['ดัง', 'รัง', 'กาง', 'ฟัง', 'นั่ง', 'วาง']) await expect(word(page, text)).toBeVisible()
+    for (const text of ['มอง', 'ดัง', 'ร้อง', 'ฟัง']) await expect(word(page, text)).toBeVisible()
     const right = await page.getByRole('group', { name: 'คำฝั่งขวา' }).getByRole('button').allInnerTexts()
     // Shuffled so no word sits opposite its partner.
-    expect(right.map((t) => t.trim())).not.toEqual(['ฟัง', 'นั่ง', 'วาง'])
+    expect(right.map((t) => t.trim())).not.toEqual(['ร้อง', 'ฟัง'])
   })
 
   test('TC-012: a wrong pair flashes red, its line vanishes, and the student can retry', async ({ page }) => {
     await open(page, 8)
-    await pair(page, 'ดัง', 'นั่ง')
+    await pair(page, 'ดัง', 'ร้อง')
     await expect(page.getByRole('status').filter({ hasText: 'ยังไม่ถูก' })).toBeVisible()
     await expect(word(page, 'ดัง')).toContainText('ไม่ใช่คู่กัน')
     await expect(lines(page)).toHaveCount(0)
@@ -45,20 +45,19 @@ test.describe('Step 8 rhyme matching', () => {
     await expect.poll(() => audioLog(page)).toContain('play:/assets/audio/feedback/correct.mp3')
   })
 
-  test('TC-013: all pairs correct shows 3 stars, scores 3 and keeps the mistake count', async ({ page }) => {
+  test('TC-013: all pairs correct shows a star per pair, scores 2 and keeps the mistake count', async ({ page }) => {
     await open(page, 8)
-    await pair(page, 'รัง', 'วาง')
+    await pair(page, 'มอง', 'ฟัง')
     await pair(page, 'ดัง', 'ฟัง')
-    await pair(page, 'รัง', 'นั่ง')
-    await pair(page, 'กาง', 'วาง')
+    await pair(page, 'มอง', 'ร้อง')
 
-    await expect(page.getByText('ได้ 3 คะแนน')).toBeVisible()
-    await expect(page.getByRole('img', { name: 'ได้ 3 ดาว' })).toBeVisible()
-    await expect(lines(page)).toHaveCount(3)
-    expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 3, maxScore: 3, answers: { mistakes: 1 } })
+    await expect(page.getByText('ได้ 2 คะแนน')).toBeVisible()
+    await expect(page.getByRole('img', { name: 'ได้ 2 ดาว' })).toBeVisible()
+    await expect(lines(page)).toHaveCount(2)
+    expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 2, maxScore: 2, answers: { mistakes: 1 } })
 
     await page.reload()
-    expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 3 })
+    expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 2 })
   })
 
   test('a locked pair cannot be re-used', async ({ page }) => {
@@ -70,18 +69,18 @@ test.describe('Step 8 rhyme matching', () => {
 
   test('keyboard: Tab to a word and press Enter on both sides', async ({ page }) => {
     await open(page, 8)
-    await word(page, 'กาง').focus()
+    await word(page, 'มอง').focus()
     await page.keyboard.press('Enter')
-    await expect(word(page, 'กาง')).toHaveAttribute('aria-pressed', 'true')
-    await word(page, 'วาง').focus()
+    await expect(word(page, 'มอง')).toHaveAttribute('aria-pressed', 'true')
+    await word(page, 'ร้อง').focus()
     await page.keyboard.press('Space')
-    await expect(word(page, 'กาง')).toContainText('จับคู่แล้ว')
+    await expect(word(page, 'มอง')).toContainText('จับคู่แล้ว')
   })
 
   test('drag from a left word to its rhyme draws a locked line', async ({ page }) => {
     await open(page, 8)
-    await drag(page, word(page, 'รัง'), word(page, 'นั่ง'))
-    await expect(word(page, 'รัง')).toContainText('จับคู่แล้ว')
+    await drag(page, word(page, 'มอง'), word(page, 'ร้อง'))
+    await expect(word(page, 'มอง')).toContainText('จับคู่แล้ว')
     await expect(lines(page)).toHaveCount(1)
   })
 
@@ -97,7 +96,7 @@ test.describe('Step 8 rhyme matching', () => {
     await open(page, 8)
     await page.getByRole('link', { name: 'ถัดไป' }).click()
     await expect(page).toHaveURL(/\/9$/)
-    expect(await activity(page)).toMatchObject({ status: 'skipped', bestScore: 0, maxScore: 3 })
+    expect(await activity(page)).toMatchObject({ status: 'skipped', bestScore: 0, maxScore: 2 })
   })
 
   test('matching some pairs then ถัดไป records the partial score, not skipped', async ({ page }) => {
@@ -107,14 +106,14 @@ test.describe('Step 8 rhyme matching', () => {
     expect(await activity(page)).toMatchObject({ status: 'in_progress', bestScore: 0 })
     await page.getByRole('link', { name: 'ถัดไป' }).click()
     await expect(page).toHaveURL(/\/9$/)
-    expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 1, maxScore: 3, attemptCount: 1 })
+    expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 1, maxScore: 2, attemptCount: 1 })
   })
 
   test('no horizontal scroll at 360px and words are at least 44px', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 740 })
     await open(page, 8)
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360)
-    const box = (await word(page, 'นั่ง').boundingBox())!
+    const box = (await word(page, 'ร้อง').boundingBox())!
     expect(box.height).toBeGreaterThanOrEqual(44)
     expect(box.width).toBeGreaterThanOrEqual(44)
   })

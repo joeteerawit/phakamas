@@ -1,7 +1,7 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
 
 // Picture order on Step 6 (src/lessons/mae-kong.ts wordFilling.pictures).
-const ANSWERS = ['ช้าง', 'ดัง', 'ลิง', 'ค้างคาว', 'รัง', 'กางเกง']
+const ANSWERS = ['ลิง', 'ช้าง', 'ดัง', 'รัง', 'ค่าง', 'ผึ้ง']
 
 const bank = (page: Page) => page.getByRole('group', { name: 'คลังคำ' })
 const bankWord = (page: Page, word: string) => bank(page).getByRole('button', { name: word, exact: true })
@@ -22,7 +22,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('shows the 6-word bank and 6 empty picture blanks', async ({ page }) => {
-  await expect(bank(page).getByRole('button')).toHaveText(['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'ดัง', 'ค้างคาว'])
+  await expect(bank(page).getByRole('button')).toHaveText(['รัง', 'ดัง', 'ผึ้ง', 'ลิง', 'ช้าง', 'ค่าง'])
   for (let n = 1; n <= 6; n++) await expect(slot(page, n)).toHaveAccessibleName(`ช่องที่ ${n}: ว่าง`)
 })
 
@@ -46,25 +46,25 @@ test('placing on a filled blank sends the old word back to the bank', async ({ p
 })
 
 test('TC-009: ตรวจคำตอบ marks each blank right or wrong and saves the score', async ({ page }) => {
-  await place(page, 'ช้าง', 1)
-  await place(page, 'ลิง', 2)
+  await place(page, 'ลิง', 1)
+  await place(page, 'ดัง', 2)
   await check(page).click()
 
-  await expect(slot(page, 1)).toHaveAccessibleName('ช่องที่ 1: ช้าง ถูก')
-  await expect(slot(page, 2)).toHaveAccessibleName('ช่องที่ 2: ลิง ผิด')
+  await expect(slot(page, 1)).toHaveAccessibleName('ช่องที่ 1: ลิง ถูก')
+  await expect(slot(page, 2)).toHaveAccessibleName('ช่องที่ 2: ดัง ผิด')
   await expect(slot(page, 3)).toHaveAccessibleName('ช่องที่ 3: ว่าง ผิด')
   await expect(page.getByRole('status')).toContainText('1/6')
   expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 1, maxScore: 6, attemptCount: 1 })
 })
 
 test('ลองอีกครั้ง clears only wrong blanks; ล้างคำตอบ clears all', async ({ page }) => {
-  await place(page, 'ช้าง', 1)
-  await place(page, 'ลิง', 2)
+  await place(page, 'ลิง', 1)
+  await place(page, 'ดัง', 2)
   await check(page).click()
   await page.getByRole('button', { name: 'ลองอีกครั้ง' }).click()
-  await expect(slot(page, 1)).toHaveAccessibleName('ช่องที่ 1: ช้าง ถูก')
+  await expect(slot(page, 1)).toHaveAccessibleName('ช่องที่ 1: ลิง ถูก')
   await expect(slot(page, 2)).toHaveAccessibleName('ช่องที่ 2: ว่าง')
-  await expect(bankWord(page, 'ลิง')).toBeVisible()
+  await expect(bankWord(page, 'ดัง')).toBeVisible()
 
   await page.getByRole('button', { name: 'ล้างคำตอบ' }).click()
   await expect(slot(page, 1)).toHaveAccessibleName('ช่องที่ 1: ว่าง')
@@ -111,7 +111,7 @@ test('ถัดไป without checking records the Activity as skipped', async (
 
 test('no horizontal scroll at 360px', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 })
-  await place(page, 'กางเกง', 6)
+  await place(page, 'ผึ้ง', 6)
   await check(page).click()
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360)
 })

@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 import { open } from './audioStub.js'
 
-const MAE_KONG = ['ลิง', 'ช้าง', 'รัง', 'กางเกง']
+const MAE_KONG = ['ดัง', 'สูง', 'ผึ้ง', 'ลิง', 'ช้าง', 'ลุง', 'รัง', 'ค่าง']
 
 const nextLink = (page: Page) => page.getByRole('link', { name: 'ถัดไป' })
 const backLink = (page: Page) => page.getByRole('link', { name: 'ย้อนกลับ' })
@@ -58,28 +58,28 @@ test('Home leaves straight away once the answers are checked', async ({ page }) 
 test('Step 10 reviews key words and rhyme pairs', async ({ page }) => {
   await open(page, 10)
   const words = page.getByRole('list', { name: 'คำสำคัญ' }).getByRole('listitem')
-  await expect(words).toHaveText(['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'ดัง', 'ค้างคาว'])
+  await expect(words).toHaveText(['ลิง', 'ช้าง', 'ดัง', 'รัง', 'ค่าง', 'ผึ้ง'])
   const pairs = page.getByRole('list', { name: 'คู่คล้องจอง' }).getByRole('listitem')
-  await expect(pairs).toHaveText(['ดัง – ฟัง', 'รัง – นั่ง', 'กาง – วาง'])
+  await expect(pairs).toHaveText(['มอง – ร้อง', 'ดัง – ฟัง'])
 })
 
-test('TC-017: Step 10 shows each bestScore, ยังไม่ได้ทำ for the rest, total /16, and survives refresh', async ({ page }) => {
+test('TC-017: Step 10 shows each bestScore, ยังไม่ได้ทำ for the rest, total /20, and survives refresh', async ({ page }) => {
   await open(page, 5)
   await selectAllCorrect(page)
   await nextLink(page).click() // Step 6
   await nextLink(page).click() // skip Step 6
   await page.goto('/lesson/mae-kong/10')
 
-  await expect(scoreRow(page, 'เลือกคำในมาตรา')).toContainText('7/7')
-  await expect(scoreRow(page, 'เติมคำตรงภาพ')).toContainText('ยังไม่ได้ทำ')
-  await expect(scoreRow(page, 'เกมจับคู่เสียง')).toContainText('ยังไม่ได้ทำ')
-  await expect(page.getByText('คะแนนรวม 7/16')).toBeVisible()
+  await expect(scoreRow(page, 'แม่กงอยู่ไหน?')).toContainText('12/12')
+  await expect(scoreRow(page, 'กล่องคำแม่กง')).toContainText('ยังไม่ได้ทำ')
+  await expect(scoreRow(page, 'จับคู่ดูคำ')).toContainText('ยังไม่ได้ทำ')
+  await expect(page.getByText('คะแนนรวม 12/20')).toBeVisible()
 
   await page.reload()
-  await expect(scoreRow(page, 'เลือกคำในมาตรา')).toContainText('7/7')
-  await expect(page.getByText('คะแนนรวม 7/16')).toBeVisible()
+  await expect(scoreRow(page, 'แม่กงอยู่ไหน?')).toContainText('12/12')
+  await expect(page.getByText('คะแนนรวม 12/20')).toBeVisible()
 
-  await scoreRow(page, 'เติมคำตรงภาพ').getByRole('link', { name: /ไปทำ/ }).click()
+  await scoreRow(page, 'กล่องคำแม่กง').getByRole('link', { name: /ไปทำ/ }).click()
   await expect(page).toHaveURL(/\/lesson\/mae-kong\/6$/)
 })
 
@@ -91,7 +91,7 @@ test('TC-020: เริ่มใหม่ on one Activity leaves the other score
   await page.getByRole('button', { name: /^ฟัง/ }).click()
   await page.getByRole('button', { name: 'เริ่มใหม่' }).click()
   await page.goto('/lesson/mae-kong/10')
-  await expect(scoreRow(page, 'เลือกคำในมาตรา')).toContainText('7/7')
+  await expect(scoreRow(page, 'แม่กงอยู่ไหน?')).toContainText('12/12')
 })
 
 test('เรียนอีกครั้ง confirms, then clears the Session and starts from Step 2', async ({ page }) => {
@@ -102,7 +102,7 @@ test('เรียนอีกครั้ง confirms, then clears the Session 
   await page.getByRole('button', { name: 'เรียนอีกครั้ง' }).click()
   await dialog(page).getByRole('button', { name: 'ยกเลิก' }).click()
   await expect(page).toHaveURL(/\/10$/)
-  await expect(scoreRow(page, 'เลือกคำในมาตรา')).toContainText('7/7')
+  await expect(scoreRow(page, 'แม่กงอยู่ไหน?')).toContainText('12/12')
 
   await page.getByRole('button', { name: 'เรียนอีกครั้ง' }).click()
   await dialog(page).getByRole('button', { name: 'ล้างและเริ่มใหม่' }).click()

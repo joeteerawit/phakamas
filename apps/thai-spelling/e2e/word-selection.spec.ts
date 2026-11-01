@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test'
 
-const MAE_KONG = ['ลิง', 'ช้าง', 'รัง', 'กางเกง']
-const DISTRACTORS = ['แมว', 'นก', 'บ้าน']
+const MAE_KONG = ['ดัง', 'สูง', 'ผึ้ง', 'ลิง', 'ช้าง', 'ลุง', 'รัง', 'ค่าง']
+const DISTRACTORS = ['งู', 'บ้าน', 'ก้ม', 'เงา']
 
 /** Records which mp3s were played instead of making sound. */
 function stubAudio() {
@@ -38,9 +38,10 @@ const activity = (page: Page) =>
     () => JSON.parse(localStorage.getItem('thai-spelling:lesson-session') ?? 'null')?.state.session.activities.wordSelection,
   )
 
-test('shows the question and 7 choices, none selected', async ({ page }) => {
+test('shows the question and 12 choices, none selected', async ({ page }) => {
   await open(page)
-  await expect(page.getByText('คำใดเป็นคำที่มี ง เป็นตัวสะกด (แม่กง)?')).toBeVisible()
+  // The question repeats the Step title, so both show it.
+  await expect(page.getByText('แม่กงอยู่ไหน?').first()).toBeVisible()
   for (const word of [...MAE_KONG, ...DISTRACTORS]) {
     await expect(choice(page, word)).toHaveAttribute('aria-pressed', 'false')
   }
@@ -54,56 +55,56 @@ test('tapping a word selects it and tapping again deselects it', async ({ page }
   await expect(choice(page, 'ลิง')).toHaveAttribute('aria-pressed', 'false')
 })
 
-test('TC-006: all correct scores 7, shows เก่งมาก! and plays praise', async ({ page }) => {
+test('TC-006: all correct scores 12, shows เก่งมาก! and plays praise', async ({ page }) => {
   await open(page)
   for (const word of MAE_KONG) await choice(page, word).click()
   await check(page).click()
 
   await expect(toast(page)).toContainText('เก่งมาก!')
-  await expect(toast(page)).toContainText('7/7')
+  await expect(toast(page)).toContainText('12/12')
   await expect.poll(() => played(page)).toContain('/assets/audio/feedback/keng-mak.mp3')
-  expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 7, maxScore: 7, attemptCount: 1 })
+  expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 12, maxScore: 12, attemptCount: 1 })
 })
 
 test('TC-007: wrong choices are flagged with text and stay editable', async ({ page }) => {
   await open(page)
-  for (const word of ['ลิง', 'ช้าง', 'รัง', 'นก']) await choice(page, word).click()
+  for (const word of [...MAE_KONG.filter((w) => w !== 'ค่าง'), 'งู']) await choice(page, word).click()
   await check(page).click()
 
-  await expect(toast(page)).toContainText('5/7')
-  await expect(choice(page, 'นก')).toContainText('เลือกผิด')
-  await expect(choice(page, 'กางเกง')).toContainText('ลืมเลือก')
+  await expect(toast(page)).toContainText('10/12')
+  await expect(choice(page, 'งู')).toContainText('เลือกผิด')
+  await expect(choice(page, 'ค่าง')).toContainText('ลืมเลือก')
   await expect(choice(page, 'ลิง')).not.toContainText('เลือกผิด')
 
-  await choice(page, 'นก').click()
-  await expect(choice(page, 'นก')).not.toContainText('เลือกผิด')
-  await choice(page, 'กางเกง').click()
+  await choice(page, 'งู').click()
+  await expect(choice(page, 'งู')).not.toContainText('เลือกผิด')
+  await choice(page, 'ค่าง').click()
   await check(page).click()
   await expect(toast(page)).toContainText('เก่งมาก!')
-  expect(await activity(page)).toMatchObject({ bestScore: 7, attemptCount: 2 })
+  expect(await activity(page)).toMatchObject({ bestScore: 12, attemptCount: 2 })
 })
 
 test('bestScore keeps the best attempt and survives a reload', async ({ page }) => {
   await open(page)
   for (const word of MAE_KONG) await choice(page, word).click()
   await check(page).click()
-  await choice(page, 'แมว').click()
+  await choice(page, 'งู').click()
   await check(page).click()
-  await expect(toast(page)).toContainText('6/7')
+  await expect(toast(page)).toContainText('11/12')
 
   await page.reload()
-  expect(await activity(page)).toMatchObject({ bestScore: 7, attemptCount: 2 })
+  expect(await activity(page)).toMatchObject({ bestScore: 12, attemptCount: 2 })
 })
 
 test('เริ่มใหม่ clears selection and feedback', async ({ page }) => {
   await open(page)
-  await choice(page, 'แมว').click()
+  await choice(page, 'งู').click()
   await check(page).click()
-  await expect(choice(page, 'แมว')).toContainText('เลือกผิด')
+  await expect(choice(page, 'งู')).toContainText('เลือกผิด')
 
   await page.getByRole('button', { name: 'เริ่มใหม่' }).click()
-  await expect(choice(page, 'แมว')).toHaveAttribute('aria-pressed', 'false')
-  await expect(choice(page, 'แมว')).not.toContainText('เลือกผิด')
+  await expect(choice(page, 'งู')).toHaveAttribute('aria-pressed', 'false')
+  await expect(choice(page, 'งู')).not.toContainText('เลือกผิด')
   await expect(toast(page)).toBeEmpty()
 })
 
@@ -112,7 +113,7 @@ test('Next without checking marks the Activity skipped', async ({ page }) => {
   await choice(page, 'ลิง').click()
   await page.getByRole('link', { name: 'ถัดไป' }).click()
   await expect(page).toHaveURL(/\/lesson\/mae-kong\/6$/)
-  expect(await activity(page)).toMatchObject({ status: 'skipped', bestScore: 0, maxScore: 7, attemptCount: 0 })
+  expect(await activity(page)).toMatchObject({ status: 'skipped', bestScore: 0, maxScore: 12, attemptCount: 0 })
 })
 
 test('Next after checking keeps the checked result', async ({ page }) => {
@@ -121,7 +122,7 @@ test('Next after checking keeps the checked result', async ({ page }) => {
   await check(page).click()
   await page.getByRole('link', { name: 'ถัดไป' }).click()
   await expect(page).toHaveURL(/\/lesson\/mae-kong\/6$/)
-  expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 4, attemptCount: 1 })
+  expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 5, attemptCount: 1 })
 })
 
 test('fits 360px with ≥44px targets, keyboard toggles a choice', async ({ page }) => {
@@ -142,7 +143,7 @@ test('fits 360px with ≥44px targets, keyboard toggles a choice', async ({ page
 
   // The feedback toast must not cover or block the Activity buttons.
   await check(page).click()
-  await expect(toast(page)).toContainText('/7')
+  await expect(toast(page)).toContainText('/12')
   await page.getByRole('button', { name: 'เริ่มใหม่' }).click()
   await expect(choice(page, 'รัง')).toHaveAttribute('aria-pressed', 'false')
 })

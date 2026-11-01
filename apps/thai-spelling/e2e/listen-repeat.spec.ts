@@ -2,11 +2,12 @@ import { expect, type Page, test } from '@playwright/test'
 import { audioLog, endCurrent, open } from './audioStub.js'
 
 const words = [
-  ['ลิง', 'ling', 'monkey'],
-  ['ช้าง', 'chang', 'elephant'],
-  ['รัง', 'rang', 'nest_with_eggs'],
-  ['กางเกง', 'kang-keng', 'jeans'],
-  ['ดัง', 'dang', 'loudspeaker'],
+  ['ลิง', 'ling'],
+  ['ช้าง', 'chang'],
+  ['ดัง', 'dang'],
+  ['รัง', 'rang'],
+  ['ค่าง', 'khang'],
+  ['ผึ้ง', 'phueng'],
 ] as const
 
 const wordCard = (page: Page) => page.getByTestId('listen-word')
@@ -23,20 +24,20 @@ async function hear(page: Page) {
 }
 
 test.describe('Step 3 listen and repeat', () => {
-  test('starts on ลิง, คำที่ 1/5, without autoplay', async ({ page }) => {
+  test('starts on ลิง, คำที่ 1/6, without autoplay', async ({ page }) => {
     await open(page, 3)
     await expect(wordCard(page)).toContainText('ลิง')
-    await expect(page.getByText('คำที่ 1/5')).toBeVisible()
+    await expect(page.getByText('คำที่ 1/6')).toBeVisible()
     await page.waitForTimeout(300)
     expect(await audioLog(page)).toEqual([])
   })
 
-  test('TC-004: คำถัดไป walks the 5 words in order, picture always matching the word', async ({ page }) => {
+  test('TC-004: คำถัดไป walks the 6 words in order, picture always matching the word', async ({ page }) => {
     await open(page, 3)
-    for (const [i, [word, , image]] of words.entries()) {
-      await expect(page.getByText(`คำที่ ${i + 1}/5`)).toBeVisible()
+    for (const [i, [word, slug]] of words.entries()) {
+      await expect(page.getByText(`คำที่ ${i + 1}/6`)).toBeVisible()
       await expect(wordCard(page).getByRole('heading')).toHaveText(word)
-      await expect(wordCard(page).locator('img')).toHaveAttribute('src', `/assets/images/vocabulary/${image}_3d.png`)
+      await expect(wordCard(page).locator('img')).toHaveAttribute('src', `/assets/canva/vocabulary/${slug}.webp`)
       if (i < words.length - 1) await nextWord(page).click()
     }
     await expect(nextWord(page)).toBeDisabled()
@@ -56,13 +57,13 @@ test.describe('Step 3 listen and repeat', () => {
 
   test('tapping a word in the progress jumps to it', async ({ page }) => {
     await open(page, 3)
-    await progressWord(page, 'กางเกง').click()
-    await expect(page.getByText('คำที่ 4/5')).toBeVisible()
-    await expect(wordCard(page).getByRole('heading')).toHaveText('กางเกง')
-    await expect(progressWord(page, 'กางเกง')).toHaveAttribute('aria-current', 'step')
+    await progressWord(page, 'รัง').click()
+    await expect(page.getByText('คำที่ 4/6')).toBeVisible()
+    await expect(wordCard(page).getByRole('heading')).toHaveText('รัง')
+    await expect(progressWord(page, 'รัง')).toHaveAttribute('aria-current', 'step')
 
     await listenButton(page).click()
-    await expect.poll(() => audioLog(page)).toEqual(['play:/assets/audio/vocabulary/kang-keng.mp3'])
+    await expect.poll(() => audioLog(page)).toEqual(['play:/assets/audio/vocabulary/rang.mp3'])
   })
 
   test('changing word stops the sound', async ({ page }) => {
@@ -74,9 +75,9 @@ test.describe('Step 3 listen and repeat', () => {
     await expect(page.getByText('ถึงตาหนูอ่านแล้ว')).toHaveCount(0)
   })
 
-  test('a star appears after all 5 words are heard, and practice stays repeatable', async ({ page }) => {
+  test('a star appears after all 6 words are heard, and practice stays repeatable', async ({ page }) => {
     await open(page, 3)
-    const done = page.getByText('ฟังครบ 5 คำแล้ว')
+    const done = page.getByText('ฟังครบ 6 คำแล้ว')
     for (const [i] of words.entries()) {
       await expect(done).toHaveCount(0)
       await hear(page)
@@ -85,7 +86,7 @@ test.describe('Step 3 listen and repeat', () => {
     await expect(done).toBeVisible()
 
     await page.getByRole('button', { name: 'ฝึกอีกรอบ' }).click()
-    await expect(page.getByText('คำที่ 1/5')).toBeVisible()
+    await expect(page.getByText('คำที่ 1/6')).toBeVisible()
     await listenButton(page).click()
     await expect.poll(() => audioLog(page)).toContain('play:/assets/audio/vocabulary/ling.mp3')
     await expect(done).toBeVisible()

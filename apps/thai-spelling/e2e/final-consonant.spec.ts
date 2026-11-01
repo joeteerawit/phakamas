@@ -1,28 +1,28 @@
 import { expect, type Page, test } from '@playwright/test'
 import { audioLog, open } from './audioStub.js'
 
-const words = ['ลิง', 'ช้าง', 'รัง', 'กางเกง']
+const words = ['ลิง', 'ช้าง', 'ดัง', 'รัง', 'ค่าง', 'ผึ้ง']
 const card = (page: Page, word: string) => page.getByRole('list').getByRole('button', { name: new RegExp(`^${word} `) })
 const marks = (page: Page, word: string) => card(page, word).locator('mark')
 const toggle = (page: Page) => page.getByRole('button', { name: 'แสดงตัวสะกด' })
 
 test.describe('Step 4 final-consonant spotting', () => {
-  test('shows the heading, น้องลิง and the 4 cards with no highlight yet', async ({ page }) => {
+  test('shows the heading, น้องลิง and the 6 cards with no highlight yet', async ({ page }) => {
     await open(page, 4)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('สังเกตตัวสะกด')
     await expect(page.getByText('มาตราแม่กง (ง) มี ง เป็นตัวสะกด')).toBeVisible()
     await expect(page.getByRole('img', { name: 'น้องลิง' })).toBeVisible()
     const cards = page.getByRole('list').getByRole('button')
-    await expect(cards).toHaveCount(4)
+    await expect(cards).toHaveCount(6)
     for (const [i, word] of words.entries()) await expect(cards.nth(i)).toHaveAccessibleName(new RegExp(`^${word} `))
     await expect(page.locator('mark')).toHaveCount(0)
   })
 
-  test('TC-005: tapping กางเกง plays it and highlights ง in both syllables', async ({ page }) => {
+  test('TC-005: tapping ผึ้ง plays it and highlights its final ง', async ({ page }) => {
     await open(page, 4)
-    await card(page, 'กางเกง').click()
-    await expect.poll(() => audioLog(page)).toEqual(['play:/assets/audio/vocabulary/kang-keng.mp3'])
-    await expect(marks(page, 'กางเกง')).toHaveText(['ง', 'ง'])
+    await card(page, 'ผึ้ง').click()
+    await expect.poll(() => audioLog(page)).toEqual(['play:/assets/audio/vocabulary/phueng.mp3'])
+    await expect(marks(page, 'ผึ้ง')).toHaveText(['ง'])
     await expect(marks(page, 'ลิง')).toHaveCount(0)
   })
 
@@ -30,7 +30,7 @@ test.describe('Step 4 final-consonant spotting', () => {
     await open(page, 4)
     await toggle(page).click()
     await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true')
-    for (const word of words) await expect(marks(page, word)).toHaveText(word === 'กางเกง' ? ['ง', 'ง'] : ['ง'])
+    for (const word of words) await expect(marks(page, word)).toHaveText(['ง'])
 
     await toggle(page).click()
     await expect(toggle(page)).toHaveAttribute('aria-pressed', 'false')
@@ -51,7 +51,7 @@ test.describe('Step 4 final-consonant spotting', () => {
     await open(page, 4)
     await toggle(page).click()
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360)
-    for (const target of [toggle(page), page.getByRole('button', { name: 'ฟังคำอธิบาย' }), card(page, 'กางเกง')]) {
+    for (const target of [toggle(page), page.getByRole('button', { name: 'ฟังคำอธิบาย' }), card(page, 'ผึ้ง')]) {
       expect((await target.boundingBox())?.height).toBeGreaterThanOrEqual(44)
     }
   })

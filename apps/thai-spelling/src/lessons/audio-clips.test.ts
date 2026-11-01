@@ -11,11 +11,17 @@ describe('audioClips', () => {
       'intro',
       'vocabulary/ling',
       'vocabulary/chang',
-      'vocabulary/rang',
-      'vocabulary/kang-keng',
       'vocabulary/dang',
-      'vocabulary/khang-khao',
+      'vocabulary/rang',
+      'vocabulary/khang',
+      'vocabulary/phueng',
       'explanations/mae-kong',
+      'vocabulary/ngu',
+      'vocabulary/ban',
+      'vocabulary/kom',
+      'vocabulary/sung',
+      'vocabulary/lung',
+      'vocabulary/ngao',
       'feedback/keng-mak',
       'feedback/correct',
       'feedback/completed',
@@ -33,5 +39,10 @@ describe('audioClips', () => {
       .map((clip) => `/public/assets/audio/${clip.id}.mp3`)
       .filter((path) => !mp3s.includes(path))
     expect(missing).toEqual([])
+  })
+
+  it('has no orphan mp3 that no AudioClip uses', () => {
+    const used = audioClips(maeKong).map((clip) => `/public/assets/audio/${clip.id}.mp3`)
+    expect(mp3s.filter((path) => !used.includes(path))).toEqual([])
   })
 })

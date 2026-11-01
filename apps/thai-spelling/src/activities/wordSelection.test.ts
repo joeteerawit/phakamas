@@ -5,36 +5,27 @@ import { checkWordSelection } from './wordSelection'
 const { choices } = maeKong.wordSelection
 const check = (...selected: string[]) => checkWordSelection(choices, new Set(selected))
 
-describe('Step 5 word selection scoring (7 Decisions)', () => {
-  it('has the spec choices: 4 แม่กง words and 3 distractors', () => {
-    expect(choices.map(({ word, correct }) => [word, correct])).toEqual([
-      ['ลิง', true],
-      ['ช้าง', true],
-      ['รัง', true],
-      ['กางเกง', true],
-      ['แมว', false],
-      ['นก', false],
-      ['บ้าน', false],
-    ])
+const MAE_KONG = ['ดัง', 'สูง', 'ผึ้ง', 'ลิง', 'ช้าง', 'ลุง', 'รัง', 'ค่าง']
+const DISTRACTORS = ['งู', 'บ้าน', 'ก้ม', 'เงา']
+
+describe('Step 5 word selection scoring (12 Decisions)', () => {
+  it('TC-006: selecting exactly the 8 แม่กง words scores 12', () => {
+    expect(check(...MAE_KONG)).toEqual({ score: 12, wrong: [] })
   })
 
-  it('TC-006: selecting exactly the 4 แม่กง words scores 7', () => {
-    expect(check('ลิง', 'ช้าง', 'รัง', 'กางเกง')).toEqual({ score: 7, wrong: [] })
+  it('nothing selected still earns the 4 distractor decisions', () => {
+    expect(check()).toEqual({ score: 4, wrong: ['ดัง', 'สูง', 'ผึ้ง', 'ลิง', 'ช้าง', 'ลุง', 'รัง', 'ค่าง'] })
   })
 
-  it('nothing selected still earns the 3 distractor decisions', () => {
-    expect(check()).toEqual({ score: 3, wrong: ['ลิง', 'ช้าง', 'รัง', 'กางเกง'] })
-  })
-
-  it('selecting everything earns only the 4 แม่กง decisions', () => {
-    expect(check('ลิง', 'ช้าง', 'รัง', 'กางเกง', 'แมว', 'นก', 'บ้าน')).toEqual({ score: 4, wrong: ['แมว', 'นก', 'บ้าน'] })
+  it('selecting everything earns only the 8 แม่กง decisions', () => {
+    expect(check(...MAE_KONG, ...DISTRACTORS)).toEqual({ score: 8, wrong: ['งู', 'บ้าน', 'ก้ม', 'เงา'] })
   })
 
   it('TC-007: one distractor picked and one word missed costs one point each', () => {
-    expect(check('ลิง', 'ช้าง', 'รัง', 'นก')).toEqual({ score: 5, wrong: ['กางเกง', 'นก'] })
+    expect(check('งู', 'ดัง', 'สูง', 'ผึ้ง', 'ลิง', 'ช้าง', 'ลุง', 'รัง')).toEqual({ score: 10, wrong: ['งู', 'ค่าง'] })
   })
 
   it('selecting only the distractors scores 0', () => {
-    expect(check('แมว', 'นก', 'บ้าน')).toEqual({ score: 0, wrong: ['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'แมว', 'นก', 'บ้าน'] })
+    expect(check(...DISTRACTORS).score).toBe(0)
   })
 })

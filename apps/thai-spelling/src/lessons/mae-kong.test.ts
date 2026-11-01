@@ -2,29 +2,29 @@ import { describe, expect, it } from 'vitest'
 import { DEFAULT_LESSON_ID, getLesson, parseStepNumber } from './index'
 import { maeKong } from './mae-kong'
 
-describe('mae-kong lesson data', () => {
-  it('has the cover title and subtitle', () => {
+const picture = (slug: string) => `/assets/canva/vocabulary/${slug}.webp`
+
+describe('mae-kong lesson data (Canva design DAHZj0Nxyxs)', () => {
+  it('has the cover title, subtitle and course line', () => {
     expect(maeKong.id).toBe('mae-kong')
     expect(maeKong.title).toBe('คำคล้องจองพาเพลิน')
-    expect(maeKong.subtitle).toBe('มาตราแม่กง (ง)')
+    expect(maeKong.subtitle).toBe('แม่ กง (ง)')
+    expect(maeKong.course).toBe('วิชาภาษาไทย ชั้นประถมศึกษาปีที่ ๒')
   })
 
-  it('has the 10 Steps from spec §1.1, in order, each with a Thai title', () => {
+  it('has the 10 Step titles of the design, in order', () => {
     expect(maeKong.steps.map((step) => step.title)).toEqual([
       'หน้าปก',
       'ดูภาพเรียนรู้คำ',
       'ฟังแล้วอ่านตาม',
       'สังเกตตัวสะกด',
-      'เลือกคำในมาตรา',
-      'เติมคำตรงภาพ',
-      'อ่านคำคล้องจอง',
-      'เกมจับคู่เสียง',
-      'ฝึกอ่านประโยค',
+      'แม่กงอยู่ไหน?',
+      'กล่องคำแม่กง',
+      'อ่านร้องคล้องคำ',
+      'จับคู่ดูคำ',
+      'อ่านออก บอกได้',
       'สรุปและประเมิน',
     ])
-    for (const step of maeKong.steps) {
-      expect(step.title).toMatch(/^[\u0E00-\u0E7F ]+$/)
-    }
   })
 
   it('is the default Lesson and can be looked up by id', () => {
@@ -42,64 +42,105 @@ describe('mae-kong lesson data', () => {
     }
   })
 
-  it('has the intro clip and the 6 vocabulary words with audio IDs and Thai text (spec §2, §5)', () => {
-    expect(maeKong.intro).toEqual({
-      id: 'intro',
-      text: 'สวัสดีเด็ก ๆ วันนี้เราจะมาเรียนรู้คำคล้องจองในมาตราแม่กงกัน พร้อมแล้วกดเริ่มเรียนได้เลย',
-    })
-    expect(maeKong.vocabulary.map(({ word, audio }) => [word, audio.id, audio.text])).toEqual([
-      ['ลิง', 'vocabulary/ling', 'ลิง'],
-      ['ช้าง', 'vocabulary/chang', 'ช้าง'],
-      ['รัง', 'vocabulary/rang', 'รัง'],
-      ['กางเกง', 'vocabulary/kang-keng', 'กางเกง'],
-      ['ดัง', 'vocabulary/dang', 'ดัง'],
-      ['ค้างคาว', 'vocabulary/khang-khao', 'ค้างคาว'],
-    ])
+  it('Steps 2 and 3 show the 6 Target Words with their picture and audio', () => {
+    const expected = [
+      ['ลิง', picture('ling'), 'vocabulary/ling'],
+      ['ช้าง', picture('chang'), 'vocabulary/chang'],
+      ['ดัง', picture('dang'), 'vocabulary/dang'],
+      ['รัง', picture('rang'), 'vocabulary/rang'],
+      ['ค่าง', picture('khang'), 'vocabulary/khang'],
+      ['ผึ้ง', picture('phueng'), 'vocabulary/phueng'],
+    ]
+    expect(maeKong.vocabulary.map(({ word, image, audio }) => [word, image, audio.id])).toEqual(expected)
+    expect(maeKong.listenAndRepeat.map(({ word, image, audio }) => [word, image, audio.id])).toEqual(expected)
+    for (const { word, audio } of maeKong.vocabulary) expect(audio.text).toBe(word)
   })
 
-  it('practises the 5 Target Words in Step 3 order, each with its own picture and audio', () => {
-    expect(maeKong.listenAndRepeat.map(({ word, image, audio }) => [word, image, audio.id])).toEqual([
-      ['ลิง', '/assets/images/vocabulary/monkey_3d.png', 'vocabulary/ling'],
-      ['ช้าง', '/assets/images/vocabulary/elephant_3d.png', 'vocabulary/chang'],
-      ['รัง', '/assets/images/vocabulary/nest_with_eggs_3d.png', 'vocabulary/rang'],
-      ['กางเกง', '/assets/images/vocabulary/jeans_3d.png', 'vocabulary/kang-keng'],
-      ['ดัง', '/assets/images/vocabulary/loudspeaker_3d.png', 'vocabulary/dang'],
-    ])
-  })
-
-  it('marks every final ง by explicit per-syllable position, both in กางเกง (spec Page 04, TC-005)', () => {
-    const { spotting } = maeKong
-    expect(spotting.heading).toBe('มาตราแม่กง (ง) มี ง เป็นตัวสะกด')
-    expect(spotting.explanation.id).toBe('explanations/mae-kong')
-    expect(spotting.explanation.text).toMatch(/แม่กง/)
+  it('Step 4 spots the final ง in two sets of three, with the design spelling lines', () => {
+    const { sets } = maeKong.spotting
     expect(
-      spotting.words.map(({ audio, syllables }) => [
-        audio.id,
-        syllables.map(({ text, final }) => `${text.slice(0, final)}[${text[final]}]${text.slice(final + 1)}`).join('|'),
-      ]),
+      sets.map((set) =>
+        set.map(({ audio, syllables, spelling }) => [
+          audio.id,
+          syllables.map(({ text, final }) => `${text.slice(0, final)}[${text[final]}]${text.slice(final + 1)}`).join('|'),
+          spelling.join('-'),
+        ]),
+      ),
     ).toEqual([
-      ['vocabulary/ling', 'ลิ[ง]'],
-      ['vocabulary/chang', 'ช้า[ง]'],
-      ['vocabulary/rang', 'รั[ง]'],
-      ['vocabulary/kang-keng', 'กา[ง]|เก[ง]'],
+      [
+        ['vocabulary/ling', 'ลิ[ง]', 'ลอ-อิ-งอ-ลิง'],
+        ['vocabulary/chang', 'ช้า[ง]', 'ชอ-อา-งอ-ชาง-ไม้โท-ช้าง'],
+        ['vocabulary/dang', 'ดั[ง]', 'ดอ-อะ-งอ-ดัง'],
+      ],
+      [
+        ['vocabulary/rang', 'รั[ง]', 'รอ-อะ-งอ-รัง'],
+        ['vocabulary/khang', 'ค่า[ง]', 'คอ-อา-งอ-คาง-ไม้เอก-ค่าง'],
+        ['vocabulary/phueng', 'ผึ้[ง]', 'ผอ-อึ-งอ-ผึง-ไม้โท-ผึ้ง'],
+      ],
     ])
-    for (const { syllables, audio } of spotting.words) expect(syllables.map(({ text }) => text).join('')).toBe(audio.text)
+    for (const { syllables, audio } of sets.flat()) expect(syllables.map(({ text }) => text).join('')).toBe(audio.text)
+    expect(maeKong.spotting.explanation.text).toMatch(/แม่กง/)
   })
 
-  it('word filling: 6 bank words, each the answer of exactly one picture', () => {
-    const { bank, pictures } = maeKong.wordFilling
-    expect(bank).toEqual(['ลิง', 'ช้าง', 'รัง', 'กางเกง', 'ดัง', 'ค้างคาว'])
-    expect(pictures.map((p) => p.answer).toSorted()).toEqual([...bank].sort())
-    expect(pictures.map((p) => p.answer)).not.toEqual(bank)
+  it('Step 5 asks แม่กงอยู่ไหน? over 12 picture cards in design order', () => {
+    const { question, instruction, choices } = maeKong.wordSelection
+    expect(question).toBe('แม่กงอยู่ไหน?')
+    expect(instruction).toMatch(/ง/)
+    expect(choices.map(({ word, correct }) => [word, correct])).toEqual([
+      ['งู', false],
+      ['ดัง', true],
+      ['บ้าน', false],
+      ['ก้ม', false],
+      ['สูง', true],
+      ['ผึ้ง', true],
+      ['ลิง', true],
+      ['ช้าง', true],
+      ['ลุง', true],
+      ['รัง', true],
+      ['ค่าง', true],
+      ['เงา', false],
+    ])
+    for (const { word, image, audio } of choices) {
+      expect(image).toMatch(/^\/assets\/canva\/vocabulary\/[a-z-]+\.webp$/)
+      expect(audio.text).toBe(word)
+    }
   })
 
-  it('has the 4 rhyme lines with line-01..04 audio IDs (spec §2 Step 7, §5)', () => {
-    expect(maeKong.rhyme).toEqual([
-      { id: 'rhyme/line-01', text: 'ลิงน้อยนั่งมอง' },
-      { id: 'rhyme/line-02', text: 'ช้างร้องเสียงดัง' },
-      { id: 'rhyme/line-03', text: 'นกบินกลับรัง' },
-      { id: 'rhyme/line-04', text: 'ฟังเพลงเพลินใจ' },
+  it('Step 6 fills the 6 pictures from the bank in design order', () => {
+    const { bank, pictures, instruction } = maeKong.wordFilling
+    expect(instruction).toBe('เลือกคำในกล่องคำเติมในช่องว่างให้ถูกต้อง')
+    expect(bank).toEqual(['รัง', 'ดัง', 'ผึ้ง', 'ลิง', 'ช้าง', 'ค่าง'])
+    expect(pictures.map(({ image, answer }) => [image, answer])).toEqual([
+      [picture('ling'), 'ลิง'],
+      [picture('chang'), 'ช้าง'],
+      [picture('dang'), 'ดัง'],
+      [picture('rang'), 'รัง'],
+      [picture('khang'), 'ค่าง'],
+      [picture('phueng'), 'ผึ้ง'],
+    ])
+  })
+
+  it('Step 7 has the 4 rhyme lines with their rhyme words marked', () => {
+    expect(maeKong.rhyme.map(({ id, text, rhymeWords }) => [id, text, rhymeWords])).toEqual([
+      ['rhyme/line-01', 'ลิงน้อยนั่งมอง', ['มอง']],
+      ['rhyme/line-02', 'ช้างร้องเสียงดัง', ['ร้อง', 'ดัง']],
+      ['rhyme/line-03', 'นกบินกลับรัง', ['รัง']],
+      ['rhyme/line-04', 'ฟังเพลงเพลินใจ', ['ฟัง']],
+    ])
+    for (const { text, rhymeWords } of maeKong.rhyme) for (const w of rhymeWords) expect(text).toContain(w)
+  })
+
+  it('Step 8 matches มอง↔ร้อง and ดัง↔ฟัง', () => {
+    expect(maeKong.rhymeMatching.pairs).toEqual([
+      { left: 'มอง', right: 'ร้อง' },
+      { left: 'ดัง', right: 'ฟัง' },
+    ])
+  })
+
+  it('Step 9 reads the two design sentences', () => {
+    expect(maeKong.sentences.map(({ audio }) => [audio.id, audio.text])).toEqual([
+      ['sentences/sentence-01', 'ลิงน้อยนั่งมองช้าง'],
+      ['sentences/sentence-02', 'บ่างวิ่งไล่ตามมา'],
     ])
   })
 })
-

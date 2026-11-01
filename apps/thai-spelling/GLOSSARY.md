@@ -21,11 +21,11 @@ One student's run through a Lesson in one browser; a browser holds at most one S
 _Avoid_: Attempt, visit
 
 **Target Word** (คำในมาตรา):
-A word whose every syllable ends in the Lesson's final consonant, e.g. ลิง, กางเกง.
+A word whose every syllable ends in the Lesson's final consonant, e.g. ลิง, ผึ้ง.
 _Avoid_: Correct word, key word
 
 **Supporting Word** (คำประกอบ):
-A word used in a Lesson that is not wholly in its final-consonant group, e.g. ค้างคาว.
+A word used in a Lesson that is not wholly in its final-consonant group, e.g. งู, เงา (ง is their initial, not their final).
 _Avoid_: Distractor (that is a wrong choice inside an Activity)
 
 **Star** (ดาว):
