@@ -4,16 +4,13 @@ import { useEffect, useState } from 'react'
 import { playClip, useClipStatus } from '../audio/audioManager'
 import { discardRecording, playRecording, startRecording, stopRecording, useRecorder } from '../audio/recorder'
 import type { Sentence } from '../lessons'
-import { Button } from './clay/Button'
-import { cx } from './clay/buttonClass'
+import { cx, orangeButton } from './clay/buttonClass'
 import { splitWords, useKaraokeWord } from './karaoke'
 import { popIn } from './motion/PopIn'
 import { RecorderMessages } from './RecorderMessages'
 import type { StepProps } from './stepProps'
 
 const icon = 'size-[56px] shrink-0'
-// Stage-scale recorder buttons: ≥ 44 CSS px tall on a 360px-tall landscape phone.
-const stageButton = 'min-h-[136px]! px-[48px]! text-[44px]!'
 
 // Boards at design DAHZj0Nxyxs page 9 coordinates (stage pixels).
 const boards = [
@@ -125,43 +122,43 @@ function SentenceRecorder({ number }: { number: number }) {
       <h2 className="font-heading text-[44px] font-bold whitespace-nowrap">บันทึกประโยคที่ {number}</h2>
       <div className="flex items-center gap-[16px]">
         {!practising ? (
-          <Button className={stageButton} onClick={() => setPractising(true)}>
+          <button type="button" className={orangeButton} onClick={() => setPractising(true)}>
             <Mic aria-hidden="true" className={icon} strokeWidth={2.5} />
             ลองอ่านเอง
-          </Button>
+          </button>
         ) : status === 'recording' ? (
-          <Button className={stageButton} onClick={stopRecording}>
+          <button type="button" className={orangeButton} onClick={stopRecording}>
             <Square aria-hidden="true" className={icon} strokeWidth={2.5} />
             หยุดบันทึก
-          </Button>
+          </button>
         ) : status === 'ready' && confirming ? (
           <>
             <p className="font-semibold whitespace-nowrap">อัดทับเสียงเดิมใช่ไหม</p>
-            <Button className={stageButton} onClick={record}>
+            <button type="button" className={orangeButton} onClick={record}>
               <Mic aria-hidden="true" className={icon} strokeWidth={2.5} />
               อัดใหม่เลย
-            </Button>
-            <Button className={stageButton} variant="ghost" onClick={() => setConfirming(false)}>
+            </button>
+            <button type="button" className={orangeButton} onClick={() => setConfirming(false)}>
               <X aria-hidden="true" className={icon} strokeWidth={2.5} />
               ยกเลิก
-            </Button>
+            </button>
           </>
         ) : status === 'ready' ? (
           <>
-            <Button className={stageButton} onClick={playRecording}>
+            <button type="button" className={orangeButton} onClick={playRecording}>
               <Play aria-hidden="true" className={icon} strokeWidth={2.5} />
               ฟังเสียงตัวเอง
-            </Button>
-            <Button className={stageButton} variant="ghost" onClick={() => setConfirming(true)}>
+            </button>
+            <button type="button" className={orangeButton} onClick={() => setConfirming(true)}>
               <RotateCcw aria-hidden="true" className={icon} strokeWidth={2.5} />
               ลองอีกครั้ง
-            </Button>
+            </button>
           </>
         ) : (
-          <Button className={stageButton} onClick={record} disabled={status === 'requesting'}>
+          <button type="button" className={orangeButton} onClick={record} disabled={status === 'requesting'}>
             <Mic aria-hidden="true" className={icon} strokeWidth={2.5} />
             เริ่มบันทึก
-          </Button>
+          </button>
         )}
       </div>
 

@@ -107,8 +107,8 @@ test.describe('Step 9 sentence reading', () => {
     await expect(page.getByRole('link', { name: 'ถัดไป' })).toBeVisible()
   })
 
-  test('fits 360px with no horizontal scroll and ≥44px buttons', async ({ page }) => {
-    await page.setViewportSize({ width: 740, height: 360 })
+  test('fits a 390px-tall landscape phone with no horizontal scroll and ≥44px buttons', async ({ page }) => {
+    await page.setViewportSize({ width: 844, height: 390 })
     await open(page)
     await button(page, 'ลองอ่านเอง').click()
     await button(page, 'เริ่มบันทึก').click()

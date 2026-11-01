@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import { useState } from 'react'
 import { useLessonSession } from '../session/lessonSession'
 import { lessonStars, MAX_STARS } from '../session/stars'
-import { pressable } from './clay/buttonClass'
+import { orangeButton, pressable } from './clay/buttonClass'
 import { ConfirmDialog } from './clay/ConfirmDialog'
 import { popIn } from './motion/PopIn'
 import { Confetti, JumpingMascot } from './Stars'
@@ -91,7 +91,7 @@ export function SummaryStep({ lesson }: StepProps) {
       <button
         type="button"
         onClick={() => setConfirmReset(true)}
-        className={`${pressable} absolute top-[926px] left-[760px] flex h-[124px] w-[400px] items-center justify-center gap-[16px] rounded-full border-[6px] border-card bg-orange font-heading text-[48px] font-bold text-white shadow-orange-button active:translate-y-[6px] active:shadow-orange-button-pressed`}
+        className={`${orangeButton} absolute top-[926px] left-[760px] w-[400px]`}
       >
         <RotateCcw aria-hidden="true" className="size-[56px]" strokeWidth={2.75} />
         เรียนอีกครั้ง

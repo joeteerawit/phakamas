@@ -17,6 +17,11 @@ export const pressable =
 /** The Canva cream word card: 4px dashed brown border, rounded as on design page 2. */
 export const creamCard = 'rounded-[40px] border-4 border-dashed border-cream-border bg-cream'
 
+/** The Canva orange 3D pill (Step 10 เรียนอีกครั้ง): place and size it at the call site. */
+export const orangeButton =
+  `${pressable} flex h-[124px] items-center justify-center gap-[16px] rounded-full border-[6px] border-card bg-orange px-[40px] ` +
+  'font-heading text-[48px] font-bold whitespace-nowrap text-white shadow-orange-button active:translate-y-[6px] active:shadow-orange-button-pressed'
+
 // MASTER.md Button: pill, 3px border, clay shadow, press = translateY(4px) +
 // pressed shadow in 150ms, visible 3px focus ring.
 const base =
