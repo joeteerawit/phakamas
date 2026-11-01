@@ -3,8 +3,12 @@ import { useEffect, useState } from 'react'
 import type { Feedback } from '../components/clay/FeedbackToast'
 import { StepContent } from '../components/StepContent'
 import { StepLayout } from '../components/StepLayout'
+import type { Scene } from '../components/stage/Stage'
 import { DEFAULT_LESSON_ID, getLesson, parseStepNumber } from '../lessons'
 import { useLessonSession } from '../session/lessonSession'
+
+/** Stage background per Step; unlisted Steps use the garden. */
+const stepScenes: Partial<Record<number, Scene>> = { 3: 'pond', 8: 'pond' }
 
 export const Route = createFileRoute('/lesson/$lessonId/$step')({
   beforeLoad: ({ params }) => {
@@ -28,7 +32,7 @@ function StepPage() {
   useEffect(() => visitStep(lesson.id, stepNumber), [visitStep, lesson.id, stepNumber])
   const [feedback, setFeedback] = useState<Feedback | null>(null)
   return (
-    <StepLayout lesson={lesson} stepNumber={stepNumber} feedback={feedback} scene={stepNumber === 3 ? 'pond' : undefined}>
+    <StepLayout lesson={lesson} stepNumber={stepNumber} feedback={feedback} scene={stepScenes[stepNumber]}>
       <StepContent lesson={lesson} stepNumber={stepNumber} onFeedback={setFeedback} />
     </StepLayout>
   )

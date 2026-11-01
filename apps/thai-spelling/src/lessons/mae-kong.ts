@@ -92,6 +92,12 @@ export const maeKong = {
       { left: 'มอง', right: 'ร้อง' },
       { left: 'ดัง', right: 'ฟัง' },
     ],
+    words: [
+      { id: 'vocabulary/mong', text: 'มอง' },
+      { id: 'vocabulary/fang', text: 'ฟัง' },
+      dang.audio,
+      { id: 'vocabulary/rong', text: 'ร้อง' },
+    ],
     sounds: {
       correct: { id: 'feedback/correct', text: 'ถูกต้อง' },
       completed: { id: 'feedback/completed', text: 'เก่งมาก จับคู่ถูกครบแล้ว' },

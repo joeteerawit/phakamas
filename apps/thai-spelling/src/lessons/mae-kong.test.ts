@@ -137,6 +137,15 @@ describe('mae-kong lesson data (Canva design DAHZj0Nxyxs)', () => {
     ])
   })
 
+  it('Step 8 has a word clip for every buzzer', () => {
+    expect(maeKong.rhymeMatching.words.map(({ id, text }) => [id, text])).toEqual([
+      ['vocabulary/mong', 'มอง'],
+      ['vocabulary/fang', 'ฟัง'],
+      ['vocabulary/dang', 'ดัง'],
+      ['vocabulary/rong', 'ร้อง'],
+    ])
+  })
+
   it('Step 9 reads the two design sentences', () => {
     expect(maeKong.sentences.map(({ audio }) => [audio.id, audio.text])).toEqual([
       ['sentences/sentence-01', 'ลิงน้อยนั่งมองช้าง'],
