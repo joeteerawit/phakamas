@@ -15,3 +15,5 @@ Cut-outs in #16 were matted exactly: the isolated elements were exported twice a
 | `chrome/back-button.webp` | `MAFPfldnN0Q` | page 2 element `LBwcGvQ30V4Y063w`, 2× | `DAHZp7scFx0` | #16 |
 | `chrome/next-button.webp` | `MAFPfuzgHok` | page 2 element `LBMFjjkZFMf64RCq`, 2× | `DAHZp7scFx0` | #16 |
 | `chrome/speaker-button.webp` | `MAFpnzvPH6I` | page 2 element `LB7kxc07M2dGz9qG` (71 px on stage, exported at 2× = 142 px; re-export larger if a Step shows it above ~140 px) | `DAHZp7scFx0` | #16 |
+| `ui/sentence-board.webp` | `MAFRcOOSohc` | page 9 element `LBZhTMQ2VDQMW0g1` (orange sentence board), matted over white/black at 2×, 1868×571 | `DAHZp1E9458` | #28 |
+| `vocabulary/bang.webp` | `MAHZpxrsAq0` → background removed `MAHZp1qCFco` | not in the design: Canva generate-image ("cute cartoon colugo flying lemur gliding, children's book illustration, bright colours, simple, white background"), copy page 33, transparent export, 360 px | `DAHZp1E9458` | #28 |

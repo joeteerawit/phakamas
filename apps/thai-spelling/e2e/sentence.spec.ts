@@ -10,7 +10,22 @@ const sentence = (page: Page, n: number) => page.getByRole('button', { name: new
 const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true })
 
 test.describe('Step 9 sentence reading', () => {
-  test('shows 2 sentence cards with pictures', async ({ page }) => {
+  test('tapping a board highlights its words one by one while it plays', async ({ page }) => {
+    await open(page)
+    await sentence(page, 1).click()
+    await expect(sentence(page, 1).locator('mark')).toHaveText('ลิง')
+    await expect(sentence(page, 1).locator('mark')).toHaveText('น้อย')
+  })
+
+  test('reduced motion: boards sit still and the highlight still shows', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await open(page)
+    await expect(sentence(page, 2)).toHaveCSS('transform', 'none')
+    await sentence(page, 2).click()
+    await expect(sentence(page, 2).locator('mark')).toHaveText('บ่าง')
+  })
+
+  test('shows 2 sentence boards with pictures', async ({ page }) => {
     await open(page)
     await expect(sentence(page, 1)).toContainText('ลิงน้อยนั่งมองช้าง')
     await expect(sentence(page, 2)).toContainText('บ่างวิ่งไล่ตามมา')
@@ -81,8 +96,7 @@ test.describe('Step 9 sentence reading', () => {
     await expect(page.getByRole('link', { name: 'ถัดไป' })).toBeVisible()
   })
 
-  // fixme(#16): old Step content is scaled down inside the 1920×1080 stage; its Step reskin ticket restores ≥44px targets.
-  test.fixme('fits 360px with no horizontal scroll and ≥44px buttons', async ({ page }) => {
+  test('fits 360px with no horizontal scroll and ≥44px buttons', async ({ page }) => {
     await page.setViewportSize({ width: 740, height: 360 })
     await open(page)
     await button(page, 'ลองอ่านเอง').click()

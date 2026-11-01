@@ -1,23 +1,33 @@
-import { Check, Mic, Play, RotateCcw, Square, Volume2, X } from 'lucide-react'
+import { Mic, Play, RotateCcw, Square, X } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { playClip, useClipStatus } from '../audio/audioManager'
 import { discardRecording, playRecording, startRecording, stopRecording, useRecorder } from '../audio/recorder'
 import type { Sentence } from '../lessons'
 import { Button } from './clay/Button'
 import { cx } from './clay/buttonClass'
-import { Card, cardClass, toneAt } from './clay/Card'
 import { RecorderMessages } from './RecorderMessages'
 import type { StepProps } from './stepProps'
 
-const icon = 'size-7 shrink-0'
+const icon = 'size-[56px] shrink-0'
+// Stage-scale recorder buttons: ≥ 44 CSS px tall on a 360px-tall landscape phone.
+const stageButton = 'min-h-[136px]! px-[48px]! text-[44px]!'
+/** Karaoke pace: one word every 500 ms while the sentence plays (no word timings in the audio). */
+const WORD_MS = 500
 
-/** Step 9: each sentence card plays only its own sentence; the student records the selected one. */
+// Boards at design DAHZj0Nxyxs page 9 coordinates, minus the StepLayout content origin (200, 180).
+const boards = [
+  { left: 251, top: 75 },
+  { left: 265, top: 396 },
+]
+
+/** Step 9: tapping a board plays only its sentence; the student records the selected one. */
 export function SentenceStep({ lesson }: StepProps) {
   const [selected, setSelected] = useState(0)
   useEffect(() => discardRecording, [])
 
   const choose = (i: number) => {
-    // Switching sentence throws the old recording away (and releases the mic); the same card just ends it.
+    // Switching sentence throws the old recording away (and releases the mic); the same board just ends it.
     if (i !== selected) discardRecording()
     else stopRecording()
     setSelected(i)
@@ -25,12 +35,11 @@ export function SentenceStep({ lesson }: StepProps) {
   }
 
   return (
-    <section className="flex flex-1 flex-col items-center gap-(--space-lg)">
-
-      <ul className="grid w-full max-w-3xl gap-(--space-md) sm:grid-cols-2">
+    <section className="relative flex-1">
+      <ul>
         {lesson.sentences.map((sentence, i) => (
-          <li key={sentence.audio.id}>
-            <SentenceCard sentence={sentence} index={i} selected={i === selected} onPlay={() => choose(i)} />
+          <li key={sentence.audio.id} className="absolute" style={boards[i % boards.length]}>
+            <SentenceBoard sentence={sentence} index={i} selected={i === selected} onPlay={() => choose(i)} />
           </li>
         ))}
       </ul>
@@ -40,40 +49,76 @@ export function SentenceStep({ lesson }: StepProps) {
   )
 }
 
-type SentenceCardProps = { sentence: Sentence; index: number; selected: boolean; onPlay: () => void }
+const words = (text: string) => [...new Intl.Segmenter('th', { granularity: 'word' }).segment(text)].map((s) => s.segment)
 
-function SentenceCard({ sentence, index, selected, onPlay }: SentenceCardProps) {
-  const status = useClipStatus(sentence.audio.id)
-  const active = status === 'loading' || status === 'playing'
+/** Index of the word to highlight while `playing`, advancing evenly; -1 when not playing. */
+function useKaraoke(playing: boolean, count: number) {
+  const [word, setWord] = useState(0)
+  useEffect(() => {
+    if (!playing) return
+    setWord(0)
+    const timer = setInterval(() => setWord((w) => Math.min(w + 1, count - 1)), WORD_MS)
+    return () => clearInterval(timer)
+  }, [playing, count])
+  return playing ? word : -1
+}
+
+type SentenceBoardProps = { sentence: Sentence; index: number; selected: boolean; onPlay: () => void }
+
+function SentenceBoard({ sentence, index, selected, onPlay }: SentenceBoardProps) {
+  const playing = useClipStatus(sentence.audio.id) === 'playing'
+  const reduceMotion = useReducedMotion()
+  const text = words(sentence.audio.text)
+  const current = useKaraoke(playing, text.length)
+  const delay = index * 0.35
 
   return (
-    <button
+    <motion.button
       type="button"
       aria-pressed={selected}
+      aria-label={`ฟังประโยคที่ ${index + 1}: ${sentence.audio.text}`}
       onClick={onPlay}
+      // Boards slide in from alternate sides.
+      initial={reduceMotion ? false : { opacity: 0, x: index % 2 ? 900 : -900 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay, x: { delay, type: 'spring', stiffness: 120, damping: 16 }, opacity: { delay, duration: 0.2 } }}
       className={cx(
-        cardClass({ tone: toneAt(index), selected, playing: status === 'playing' }),
-        'flex w-full cursor-pointer select-none flex-col items-center gap-(--space-xs) p-(--space-sm) sm:p-(--space-md)',
-        'transition-[transform,box-shadow] duration-150 ease-out active:translate-y-1 active:shadow-clay-pressed motion-reduce:transition-none',
-        'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring',
+        'relative block h-[285px] w-[934px] cursor-pointer select-none',
+        'transition-[filter] duration-150 active:brightness-95 motion-reduce:transition-none',
+        'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring',
+        selected && 'drop-shadow-[0_0_18px_#ffffff]',
       )}
     >
-      <span className="flex items-center gap-(--space-xs) font-semibold">
-        <Volume2 aria-hidden="true" className={cx('size-6 shrink-0', active && 'motion-safe:animate-pulse')} strokeWidth={2.5} />
-        ฟังประโยคที่ {index + 1}
-      </span>
-      <span className="flex justify-center gap-(--space-xs)">
-        {sentence.images.map((src) => (
-          <img key={src} src={src} alt="" width={256} height={256} draggable={false} className="pointer-events-none size-20 object-contain sm:size-24" />
-        ))}
-      </span>
-      <span className="font-heading text-heading font-bold">{sentence.audio.text}</span>
-      {/* Selection is shown by text and icon, not by the pink border alone. */}
-      <span className={cx('flex items-center gap-(--space-xs) font-semibold', !selected && 'invisible')}>
-        <Check aria-hidden="true" className="size-5 shrink-0" strokeWidth={3} />
-        ประโยคที่เลือก
-      </span>
-    </button>
+      {/* The inner board bobs while idle, so the button itself stays still for taps. */}
+      <motion.span
+        className="absolute inset-0 flex items-center justify-center bg-contain bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(/assets/canva/ui/sentence-board.webp)' }}
+        animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
+        transition={{ delay: delay + 0.8, duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <span className="-mt-[20px] font-heading text-[102px] leading-[1.4] font-bold text-navy">
+          {text.map((word, w) =>
+            w === current ? (
+              <mark
+                key={w}
+                className="inline-block scale-110 bg-transparent text-card transition-transform duration-150 motion-reduce:scale-100 motion-reduce:transition-none"
+              >
+                {word}
+              </mark>
+            ) : (
+              <span key={w} className="inline-block">
+                {word}
+              </span>
+            ),
+          )}
+        </span>
+        <span className="absolute top-1/2 left-[calc(100%+16px)] flex w-max -translate-y-1/2 gap-[8px]">
+          {sentence.images.map((src) => (
+            <img key={src} src={src} alt="" draggable={false} className="pointer-events-none size-[148px] object-contain" />
+          ))}
+        </span>
+      </motion.span>
+    </motion.button>
   )
 }
 
@@ -88,51 +133,53 @@ function SentenceRecorder({ number }: { number: number }) {
   }
 
   return (
-    <Card className="flex w-full max-w-xl flex-col items-center gap-(--space-sm)">
-      <h2 className="font-heading text-heading font-semibold">บันทึกประโยคที่ {number}</h2>
-      <div className="flex flex-wrap justify-center gap-(--space-sm)">
+    <div className="absolute inset-x-0 top-[712px] flex h-[152px] items-center justify-center gap-[24px] rounded-full border-[6px] border-card bg-pill/90 px-[32px] text-[36px] text-navy">
+      <h2 className="font-heading text-[44px] font-bold whitespace-nowrap">บันทึกประโยคที่ {number}</h2>
+      <div className="flex items-center gap-[16px]">
         {!practising ? (
-          <Button onClick={() => setPractising(true)}>
+          <Button className={stageButton} onClick={() => setPractising(true)}>
             <Mic aria-hidden="true" className={icon} strokeWidth={2.5} />
             ลองอ่านเอง
           </Button>
         ) : status === 'recording' ? (
-          <Button onClick={stopRecording}>
+          <Button className={stageButton} onClick={stopRecording}>
             <Square aria-hidden="true" className={icon} strokeWidth={2.5} />
             หยุดบันทึก
           </Button>
         ) : status === 'ready' && confirming ? (
           <>
-            <p className="w-full text-center font-semibold">อัดทับเสียงเดิมใช่ไหม</p>
-            <Button onClick={record}>
+            <p className="font-semibold whitespace-nowrap">อัดทับเสียงเดิมใช่ไหม</p>
+            <Button className={stageButton} onClick={record}>
               <Mic aria-hidden="true" className={icon} strokeWidth={2.5} />
               อัดใหม่เลย
             </Button>
-            <Button variant="ghost" onClick={() => setConfirming(false)}>
+            <Button className={stageButton} variant="ghost" onClick={() => setConfirming(false)}>
               <X aria-hidden="true" className={icon} strokeWidth={2.5} />
               ยกเลิก
             </Button>
           </>
         ) : status === 'ready' ? (
           <>
-            <Button onClick={playRecording}>
+            <Button className={stageButton} onClick={playRecording}>
               <Play aria-hidden="true" className={icon} strokeWidth={2.5} />
               ฟังเสียงตัวเอง
             </Button>
-            <Button variant="ghost" onClick={() => setConfirming(true)}>
+            <Button className={stageButton} variant="ghost" onClick={() => setConfirming(true)}>
               <RotateCcw aria-hidden="true" className={icon} strokeWidth={2.5} />
               ลองอีกครั้ง
             </Button>
           </>
         ) : (
-          <Button onClick={record} disabled={status === 'requesting'}>
+          <Button className={stageButton} onClick={record} disabled={status === 'requesting'}>
             <Mic aria-hidden="true" className={icon} strokeWidth={2.5} />
             เริ่มบันทึก
           </Button>
         )}
       </div>
 
-      <RecorderMessages />
-    </Card>
+      <div className="max-w-[600px] text-[26px] leading-[1.3]">
+        <RecorderMessages />
+      </div>
+    </div>
   )
 }
