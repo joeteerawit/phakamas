@@ -9,10 +9,6 @@ import { splitWords, useKaraokeWord } from './karaoke'
 import { RecorderMessages } from './RecorderMessages'
 import type { StepProps } from './stepProps'
 
-// Colours sampled from design DAHZj0Nxyxs page 7.
-const NAVY = '#1800ad'
-const RHYME_RED = '#ff3131'
-
 /**
  * Step 7 (design page 7): the rhyme on the swaying signboard in the pond. ฟังครูอ่าน plays every line in
  * order; step mode (or tapping a line) plays one line; the playing line's words light up karaoke-style.
@@ -135,8 +131,11 @@ function LineWords({ line, playing, reduceMotion }: { line: RhymeLine; playing: 
       <motion.span
         key={i}
         data-active={active}
-        className={cx('inline-block rounded-[16px] transition-colors duration-150', active && 'bg-tint-yellow')}
-        style={{ color: rhyme ? RHYME_RED : NAVY }}
+        className={cx(
+          'inline-block rounded-[16px] transition-colors duration-150',
+          rhyme ? 'text-final' : 'text-navy',
+          active && 'bg-tint-yellow',
+        )}
         animate={{ scale: active && rhyme && !reduceMotion ? 1.15 : 1 }}
       >
         {word}

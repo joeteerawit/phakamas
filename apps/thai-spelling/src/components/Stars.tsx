@@ -6,9 +6,8 @@ import type { AudioClip, Lesson } from '../lessons'
 import type { ActivityId } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { activityStars, lessonStars } from '../session/stars'
-
-/** The Mascot cut-out from the cover (docs/canva-assets.md, #19). */
-export const MONKEY_SRC = '/assets/canva/cover/monkey.webp'
+import { MONKEY_SRC } from './Mascot'
+import { popIn } from './motion/PopIn'
 
 /** The Activity being celebrated; not persisted. */
 const useCelebration = create<{ activityId: ActivityId | null }>(() => ({ activityId: null }))
@@ -21,15 +20,14 @@ const FLY_AT_MS = 1500
 // Stage-pixel offset from the big Stars' centre (960, 480) to the Star counter's centre (550, 86).
 const TO_COUNTER = { x: -410, y: -394 }
 
-/** The stage chrome's Star counter: a wooden pill next to the title sign. */
+/** The stage chrome's Star counter: a small wooden pill (MASTER.md wood) next to the title sign. */
 export function StarCounter({ lesson }: { lesson: Lesson }) {
   const results = useLessonSession((state) => state.session?.activities)
   const { total, max } = lessonStars(lesson, results)
   return (
     <p
       data-testid="star-counter"
-      className="absolute top-[29px] left-[440px] flex h-[115px] w-[220px] items-center justify-center gap-[8px] bg-contain bg-center bg-no-repeat font-heading text-[40px] font-bold text-navy"
-      style={{ backgroundImage: 'url(/assets/canva/chrome/title-sign.webp)' }}
+      className="absolute top-[46px] left-[455px] flex h-[80px] items-center gap-[8px] rounded-full border-4 border-cream-border bg-wood px-[24px] font-heading text-[40px] font-bold text-on-wood shadow-[inset_0_-6px_0_rgb(0_0_0/0.2)]"
     >
       <span className="sr-only">ดาวที่ได้</span>
       <span aria-hidden="true">⭐</span>
@@ -84,9 +82,7 @@ function Burst({ stars, clip }: { stars: number; clip: AudioClip }) {
         {Array.from({ length: stars }, (_, i) => (
           <motion.span
             key={i}
-            initial={still ? false : { scale: 0, rotate: -40 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 12, delay: 0.15 + i * 0.18 }}
+            {...popIn(i, !!still)}
           >
             ⭐
           </motion.span>

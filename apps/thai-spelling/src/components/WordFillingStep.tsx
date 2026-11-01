@@ -6,7 +6,8 @@ import { celebrate } from './Stars'
 import { scoreFeedback, useClearFeedbackOnLeave } from '../activities/feedback'
 import { lessonActivity, useReportUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
-import { cx } from './clay/buttonClass'
+import { creamCard, cx } from './clay/buttonClass'
+import { popIn } from './motion/PopIn'
 import { useStageScale } from './stage/Stage'
 import type { ActivityStepProps } from './stepProps'
 import { usePointerDrag } from './usePointerDrag'
@@ -15,7 +16,7 @@ import { usePointerDrag } from './usePointerDrag'
 const CARD_LEFT = [108, 399, 691, 982, 1273, 1564]
 
 const pill =
-  'flex items-center justify-center rounded-full border-4 border-dashed border-cream-border bg-[#fff6b3] font-heading font-bold text-navy'
+  'flex items-center justify-center rounded-full border-4 border-dashed border-cream-border bg-cream-light font-heading font-bold text-navy'
 const control =
   'absolute flex h-[122px] w-[320px] items-center justify-center gap-[12px] whitespace-nowrap rounded-full border-[6px] border-card font-heading text-[40px] font-bold text-navy ' +
   'transition-transform duration-150 ease-out active:scale-95 disabled:opacity-50 motion-reduce:transition-none ' +
@@ -150,9 +151,7 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
               data-blank={i}
               className="absolute top-[294px] h-[374px] w-[255px]"
               style={{ left: CARD_LEFT[i] }}
-              initial={reduceMotion ? false : { opacity: 0, y: 60, scale: 0.85 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: i * 0.07, type: 'spring', duration: 0.5, bounce: 0.4 }}
+              {...popIn(i, !!reduceMotion)}
             >
               <motion.div
                 key={checks}
@@ -160,10 +159,12 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
                 animate={result === false && !reduceMotion ? { x: SHAKE } : undefined}
                 transition={{ duration: 0.5 }}
                 className={cx(
-                  'relative size-full rounded-[28px] border-4 border-dashed border-cream-border bg-cream',
-                  'transition-shadow duration-300 motion-reduce:transition-none',
-                  result === true && 'border-solid border-correct shadow-[0_0_0_6px_#4ade80,0_0_48px_12px_#86efac]',
-                  result === false && 'border-solid border-wrong shadow-[0_0_0_6px_#f87171]',
+                  'relative size-full transition-shadow duration-300 motion-reduce:transition-none',
+                  result === true
+                    ? 'rounded-[40px] border-4 border-correct bg-cream shadow-glow-correct'
+                    : result === false
+                      ? 'rounded-[40px] border-4 border-wrong bg-cream shadow-ring-wrong'
+                      : creamCard,
                 )}
               >
                 <img
@@ -176,7 +177,7 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
                 />
                 <div
                   className={cx(
-                    'absolute inset-x-[-4px] bottom-[-4px] h-[97px] rounded-[20px] border-4 border-dashed bg-card',
+                    'absolute inset-x-[-4px] bottom-[-4px] h-[97px] rounded-[40px] border-4 border-dashed bg-card',
                     selected && !word ? 'border-pill' : 'border-cream-border',
                   )}
                 />
@@ -186,7 +187,7 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
                   onClick={drag.click(() => tapBlank(i))}
                   {...(word ? dragProps(word) : {})}
                   className={cx(
-                    'absolute inset-0 flex cursor-pointer items-end rounded-[28px] select-none',
+                    'absolute inset-0 flex cursor-pointer items-end rounded-[40px] select-none',
                     'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring',
                     word && 'touch-none',
                   )}
@@ -252,7 +253,7 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
               className={cx(
                 pill,
                 'h-[87px] w-full text-[60px] leading-[1.4] transition-[translate,box-shadow] duration-150 motion-reduce:transition-none',
-                selected === word && '-translate-y-[10px] border-solid border-pill shadow-[0_10px_0_#8a3a13]',
+                selected === word && '-translate-y-[10px] border-solid border-pill shadow-lift',
               )}
             >
               {word}

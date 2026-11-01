@@ -6,6 +6,17 @@ export function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(' ')
 }
 
+/**
+ * Stage-scale press feedback shared by Canva buttons: scale down 150 ms, 8px focus ring.
+ * pointer-events-auto so it also works inside a data-full-stage Step (whose layer ignores the pointer).
+ */
+export const pressable =
+  'pointer-events-auto cursor-pointer select-none transition-transform duration-150 ease-out active:scale-95 motion-reduce:transition-none ' +
+  'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-40'
+
+/** The Canva cream word card: 4px dashed brown border, rounded as on design page 2. */
+export const creamCard = 'rounded-[40px] border-4 border-dashed border-cream-border bg-cream'
+
 // MASTER.md Button: pill, 3px border, clay shadow, press = translateY(4px) +
 // pressed shadow in 150ms, visible 3px focus ring.
 const base =

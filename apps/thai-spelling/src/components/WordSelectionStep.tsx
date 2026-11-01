@@ -8,13 +8,13 @@ import { checkWordSelection } from '../activities/wordSelection'
 import type { WordChoice } from '../lessons'
 import { lessonActivity, useReportUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
-import { cx } from './clay/buttonClass'
+import { creamCard, cx, pressable } from './clay/buttonClass'
 import type { ActivityStepProps } from './stepProps'
 
-// Stage pixels from design DAHZj0Nxyxs page 5, minus StepLayout's content box origin (200, 180).
-// Rows sit 40px higher than the design so the ≥44px check buttons fit under them on a 390px phone.
-const COLUMNS = [278, 523, 768, 1013, 1258, 1503].map((x) => x - 200)
-const ROWS = [225, 606].map((y) => y - 180)
+// Stage pixels from design DAHZj0Nxyxs page 5. Rows sit 40px higher than the design so the
+// ≥44px check buttons fit under them on a 390px phone.
+const COLUMNS = [278, 523, 768, 1013, 1258, 1503]
+const ROWS = [225, 606]
 
 type Result = 'right' | 'wrong' | 'missed'
 
@@ -74,7 +74,7 @@ export function WordSelectionStep({ lesson, onFeedback }: ActivityStepProps) {
   }
 
   return (
-    <section aria-label={question} className="relative h-[876px] w-[1520px] shrink-0">
+    <section data-full-stage aria-label={question} className="relative size-full">
       <ul>
         {choices.map((choice, i) => (
           <li key={choice.word}>
@@ -91,11 +91,11 @@ export function WordSelectionStep({ lesson, onFeedback }: ActivityStepProps) {
         ))}
       </ul>
       {/* Left and right of centre, so the feedback toast (bottom centre) never hides them. */}
-      <button type="button" onClick={check} className={cx(actionClass, 'left-[40px] bg-cream')}>
+      <button type="button" onClick={check} className={cx(actionClass, 'left-[240px] bg-cream')}>
         <ClipboardCheck aria-hidden="true" className="size-16" strokeWidth={2.5} />
         ตรวจคำตอบ
       </button>
-      <button type="button" onClick={restart} className={cx(actionClass, 'left-[1080px] bg-pill')}>
+      <button type="button" onClick={restart} className={cx(actionClass, 'left-[1280px] bg-pill')}>
         <RotateCcw aria-hidden="true" className="size-16" strokeWidth={2.5} />
         เริ่มใหม่
       </button>
@@ -103,10 +103,11 @@ export function WordSelectionStep({ lesson, onFeedback }: ActivityStepProps) {
   )
 }
 
-const actionClass =
-  'absolute top-[748px] flex h-[124px] w-[400px] items-center justify-center gap-[16px] rounded-full border-[6px] border-cream-border ' +
-  'font-heading text-[48px] font-bold text-navy shadow-[0_8px_0_rgba(0,0,0,0.2)] transition-transform duration-150 active:scale-95 ' +
-  'motion-reduce:transition-none focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring'
+const actionClass = cx(
+  pressable,
+  'absolute top-[928px] flex h-[124px] w-[400px] items-center justify-center gap-[16px] rounded-full border-[6px] border-cream-border',
+  'font-heading text-[48px] font-bold text-navy shadow-[0_8px_0_rgba(0,0,0,0.2)]',
+)
 
 type PictureCardProps = {
   choice: WordChoice
@@ -136,7 +137,7 @@ function PictureCard({ choice, left, top, selected, result, round, onToggle }: P
       onClick={onToggle}
       style={{ left, top }}
       className={cx(
-        'absolute h-[311px] w-[210px] cursor-pointer select-none rounded-[36px]',
+        'pointer-events-auto absolute h-[311px] w-[210px] cursor-pointer select-none rounded-[40px]',
         'transition-transform duration-200 ease-out motion-reduce:transition-none',
         'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring',
         selected && '-translate-y-[14px]',
@@ -146,7 +147,7 @@ function PictureCard({ choice, left, top, selected, result, round, onToggle }: P
       <motion.span
         key={round}
         animate={result && !reduceMotion ? motionFor[result] : undefined}
-        className={cx('absolute inset-0 block rounded-[36px] border-4', cardLook(selected, result))}
+        className={cx('absolute inset-0 block rounded-[40px] border-4', cardLook(selected, result))}
       >
         <span className="absolute top-[204px] right-[12px] font-heading text-[54px] leading-[1.2] font-bold text-navy">
           {choice.word}
@@ -181,14 +182,12 @@ function PictureCard({ choice, left, top, selected, result, round, onToggle }: P
   )
 }
 
-const glow = 'shadow-[0_0_0_6px_#fde047,0_0_40px_12px_rgba(253,224,71,0.85)]'
-
 /** Card colours per state; right/wrong/missed also get a badge icon and sr-only text, never colour alone. */
 function cardLook(selected: boolean, result: Result | undefined) {
-  if (result === 'right') return cx('border-solid border-correct bg-cream', glow)
-  if (result === 'wrong') return 'border-solid border-wrong bg-[#ffc9c2]'
-  if (result === 'missed') return 'border-solid border-final bg-cream shadow-[0_0_0_6px_rgba(255,49,49,0.5)]'
-  return selected ? cx('border-solid border-accent bg-cream', glow) : 'border-dashed border-cream-border bg-cream'
+  if (result === 'right') return 'border-solid border-correct bg-cream shadow-glow-sun'
+  if (result === 'wrong') return 'border-solid border-wrong bg-wrong-tint'
+  if (result === 'missed') return 'border-solid border-final bg-cream shadow-ring-missed'
+  return selected ? 'border-solid border-accent bg-cream shadow-glow-sun' : creamCard
 }
 
 const SPARKS = Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 4)
@@ -200,7 +199,7 @@ function Sparkles() {
       {SPARKS.map((angle, i) => (
         <motion.span
           key={i}
-          className="absolute -translate-1/2 text-[48px] leading-none text-sun drop-shadow-[0_0_6px_#f59e0b]"
+          className="absolute -translate-1/2 text-[48px] leading-none text-sun drop-shadow-[0_0_6px_var(--color-accent)]"
           initial={{ x: 0, y: 0, opacity: 1, scale: 0.4 }}
           animate={{ x: Math.cos(angle) * 170, y: Math.sin(angle) * 200, opacity: 0, scale: 1.2, rotate: 90 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}

@@ -7,6 +7,7 @@ import type { Sentence } from '../lessons'
 import { Button } from './clay/Button'
 import { cx } from './clay/buttonClass'
 import { splitWords, useKaraokeWord } from './karaoke'
+import { popIn } from './motion/PopIn'
 import { RecorderMessages } from './RecorderMessages'
 import type { StepProps } from './stepProps'
 
@@ -55,7 +56,9 @@ function SentenceBoard({ sentence, index, selected, onPlay }: SentenceBoardProps
   const reduceMotion = useReducedMotion()
   const text = splitWords(sentence.audio.text)
   const current = useKaraokeWord(playing, text.length)
-  const delay = index * 0.35
+  // The shared card stagger, plus a slide in from alternate sides.
+  const pop = popIn(index, !!reduceMotion)
+  const delay = pop.transition.delay
 
   return (
     <motion.button
@@ -64,14 +67,14 @@ function SentenceBoard({ sentence, index, selected, onPlay }: SentenceBoardProps
       aria-label={`ฟังประโยคที่ ${index + 1}: ${sentence.audio.text}`}
       onClick={onPlay}
       // Boards slide in from alternate sides.
-      initial={reduceMotion ? false : { opacity: 0, x: index % 2 ? 900 : -900 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay, x: { delay, type: 'spring', stiffness: 120, damping: 16 }, opacity: { delay, duration: 0.2 } }}
+      initial={reduceMotion ? pop.initial : { ...pop.initial, x: index % 2 ? 900 : -900 }}
+      animate={{ ...pop.animate, x: 0 }}
+      transition={pop.transition}
       className={cx(
         'pointer-events-auto relative block h-[285px] w-[934px] cursor-pointer select-none',
         'transition-[filter] duration-150 active:brightness-95 motion-reduce:transition-none',
         'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring',
-        selected && 'drop-shadow-[0_0_18px_#ffffff]',
+        selected && 'drop-shadow-[0_0_18px_var(--color-card)]',
       )}
     >
       {/* The inner board bobs while idle, so the button itself stays still for taps. */}

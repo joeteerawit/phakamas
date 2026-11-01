@@ -1,19 +1,15 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useState } from 'react'
-import { clipDurationMs, playClip } from '../audio/audioManager'
+import { clipDurationMs, playClip, useClipStatus } from '../audio/audioManager'
 import type { SpottingWord } from '../lessons'
-import { cx } from './clay/buttonClass'
+import { creamCard, cx, pressable } from './clay/buttonClass'
+import { SpeakerButton } from './SpeakerButton'
 import type { StepProps } from './stepProps'
 
 /** Per-part highlight time until the clip's length is known (speech fallback, metadata still loading). */
 const PART_MS = 500
 const CARD_LEFTS = [251, 744, 1237]
-const SPEAKER = '/assets/canva/chrome/speaker-button.webp'
 const picture = (word: SpottingWord) => `/assets/canva/vocabulary/${word.audio.id.split('/').pop()}.webp`
-
-const pressable =
-  'pointer-events-auto cursor-pointer select-none transition-transform duration-150 ease-out active:scale-95 motion-reduce:transition-none ' +
-  'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring'
 
 /**
  * Step 4 (design DAHZj0Nxyxs pages 3–4): one set of three words at a time on the pond. Tapping a card plays
@@ -22,6 +18,7 @@ const pressable =
 export function SpottingStep({ lesson }: StepProps) {
   const { explanation, sets } = lesson.spotting
   const reduceMotion = useReducedMotion()
+  const explaining = useClipStatus(explanation.id) === 'playing'
   const [setIndex, setSetIndex] = useState(0)
   const [direction, setDirection] = useState(1)
   const [sweep, setSweep] = useState<{ word: SpottingWord; part: number } | null>(null)
@@ -67,14 +64,12 @@ export function SpottingStep({ lesson }: StepProps) {
           </button>
         ))}
       </div>
-      <button
-        type="button"
-        aria-label="ฟังคำอธิบาย"
+      <SpeakerButton
+        label="ฟังคำอธิบาย"
         onClick={() => playClip(explanation)}
-        className={cx(pressable, 'absolute top-[30px] left-[1470px] size-[124px]')}
-      >
-        <img src={SPEAKER} alt="" draggable={false} className="size-full object-contain" />
-      </button>
+        playing={explaining}
+        className="top-[30px] left-[1470px] size-[124px]"
+      />
 
       <AnimatePresence mode="wait" initial={false}>
         <motion.ul
@@ -111,6 +106,7 @@ type SpottingCardProps = {
 
 function SpottingCard({ word, left, activePart, onPlay }: SpottingCardProps) {
   const reduceMotion = useReducedMotion()
+  const playing = useClipStatus(word.audio.id) === 'playing'
   const glowing = activePart !== null
   const text = word.audio.text
 
@@ -122,7 +118,7 @@ function SpottingCard({ word, left, activePart, onPlay }: SpottingCardProps) {
         data-glowing={glowing}
         onClick={onPlay}
         style={{ left }}
-        className={cx(pressable, 'absolute top-[165px] h-[639px] w-[432px] rounded-[48px] border-4 border-dashed border-cream-border bg-cream')}
+        className={cx(pressable, creamCard, 'absolute top-[165px] h-[639px] w-[432px]')}
       >
         <img
           src={picture(word)}
@@ -130,7 +126,7 @@ function SpottingCard({ word, left, activePart, onPlay }: SpottingCardProps) {
           draggable={false}
           className="absolute top-[40px] left-[40px] h-[380px] w-[352px] object-contain"
         />
-        <img src={SPEAKER} alt="" draggable={false} className="absolute top-[458px] left-[73px] size-[120px]" />
+        <SpeakerButton className="top-[458px] left-[73px] size-[120px]" playing={playing} />
         <span className="absolute top-[444px] left-[196px] w-[228px] text-center font-heading text-[108px] leading-[1.2] font-bold text-navy">
           {word.syllables.map(({ text: syllable, final }, i) => (
             <span key={i}>
@@ -139,8 +135,8 @@ function SpottingCard({ word, left, activePart, onPlay }: SpottingCardProps) {
                 className="text-final"
                 animate={
                   glowing && !reduceMotion
-                    ? { textShadow: ['0 0 0px #ff3131', '0 0 28px #ff3131', '0 0 0px #ff3131'] }
-                    : { textShadow: '0 0 0px #ff3131' }
+                    ? { textShadow: ['0 0 0px currentColor', '0 0 28px currentColor', '0 0 0px currentColor'] }
+                    : { textShadow: '0 0 0px currentColor' }
                 }
                 transition={glowing && !reduceMotion ? { duration: 0.9, repeat: Infinity } : { duration: 0 }}
               >

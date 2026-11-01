@@ -4,16 +4,14 @@ import { motion, useReducedMotion } from 'motion/react'
 import { useState } from 'react'
 import { useLessonSession } from '../session/lessonSession'
 import { lessonStars, MAX_STARS } from '../session/stars'
+import { pressable } from './clay/buttonClass'
 import { ConfirmDialog } from './clay/ConfirmDialog'
+import { popIn } from './motion/PopIn'
 import { Confetti, JumpingMascot } from './Stars'
 import type { StepProps } from './stepProps'
 import { useRestartLesson } from './useRestartLesson'
 
-const pressable =
-  'pointer-events-auto transition-transform duration-150 ease-out active:scale-95 motion-reduce:transition-none ' +
-  'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring'
-
-/** A row of Star slots, the first `stars` filled, popping in one by one unless motion is reduced. */
+/** A row of Star slots, the first `stars` filled and popping in one by one (a fade with reduced motion). */
 function StarRow({ stars, slots, size }: { stars: number; slots: number; size: string }) {
   const still = useReducedMotion()
   return (
@@ -22,9 +20,7 @@ function StarRow({ stars, slots, size }: { stars: number; slots: number; size: s
         <motion.span
           key={i}
           className={i < stars ? '' : 'opacity-25 grayscale'}
-          initial={still || i >= stars ? false : { scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 12, delay: 0.3 + i * 0.25 }}
+          {...(i < stars ? popIn(i, !!still) : {})}
         >
           ⭐
         </motion.span>
@@ -95,7 +91,7 @@ export function SummaryStep({ lesson }: StepProps) {
       <button
         type="button"
         onClick={() => setConfirmReset(true)}
-        className={`${pressable} absolute top-[926px] left-[760px] flex h-[124px] w-[400px] items-center justify-center gap-[16px] rounded-full border-[6px] border-card bg-orange font-heading text-[48px] font-bold text-white shadow-[0_10px_0_#c2410c] active:translate-y-[6px] active:shadow-[0_4px_0_#c2410c]`}
+        className={`${pressable} absolute top-[926px] left-[760px] flex h-[124px] w-[400px] items-center justify-center gap-[16px] rounded-full border-[6px] border-card bg-orange font-heading text-[48px] font-bold text-white shadow-orange-button active:translate-y-[6px] active:shadow-orange-button-pressed`}
       >
         <RotateCcw aria-hidden="true" className="size-[56px]" strokeWidth={2.75} />
         เรียนอีกครั้ง

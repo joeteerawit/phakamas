@@ -6,6 +6,7 @@ import { stopAudio, toggleMute, useAudio } from '../audio/audioManager'
 import type { Lesson } from '../lessons'
 import { lessonActivities, useUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
+import { cx, pressable as pressFeedback } from './clay/buttonClass'
 import { ConfirmDialog } from './clay/ConfirmDialog'
 import { FeedbackToast, type Feedback } from './clay/FeedbackToast'
 import { Stage, type Scene } from './stage/Stage'
@@ -25,9 +26,7 @@ type StepLayoutProps = {
 }
 
 const chromeImage = 'pointer-events-none size-full select-none object-contain'
-const pressable =
-  'absolute block transition-transform duration-150 ease-out active:scale-95 motion-reduce:transition-none ' +
-  'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring'
+const pressable = cx(pressFeedback, 'absolute block')
 
 /**
  * Shared Step layout (spec §1.3, MASTER.md "Canva garden"): every Step sits on the 1920×1080 stage
@@ -115,8 +114,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
         </Link>
       )}
 
-      {/* shortcut: old Step content keeps its rem sizes and scrolls inside the stage; each Step's reskin ticket lays it out in stage pixels. */}
-      {/* A reskinned Step marks its root data-full-stage and is laid out over the whole stage in design pixels. */}
+      {/* Every Step marks its root data-full-stage and is laid out over the whole stage in design pixels (Step 6 portals onto the stage). */}
       <main className="absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto has-[[data-full-stage]]:pointer-events-none has-[[data-full-stage]]:inset-0 has-[[data-full-stage]]:overflow-hidden">
         {/* #18: the old Step slides out and the next slides in, in the travel direction; a fade with reduced motion. */}
         {/* No AnimatePresence initial={false}: it would also freeze every looping animation inside the first Step. */}

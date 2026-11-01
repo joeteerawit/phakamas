@@ -10,9 +10,10 @@ import {
   stopRecording,
   useRecorder,
 } from '../audio/recorder'
-import { cx } from './clay/buttonClass'
+import { creamCard, cx, pressable } from './clay/buttonClass'
 import { Mascot } from './Mascot'
 import { RecorderMessages } from './RecorderMessages'
+import { SpeakerButton } from './SpeakerButton'
 import type { StepProps } from './stepProps'
 
 const statusText: Partial<Record<AudioStatus, string>> = {
@@ -22,16 +23,13 @@ const statusText: Partial<Record<AudioStatus, string>> = {
 }
 
 // Every target here is ≥ 122 stage px: 44 CSS px on a 390px-tall landscape phone.
-const pressable =
-  'cursor-pointer transition-transform duration-150 ease-out active:scale-95 motion-reduce:transition-none ' +
-  'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-40'
 const roundOrange = `${pressable} flex size-[130px] items-center justify-center rounded-full border-[6px] border-card bg-orange text-card shadow-[0_8px_0_rgb(0_0_0/0.2)]`
 
 /**
  * Step 3 ฟังแล้วอ่านตาม (not in the Canva design; built from its kit on the pond scene, #22).
  * One cream word card at a time, played only on demand; when the clip ends the Mascot says
  * ถึงตาหนูอ่านแล้ว and the red buzzer records the child. Hearing every word earns a star.
- * Positions are stage pixels inside StepLayout's main (stage x 200, y 180).
+ * Positions are stage pixels over the whole stage (data-full-stage).
  */
 export function ListenRepeatStep({ lesson }: StepProps) {
   const words = lesson.listenAndRepeat
@@ -75,7 +73,7 @@ export function ListenRepeatStep({ lesson }: StepProps) {
   const slide = reduceMotion ? 0 : 240
 
   return (
-    <section className="relative h-[876px] w-[1520px] shrink-0 font-heading text-navy">
+    <section data-full-stage className="relative size-full font-heading text-navy">
       <AnimatePresence mode="wait" custom={direction}>
         <motion.div
           key={current.audio.id}
@@ -90,7 +88,10 @@ export function ListenRepeatStep({ lesson }: StepProps) {
           animate="center"
           exit="exit"
           transition={reduceMotion ? { duration: 0 } : { type: 'spring', duration: 0.45, bounce: 0.35 }}
-          className="absolute top-[30px] left-[550px] flex h-[560px] w-[420px] flex-col items-center justify-center gap-[8px] rounded-[48px] border-[6px] border-dashed border-cream-border bg-cream shadow-[0_12px_0_rgb(0_0_0/0.15)]"
+          className={cx(
+            creamCard,
+            'absolute top-[210px] left-[750px] flex h-[560px] w-[420px] flex-col items-center justify-center gap-[8px] shadow-[0_12px_0_rgb(0_0_0/0.15)]',
+          )}
         >
           <img src={current.image} alt="" width={300} height={300} draggable={false} className="size-[300px] object-contain" />
           <h2 className="text-[110px] leading-[1.4] font-bold">{current.word}</h2>
@@ -98,22 +99,19 @@ export function ListenRepeatStep({ lesson }: StepProps) {
         </motion.div>
       </AnimatePresence>
 
-      <button
-        type="button"
-        aria-label={heard.has(current.audio.id) ? 'ฟังอีกครั้ง' : 'ฟังเสียง'}
+      <SpeakerButton
+        label={heard.has(current.audio.id) ? 'ฟังอีกครั้ง' : 'ฟังเสียง'}
         onClick={listen}
-        className={`${pressable} absolute top-[0px] left-[900px] size-[140px] rounded-full`}
-      >
-        {playing && !reduceMotion && <SoundWaves />}
-        <img src="/assets/canva/chrome/speaker-button.webp" alt="" draggable={false} className="relative size-full" />
-      </button>
+        playing={playing}
+        className="top-[180px] left-[1100px] size-[140px] rounded-full"
+      />
 
       <button
         type="button"
         aria-label="คำก่อนหน้า"
         disabled={index === 0}
         onClick={() => goTo(index - 1)}
-        className={`${roundOrange} absolute top-[245px] left-[370px]`}
+        className={`${roundOrange} absolute top-[425px] left-[570px]`}
       >
         <ChevronLeft aria-hidden="true" className="size-[80px]" strokeWidth={3} />
       </button>
@@ -122,12 +120,12 @@ export function ListenRepeatStep({ lesson }: StepProps) {
         aria-label="คำถัดไป"
         disabled={index === words.length - 1}
         onClick={() => goTo(index + 1)}
-        className={`${roundOrange} absolute top-[245px] left-[1020px]`}
+        className={`${roundOrange} absolute top-[425px] left-[1220px]`}
       >
         <ChevronRight aria-hidden="true" className="size-[80px]" strokeWidth={3} />
       </button>
 
-      <nav aria-label="ลำดับคำ" className="absolute top-[610px] left-[388px] flex w-[744px] flex-col items-center">
+      <nav aria-label="ลำดับคำ" className="absolute top-[790px] left-[588px] flex w-[744px] flex-col items-center">
         <p className="rounded-full border-[5px] border-card bg-pill px-[28px] text-[40px] leading-[1.4] font-bold">
           คำที่ {index + 1}/{words.length}
         </p>
@@ -156,7 +154,7 @@ export function ListenRepeatStep({ lesson }: StepProps) {
 
       <Recorder />
 
-      <div role="status" aria-live="polite" className="absolute top-[40px] left-[0px] flex w-[340px] flex-col items-center gap-[24px] text-center">
+      <div role="status" aria-live="polite" className="absolute top-[220px] left-[200px] flex w-[340px] flex-col items-center gap-[24px] text-center">
         {yourTurn && (
           <motion.p
             initial={reduceMotion ? false : { scale: 0.6, opacity: 0 }}
@@ -168,7 +166,7 @@ export function ListenRepeatStep({ lesson }: StepProps) {
           </motion.p>
         )}
         {complete && (
-          <div className="flex w-full flex-col items-center gap-[12px] rounded-[40px] border-[6px] border-dashed border-cream-border bg-cream p-[20px]">
+          <div className={cx(creamCard, 'flex w-full flex-col items-center gap-[12px] p-[20px]')}>
             <motion.span
               initial={reduceMotion ? false : { scale: 0.4, rotate: -30 }}
               animate={{ scale: 1, rotate: 0 }}
@@ -192,20 +190,6 @@ export function ListenRepeatStep({ lesson }: StepProps) {
   )
 }
 
-/** Two rings spreading from the speaker while the teacher clip plays (as on Step 2). */
-function SoundWaves() {
-  return [0, 0.6].map((delay) => (
-    <motion.span
-      key={delay}
-      aria-hidden="true"
-      className="absolute inset-0 rounded-full border-[8px] border-orange"
-      initial={{ scale: 1, opacity: 0.8 }}
-      animate={{ scale: 1.8, opacity: 0 }}
-      transition={{ duration: 1.2, delay, repeat: Infinity, ease: 'easeOut' }}
-    />
-  ))
-}
-
 /** Red buzzer (Canva design page 8) to record, the remaining time, and an orange play-back button. */
 function Recorder() {
   const status = useRecorder((state) => state.status)
@@ -214,7 +198,7 @@ function Recorder() {
   const secondsLeft = useSecondsLeft(recording)
 
   return (
-    <div className="absolute top-[60px] left-[1180px] flex w-[340px] flex-col items-center gap-[12px]">
+    <div className="absolute top-[240px] left-[1380px] flex w-[340px] flex-col items-center gap-[12px]">
       <button
         type="button"
         aria-label={recording ? 'หยุดบันทึก' : 'ลองอ่านเอง'}

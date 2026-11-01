@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import { playClip } from '../audio/audioManager'
 import { toggleMusic } from '../audio/music'
 import { useLessonSession } from '../session/lessonSession'
+import { cx, pressable as pressFeedback } from './clay/buttonClass'
 import type { StepProps } from './stepProps'
 import { useRestartLesson } from './useRestartLesson'
 
@@ -11,9 +12,7 @@ import { useRestartLesson } from './useRestartLesson'
 const COVER = '/assets/canva/cover'
 
 const layer = 'pointer-events-none absolute select-none'
-const pressable =
-  'pointer-events-auto absolute block transition-transform duration-150 ease-out active:scale-95 motion-reduce:transition-none ' +
-  'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring'
+const pressable = cx(pressFeedback, 'absolute block')
 
 const loop = { repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' } as const
 
@@ -55,12 +54,12 @@ export function CoverStep({ lesson }: StepProps) {
         <h2 className="absolute top-[206px] left-[532px] w-[1167px] rotate-[1.66deg] text-center font-heading text-[112px] leading-[1.53] font-bold tracking-tight whitespace-nowrap text-navy">
           {lesson.title}
         </h2>
-        <p className="absolute top-[377px] left-[798px] flex h-[192px] w-[584px] items-center justify-center rounded-full border-[10px] border-card bg-[#ff66c4]">
-          <span className="rotate-[1.66deg] font-heading text-[105px] leading-[1.2] font-bold whitespace-nowrap text-[#ff3131]">
+        <p className="absolute top-[377px] left-[798px] flex h-[192px] w-[584px] items-center justify-center rounded-full border-[10px] border-card bg-cover-pill">
+          <span className="rotate-[1.66deg] font-heading text-[105px] leading-[1.2] font-bold whitespace-nowrap text-final">
             {lesson.subtitle}
           </span>
         </p>
-        <p className="absolute top-[684px] left-[762px] flex h-[85px] w-[584px] items-center justify-center rounded-full border-4 border-card bg-[#ffe98d] font-sans text-[40px] font-bold whitespace-nowrap text-navy">
+        <p className="absolute top-[684px] left-[762px] flex h-[85px] w-[584px] items-center justify-center rounded-full border-4 border-card bg-cream font-sans text-[40px] font-bold whitespace-nowrap text-navy">
           {lesson.gradeLine}
         </p>
       </motion.div>
@@ -96,7 +95,7 @@ export function CoverStep({ lesson }: StepProps) {
           <span
             data-testid="music-off"
             aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 left-1/2 h-[14px] w-[150px] -translate-1/2 -rotate-45 rounded-full border-4 border-card bg-[#ff3131]"
+            className="pointer-events-none absolute top-1/2 left-1/2 h-[14px] w-[150px] -translate-1/2 -rotate-45 rounded-full border-4 border-card bg-final"
           />
         )}
       </button>

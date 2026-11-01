@@ -3,6 +3,8 @@ import { cx } from './clay/buttonClass'
 /** Microsoft Fluent Emoji 3D "Monkey" (MIT), see public/assets/images/characters/. */
 export const MASCOT_SRC = '/assets/images/characters/monkey_3d.png'
 export const MASCOT_NAME = 'น้องลิง'
+/** The Canva Mascot cut-out from the cover (docs/canva-assets.md, #19). */
+export const MONKEY_SRC = '/assets/canva/cover/monkey.webp'
 
 type MascotSize = 'sm' | 'md' | 'lg'
 

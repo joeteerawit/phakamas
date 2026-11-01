@@ -2,7 +2,9 @@ import { motion, useAnimate, useReducedMotion } from 'motion/react'
 import { useState } from 'react'
 import { playClip, useClipStatus, type AudioStatus } from '../audio/audioManager'
 import type { VocabularyWord } from '../lessons'
-import { cx } from './clay/buttonClass'
+import { creamCard, cx } from './clay/buttonClass'
+import { popIn } from './motion/PopIn'
+import { SpeakerButton } from './SpeakerButton'
 import type { StepProps } from './stepProps'
 
 /** Card lefts in stage pixels, from design DAHZj0Nxyxs page 2. */
@@ -34,9 +36,7 @@ export function VocabularyStep({ lesson }: StepProps) {
             key={item.audio.id}
             className="absolute top-[335px] h-[378px] w-[255px]"
             style={{ left: cardLefts[i] }}
-            initial={reduceMotion ? false : { opacity: 0, scale: 0.6, y: 40 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ delay: 0.15 + i * 0.08, type: 'spring', stiffness: 260, damping: 18 }}
+            {...popIn(i, !!reduceMotion)}
           >
             <VocabularyCard
               item={item}
@@ -73,7 +73,8 @@ function VocabularyCard({ item, visited, onPlay }: VocabularyCardProps) {
       type="button"
       onClick={tap}
       className={cx(
-        'pointer-events-auto relative block size-full cursor-pointer select-none rounded-[40px] border-4 border-dashed border-cream-border bg-cream',
+        'pointer-events-auto relative block size-full cursor-pointer select-none',
+        creamCard,
         'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring',
         status === 'playing' && 'ring-8 ring-pill',
       )}
@@ -88,33 +89,7 @@ function VocabularyCard({ item, visited, onPlay }: VocabularyCardProps) {
         {item.word}
       </span>
       <span className="sr-only"> {statusText[status === 'idle' && visited ? 'visited' : status]}</span>
-      <img
-        src="/assets/canva/chrome/speaker-button.webp"
-        alt=""
-        draggable={false}
-        className={cx(
-          'pointer-events-none absolute top-[271px] left-[43px] size-[71px]',
-          status === 'loading' && 'motion-safe:animate-pulse',
-        )}
-      />
-      {status === 'playing' && <SoundWaves />}
+      <SpeakerButton className="top-[271px] left-[43px] size-[71px]" playing={status === 'playing'} loading={status === 'loading'} />
     </button>
-  )
-}
-
-/** 3 arcs beside the speaker; they pulse outwards, or stay lit with reduced motion. */
-function SoundWaves() {
-  return (
-    <svg
-      data-testid="sound-waves"
-      aria-hidden="true"
-      viewBox="0 0 20 56"
-      className="pointer-events-none absolute top-[278px] left-[108px] h-[56px] w-[20px] fill-none stroke-final stroke-[3.5]"
-      strokeLinecap="round"
-    >
-      {['M2 22a8 8 0 0 1 0 12', 'M6 16a16 16 0 0 1 0 24', 'M10 10a24 24 0 0 1 0 36'].map((d, i) => (
-        <path key={d} d={d} className="animate-sound-wave motion-reduce:animate-none" style={{ animationDelay: `${i * 0.15}s` }} />
-      ))}
-    </svg>
   )
 }

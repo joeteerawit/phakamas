@@ -6,7 +6,7 @@ import { celebrate } from './Stars'
 import { useClearFeedbackOnLeave } from '../activities/feedback'
 import { lessonActivity, useReportUncheckedWork, useUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
-import { cx } from './clay/buttonClass'
+import { creamCard, cx, pressable } from './clay/buttonClass'
 import type { Feedback } from './clay/FeedbackToast'
 import type { ActivityStepProps } from './stepProps'
 
@@ -14,19 +14,21 @@ const WRONG_FLASH_MS = 700
 const TOAST_MS = 2500
 const BUZZER = '/assets/canva/ui/buzzer.webp'
 
-// shortcut: StepLayout's <main> starts at stage (200, 180); positions below are design page 8 stage pixels
-// minus that offset. Drop ORIGIN once StepLayout lets a Step fill the whole stage.
-const ORIGIN = { x: 200, y: 180 }
+/** A point on the 1920×1080 stage. */
+type StagePoint = { x: number; y: number }
+
 const SIZE = { width: 269, height: 232 }
+/** From a buzzer's top to the middle of the word on its red cap. */
+const CAP_TEXT_Y = 88
 /** Buzzer top-left corners from design page 8, in `lesson.rhymeMatching.words` order (TL, TR, BL, BR). */
-const SPOTS = [
+const SPOTS: readonly StagePoint[] = [
   { x: 343, y: 308 },
   { x: 1229, y: 316 },
   { x: 343, y: 630 },
   { x: 1220, y: 637 },
 ]
 /** Middle of the word on the red cap; match lines join these. */
-const capCentre = ({ x, y }: { x: number; y: number }) => ({ x: x - ORIGIN.x + SIZE.width / 2, y: y - ORIGIN.y + 88 })
+const capCentre = ({ x, y }: StagePoint): StagePoint => ({ x: x + SIZE.width / 2, y: y + CAP_TEXT_Y })
 
 type Pair = { a: string; b: string }
 
@@ -111,7 +113,7 @@ export function RhymeMatchingStep({ lesson, onFeedback }: ActivityStepProps) {
   const spotOf = (word: string) => SPOTS[words.findIndex((clip) => clip.text === word)]!
 
   return (
-    <section className="relative h-[876px] w-[1520px] shrink-0">
+    <section data-full-stage className="relative size-full">
       <svg
         data-testid="match-lines"
         aria-hidden="true"
@@ -158,8 +160,8 @@ export function RhymeMatchingStep({ lesson, onFeedback }: ActivityStepProps) {
             disabled={locked}
             aria-pressed={locked ? undefined : selected === word}
             onClick={() => press(index)}
-            className="group absolute cursor-pointer select-none focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring disabled:cursor-default"
-            style={{ left: spot.x - ORIGIN.x, top: spot.y - ORIGIN.y, ...SIZE }}
+            className="group pointer-events-auto absolute cursor-pointer select-none focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring disabled:cursor-default"
+            style={{ left: spot.x, top: spot.y, ...SIZE }}
           >
             {/* Remounts on each wrong try or new pair so the shake or bounce replays. */}
             <motion.span
@@ -205,7 +207,10 @@ export function RhymeMatchingStep({ lesson, onFeedback }: ActivityStepProps) {
       <button
         type="button"
         onClick={restart}
-        className="absolute top-[740px] left-1/2 flex -translate-x-1/2 items-center gap-[12px] rounded-full border-4 border-card bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold text-navy transition-transform active:scale-95 motion-reduce:transition-none focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring"
+        className={cx(
+          pressable,
+          'absolute top-[920px] left-1/2 flex -translate-x-1/2 items-center gap-[12px] rounded-full border-4 border-card bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold text-navy',
+        )}
       >
         <RotateCcw aria-hidden="true" className="size-[40px]" strokeWidth={3} />
         เริ่มใหม่
@@ -219,7 +224,7 @@ function CompletedCard({ score }: { score: number }) {
   const reduceMotion = useReducedMotion()
   return (
     <motion.div
-      className="absolute top-[300px] left-[760px] z-20 flex -translate-x-1/2 flex-col items-center gap-[8px] rounded-[40px] border-[6px] border-cream-border bg-cream px-[48px] py-[24px] text-center text-navy"
+      className={cx(creamCard, 'absolute top-[480px] left-[960px] z-20 flex -translate-x-1/2 flex-col items-center gap-[8px] px-[48px] py-[24px] text-center text-navy')}
       initial={reduceMotion ? false : { scale: 0.6, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', duration: 0.3, bounce: 0.45 }}
