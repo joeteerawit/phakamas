@@ -70,8 +70,8 @@ export type RhymeMatching = {
   pairs: readonly { left: string; right: string }[]
   /** One buzzer per word, in design reading order (top-left, top-right, bottom-left, bottom-right). */
   words: readonly AudioClip[]
-  /** Played when a pair locks, and when every pair is matched. */
-  sounds: { correct: AudioClip; completed: AudioClip }
+  /** Played when a pair locks; matching every pair plays the shared เก่งมาก! praise. */
+  sounds: { correct: AudioClip }
 }
 
 /** A line of the Step 7 rhyme; `rhymeWords` are the words in it the UI highlights. */

@@ -63,6 +63,8 @@ test.describe('Step 8 rhyme matching', () => {
     await expect(page.getByText('ได้ 2 คะแนน')).toBeVisible()
     await expect(page.getByRole('img', { name: 'ได้ 2 ดาว' })).toBeVisible()
     await expect(lines(page)).toHaveCount(2)
+    // The same เก่งมาก! praise as Steps 5 and 6.
+    await expect.poll(() => audioLog(page)).toContain('play:/assets/audio/feedback/keng-mak.mp3')
     expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 2, maxScore: 2, answers: { mistakes: 1 } })
 
     await page.reload()
@@ -108,7 +110,7 @@ test.describe('Step 8 rhyme matching', () => {
     expect(await activity(page)).toMatchObject({ status: 'in_progress', bestScore: 0 })
     await page.getByRole('link', { name: 'ถัดไป' }).click()
     await expect(page).toHaveURL(/\/9$/)
-    expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 1, maxScore: 2, attemptCount: 1 })
+    expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 1, maxScore: 2, attemptCount: 1, partial: true })
   })
 
   test('no horizontal scroll on a 740×360 phone and buzzers are at least 44px', async ({ page }) => {

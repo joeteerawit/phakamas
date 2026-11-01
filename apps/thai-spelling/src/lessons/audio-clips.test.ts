@@ -28,7 +28,6 @@ describe('audioClips', () => {
       'vocabulary/fang',
       'vocabulary/rong',
       'feedback/correct',
-      'feedback/completed',
       'rhyme/line-01',
       'rhyme/line-02',
       'rhyme/line-03',

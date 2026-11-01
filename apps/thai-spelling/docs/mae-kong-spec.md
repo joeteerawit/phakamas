@@ -389,7 +389,7 @@ public/assets/
     └── feedback/
         ├── correct.mp3
         ├── incorrect.mp3
-        └── completed.mp3
+        └── keng-mak.mp3  (เก่งมาก! ของ Activity ทั้ง 3 รวมหน้า 8)
 ```
 
 ใช้ `AudioManager` ส่วนกลางป้องกันเสียงซ้อน

@@ -100,7 +100,6 @@ export const maeKong = {
     ],
     sounds: {
       correct: { id: 'feedback/correct', text: 'ถูกต้อง' },
-      completed: { id: 'feedback/completed', text: 'เก่งมาก จับคู่ถูกครบแล้ว' },
     },
   },
   rhyme: [

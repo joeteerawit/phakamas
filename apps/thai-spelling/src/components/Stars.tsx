@@ -11,10 +11,10 @@ import { activityStars, lessonStars } from '../session/stars'
 export const MONKEY_SRC = '/assets/canva/cover/monkey.webp'
 
 /** The Activity being celebrated; not persisted. */
-const useCelebration = create<{ activityId: ActivityId | null; clip?: AudioClip }>(() => ({ activityId: null }))
-/** An Activity Step calls this once its answers are checked (or all pairs matched); `clip` replaces the เก่งมาก! praise. */
-export const celebrate = (activityId: ActivityId, clip?: AudioClip) => useCelebration.setState({ activityId, clip })
-export const endCelebration = () => useCelebration.setState({ activityId: null, clip: undefined })
+const useCelebration = create<{ activityId: ActivityId | null }>(() => ({ activityId: null }))
+/** An Activity Step calls this once its answers are checked (or all pairs matched). */
+export const celebrate = (activityId: ActivityId) => useCelebration.setState({ activityId })
+export const endCelebration = () => useCelebration.setState({ activityId: null })
 
 const CELEBRATION_MS = 2500
 const FLY_AT_MS = 1500
@@ -43,11 +43,11 @@ export function StarCounter({ lesson }: { lesson: Lesson }) {
  * the Mascot jumps and เก่งมาก! plays. Tap or 2.5 s dismisses. Reduced motion: Stars only, static.
  */
 export function Celebration({ lesson }: { lesson: Lesson }) {
-  const { activityId, clip } = useCelebration()
+  const activityId = useCelebration((state) => state.activityId)
   const stars = useLessonSession((state) => activityStars(activityId ? state.session?.activities[activityId] : undefined))
   return (
     <AnimatePresence>
-      {activityId && <Burst key={activityId} stars={stars} clip={clip ?? lesson.wordSelection.praise} />}
+      {activityId && <Burst key={activityId} stars={stars} clip={lesson.wordSelection.praise} />}
     </AnimatePresence>
   )
 }

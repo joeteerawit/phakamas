@@ -89,7 +89,7 @@ export function RhymeMatchingStep({ lesson, onFeedback }: ActivityStepProps) {
       return
     }
     recordActivityCheck(activity.id, pairs.length, activity.maxScore, { mistakes })
-    celebrate(activity.id, sounds.completed)
+    celebrate(activity.id)
     setFeedback({ kind: 'correct', message: 'เก่งมาก! จับคู่ถูกครบแล้ว' })
   }
 
