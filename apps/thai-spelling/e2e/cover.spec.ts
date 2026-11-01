@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
+import { audioLog, open } from './audioStub.js'
 
 const playLink = (page: Page) => page.getByRole('link', { name: 'เริ่มเรียน' })
 const mascot = (page: Page) => page.getByTestId('cover-mascot')
@@ -18,6 +19,23 @@ test('the cover is design page 1: separate background, sign and Mascot, live tex
 
   await playLink(page).click()
   await expect(page).toHaveURL(/\/lesson\/mae-kong\/2$/)
+})
+
+test('the first ▶ of a Session plays the teacher intro and goes to Step 2; resuming does not', async ({ page }) => {
+  const intro = 'play:/assets/audio/intro.mp3'
+  await open(page, 1)
+  await playLink(page).click()
+  await expect(page).toHaveURL(/\/lesson\/mae-kong\/2$/)
+  await expect.poll(() => audioLog(page)).toEqual([intro])
+  // Still playing on Step 2: leaving the cover does not cut the intro off.
+  await expect(page.getByRole('button', { name: /^ลิง / })).toBeVisible()
+  expect(await audioLog(page)).not.toContain('pause:/assets/audio/intro.mp3')
+
+  await page.getByRole('link', { name: 'ย้อนกลับ' }).click()
+  await page.getByRole('link', { name: 'เรียนต่อ (ขั้น 2)' }).click()
+  await expect(page).toHaveURL(/\/lesson\/mae-kong\/2$/)
+  await page.waitForTimeout(300)
+  expect((await audioLog(page)).filter((entry) => entry === intro)).toHaveLength(1)
 })
 
 test('the Mascot swings, the sign drops in and ▶ pulses', async ({ page }) => {

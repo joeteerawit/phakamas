@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { RotateCcw } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
+import { playClip } from '../audio/audioManager'
 import { toggleMusic } from '../audio/music'
 import { useLessonSession } from '../session/lessonSession'
 import type { StepProps } from './stepProps'
@@ -114,6 +115,8 @@ export function CoverStep({ lesson }: StepProps) {
       <Link
         to="/lesson/$lessonId/$step"
         params={{ lessonId: lesson.id, step: String(resumeStep ?? 2) }}
+        // The cover speaker is the music toggle, so the teacher intro plays on the Session's first ▶ instead.
+        onClick={resumeStep ? undefined : () => playClip(lesson.intro)}
         className={`${pressable} top-[878px] left-[1702px] size-[187px]`}
       >
         <span className="sr-only">{resumeStep ? `เรียนต่อ (ขั้น ${resumeStep})` : 'เริ่มเรียน'}</span>

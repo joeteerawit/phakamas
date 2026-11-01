@@ -44,8 +44,8 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
   const { direction, moved } = useStepDirection(stepNumber)
   const reduceMotion = useReducedMotion()
   const muted = useAudio((state) => state.muted)
-  // AUD-004: leaving a Step stops its sound.
-  useEffect(() => stopAudio, [stepNumber])
+  // AUD-004: leaving a Step stops its sound; the cover's intro (started by ▶) carries on into Step 2.
+  useEffect(() => (isFirst ? undefined : stopAudio), [stepNumber, isFirst])
   useEffect(() => endCelebration, [stepNumber])
 
   // Spec §4: ถัดไป completes a plain Step; on an Activity it saves partial work or, untouched, marks it skipped.
