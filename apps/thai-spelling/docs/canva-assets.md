@@ -15,3 +15,9 @@ Cut-outs in #16 were matted exactly: the isolated elements were exported twice a
 | `chrome/back-button.webp` | `MAFPfldnN0Q` | page 2 element `LBwcGvQ30V4Y063w`, 2× | `DAHZp7scFx0` | #16 |
 | `chrome/next-button.webp` | `MAFPfuzgHok` | page 2 element `LBMFjjkZFMf64RCq`, 2× | `DAHZp7scFx0` | #16 |
 | `chrome/speaker-button.webp` | `MAFpnzvPH6I` | page 2 element `LB7kxc07M2dGz9qG` (71 px on stage, exported at 2× = 142 px; re-export larger if a Step shows it above ~140 px) | `DAHZp7scFx0` | #16 |
+| `ambient/bee.webp` | `MAHAz-S1CSc` | page 2 element `LB8CJfLNdTcKH4Tc` (ผึ้ง card image), isolated on its own page (copy page 33) and exported transparent, trimmed, 240 px wide (2× the 120 px flyer) | `DAHZp4iVMdI` | #18 |
+| `ambient/cloud-1.webp` | `MAHZj1fDy7E` | cloud baked into the garden background (page 2), cut out of `backgrounds/garden.webp` at stage 1000,68 with alpha from the red channel (`-level 55%,88%`; sky is blue, cloud white), 1× | – (from #16 export) | #18 |
+| `ambient/cloud-2.webp` | `MAHZj1fDy7E` | garden background cloud at stage 455,135, same red-channel key, 1× | – (from #16 export) | #18 |
+| `ambient/cloud-3.webp` | `MAHZj5W9nK8` | pond background (page 3) cloud at stage 930,268, cut out of `backgrounds/pond.webp`, same key, 1× | – (from #16 export) | #18 |
+| `ambient/flower-yellow.webp` | `MAHZj1fDy7E` | garden background flower head at stage 0,665, alpha from the red channel (`-level 72%,88%`; leaves are green), 1× | – (from #16 export) | #18 |
+| `ambient/flower-pink.webp` | `MAHZj1fDy7E` | garden background flower head at stage 10,865, same key, 1× | – (from #16 export) | #18 |

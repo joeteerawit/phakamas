@@ -1,6 +1,6 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Volume2, VolumeX } from 'lucide-react'
-import { motion, useReducedMotion } from 'motion/react'
+import { AnimatePresence, motion, useIsPresent, useReducedMotion } from 'motion/react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { stopAudio, toggleMute, useAudio } from '../audio/audioManager'
 import type { Lesson } from '../lessons'
@@ -112,15 +112,12 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
 
       {/* shortcut: old Step content keeps its rem sizes and scrolls inside the stage; each Step's reskin ticket lays it out in stage pixels. */}
       <main className="absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto">
-        <motion.div
-          key={stepNumber}
-          className="flex flex-1 flex-col"
-          initial={reduceMotion ? false : { opacity: 0, x: direction * 48 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-        >
-          {children}
-        </motion.div>
+        {/* #18: the old Step slides out and the next slides in, in the travel direction; a fade with reduced motion. */}
+        <AnimatePresence mode="wait" initial={false} custom={{ direction, reduceMotion }}>
+          <StepSlide key={stepNumber} travel={{ direction, reduceMotion }}>
+            {children}
+          </StepSlide>
+        </AnimatePresence>
       </main>
 
       <nav aria-label="เปลี่ยนขั้น">
@@ -159,6 +156,34 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
 
       <FeedbackToast feedback={feedback} className="absolute inset-x-0 bottom-[48px] z-30 flex justify-center" />
     </Stage>
+  )
+}
+
+type Travel = { direction: number; reduceMotion: boolean | null }
+const SLIDE_PX = 240
+const slide = {
+  enter: ({ direction, reduceMotion }: Travel) => (reduceMotion ? { opacity: 0 } : { opacity: 0, x: direction * SLIDE_PX }),
+  center: { opacity: 1, x: 0 },
+  exit: ({ direction, reduceMotion }: Travel) => (reduceMotion ? { opacity: 0 } : { opacity: 0, x: -direction * SLIDE_PX }),
+}
+
+/** One Step's content; inert while it slides out so nothing in it can be pressed twice. */
+function StepSlide({ travel, children }: { travel: Travel; children: ReactNode }) {
+  const isPresent = useIsPresent()
+  return (
+    <motion.div
+      data-testid="step-content"
+      inert={!isPresent}
+      className="flex flex-1 flex-col"
+      variants={slide}
+      custom={travel}
+      initial="enter"
+      animate="center"
+      exit="exit"
+      transition={{ duration: 0.22, ease: 'easeOut' }}
+    >
+      {children}
+    </motion.div>
   )
 }
 

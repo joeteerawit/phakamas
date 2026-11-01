@@ -1,6 +1,7 @@
 import { Smartphone } from 'lucide-react'
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from 'react'
 import { Mascot } from '../Mascot'
+import { Ambient } from './Ambient'
 import { fitStage, isPortrait, STAGE_HEIGHT, STAGE_WIDTH } from './fitStage'
 
 export type Scene = 'garden' | 'pond'
@@ -44,6 +45,7 @@ export function Stage({ scene = 'garden', children }: { scene?: Scene; children:
           backgroundImage: `url(${sceneSrc[scene]})`,
         }}
       >
+        <Ambient scene={scene} />
         <StageScale.Provider value={scale}>{children}</StageScale.Provider>
       </div>
       {portrait && <RotateOverlay />}
