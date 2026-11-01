@@ -13,9 +13,19 @@ const button = (page: Page, name: string) => page.getByRole('button', { name, ex
 test.describe('Step 9 sentence reading', () => {
   test('tapping a board highlights its words one by one while it plays', async ({ page }) => {
     await open(page)
+    // Record every highlighted word in the page, so a busy machine cannot skip past a 300 ms word between polls.
+    await sentence(page, 1).evaluate((board) => {
+      const seen: string[] = []
+      ;(window as unknown as { __marks: string[] }).__marks = seen
+      new MutationObserver(() => {
+        const text = board.querySelector('mark')?.textContent
+        if (text && seen.at(-1) !== text) seen.push(text)
+      }).observe(board, { subtree: true, childList: true, characterData: true })
+    })
     await sentence(page, 1).click()
-    await expect(sentence(page, 1).locator('mark')).toHaveText('ลิง')
-    await expect(sentence(page, 1).locator('mark')).toHaveText('น้อย')
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { __marks: string[] }).__marks.slice(0, 2)))
+      .toEqual(['ลิง', 'น้อย'])
   })
 
   test('reduced motion: boards sit still and the highlight still shows', async ({ page }) => {
