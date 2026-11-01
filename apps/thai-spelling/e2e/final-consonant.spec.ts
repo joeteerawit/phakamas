@@ -1,40 +1,46 @@
 import { expect, type Page, test } from '@playwright/test'
 import { audioLog, open } from './audioStub.js'
 
-const words = ['ลิง', 'ช้าง', 'ดัง', 'รัง', 'ค่าง', 'ผึ้ง']
-const card = (page: Page, word: string) => page.getByRole('list').getByRole('button', { name: new RegExp(`^${word} `) })
-const marks = (page: Page, word: string) => card(page, word).locator('mark')
-const toggle = (page: Page) => page.getByRole('button', { name: 'แสดงตัวสะกด' })
+const card = (page: Page, word: string) => page.getByRole('button', { name: `ฟังคำว่า ${word}` })
+const pill = (page: Page, word: string) => page.getByTestId(`spelling-${word}`)
+const setButton = (page: Page, n: number) => page.getByRole('button', { name: `ชุดคำที่ ${n}` })
+const RED = 'rgb(255, 49, 49)'
 
 test.describe('Step 4 final-consonant spotting', () => {
-  test('shows the heading, น้องลิง and the 6 cards with no highlight yet', async ({ page }) => {
+  test('shows set 1 on the pond with red final ง and spelling pills from the Lesson', async ({ page }) => {
     await open(page, 4)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('สังเกตตัวสะกด')
-    await expect(page.getByText('มาตราแม่กง (ง) มี ง เป็นตัวสะกด')).toBeVisible()
-    await expect(page.getByRole('img', { name: 'น้องลิง' })).toBeVisible()
-    const cards = page.getByRole('list').getByRole('button')
-    await expect(cards).toHaveCount(6)
-    for (const [i, word] of words.entries()) await expect(cards.nth(i)).toHaveAccessibleName(new RegExp(`^${word} `))
-    await expect(page.locator('mark')).toHaveCount(0)
+    await expect(page.getByTestId('stage')).toHaveCSS('background-image', /pond\.webp/)
+    for (const word of ['ลิง', 'ช้าง', 'ดัง']) await expect(card(page, word)).toBeVisible()
+    await expect(card(page, 'รัง')).toHaveCount(0)
+    await expect(card(page, 'ช้าง').getByText('ง', { exact: true })).toHaveCSS('color', RED)
+    await expect(pill(page, 'ช้าง')).toHaveText('ชอ-อา-งอ-ชาง-ไม้โท-ช้าง')
+    await expect(setButton(page, 1)).toHaveAttribute('aria-pressed', 'true')
   })
 
-  test('TC-005: tapping ผึ้ง plays it and highlights its final ง', async ({ page }) => {
+  test('the set switch shows set 2', async ({ page }) => {
     await open(page, 4)
+    await setButton(page, 2).click()
+    await expect(setButton(page, 2)).toHaveAttribute('aria-pressed', 'true')
+    for (const word of ['รัง', 'ค่าง', 'ผึ้ง']) await expect(card(page, word)).toBeVisible()
+    await expect(card(page, 'ลิง')).toHaveCount(0)
+    await expect(pill(page, 'ผึ้ง')).toHaveText('ผอ-อึ-งอ-ผึง-ไม้โท-ผึ้ง')
+  })
+
+  test('TC-005: tapping a card plays it and sweeps its spelling part by part', async ({ page }) => {
+    await page.clock.install()
+    await open(page, 4)
+    await setButton(page, 2).click()
     await card(page, 'ผึ้ง').click()
     await expect.poll(() => audioLog(page)).toEqual(['play:/assets/audio/vocabulary/phueng.mp3'])
-    await expect(marks(page, 'ผึ้ง')).toHaveText(['ง'])
-    await expect(marks(page, 'ลิง')).toHaveCount(0)
-  })
-
-  test('แสดงตัวสะกด toggles every highlight on and off', async ({ page }) => {
-    await open(page, 4)
-    await toggle(page).click()
-    await expect(toggle(page)).toHaveAttribute('aria-pressed', 'true')
-    for (const word of words) await expect(marks(page, word)).toHaveText(['ง'])
-
-    await toggle(page).click()
-    await expect(toggle(page)).toHaveAttribute('aria-pressed', 'false')
-    await expect(page.locator('mark')).toHaveCount(0)
+    const active = pill(page, 'ผึ้ง').locator('[data-active]')
+    await expect(active).toHaveText('ผอ')
+    await expect(card(page, 'ผึ้ง')).toHaveAttribute('data-glowing', 'true')
+    await page.clock.runFor(600)
+    await expect(active).toHaveText('อึ')
+    await page.clock.runFor(4_000)
+    await expect(active).toHaveCount(0)
+    await expect(card(page, 'ผึ้ง')).not.toHaveAttribute('data-glowing', 'true')
   })
 
   test('ฟังคำอธิบาย plays the แม่กง explanation, with a Thai speech fallback', async ({ page }) => {
@@ -46,14 +52,13 @@ test.describe('Step 4 final-consonant spotting', () => {
     ])
   })
 
-  // fixme(#16): old Step content is scaled down inside the 1920×1080 stage; its Step reskin ticket restores ≥44px targets.
-  test.fixme('fits a 360px phone with no horizontal scroll and ≥44px targets', async ({ page }) => {
-    await page.setViewportSize({ width: 740, height: 360 })
+  test('targets are ≥44px on a 390px-tall landscape phone', async ({ page }) => {
+    await page.setViewportSize({ width: 844, height: 390 })
     await open(page, 4)
-    await toggle(page).click()
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360)
-    for (const target of [toggle(page), page.getByRole('button', { name: 'ฟังคำอธิบาย' }), card(page, 'ผึ้ง')]) {
-      expect((await target.boundingBox())?.height).toBeGreaterThanOrEqual(44)
+    for (const target of [setButton(page, 1), setButton(page, 2), page.getByRole('button', { name: 'ฟังคำอธิบาย' }), card(page, 'ลิง')]) {
+      const box = await target.boundingBox()
+      expect(box?.height).toBeGreaterThanOrEqual(44)
+      expect(box?.width).toBeGreaterThanOrEqual(44)
     }
   })
 })
