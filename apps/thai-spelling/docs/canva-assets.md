@@ -23,3 +23,9 @@ Cut-outs in #16 were matted exactly: the isolated elements were exported twice a
 | `vocabulary/phueng.webp` | `MAHAz-S1CSc` | page 2 element `LB8CJfLNdTcKH4Tc` (bee), 2×, white/black matte | `DAHZp7SpMi8` | #21 |
 | `ui/buzzer.webp` | `MAHNWn7XIMk` | page 8 element `LBmV70pD2RJFh1Vg` (red 3D buzzer, Step 3 record button), white/black matte at 2× | `DAHZp_MBBaQ` | #22 |
 | `ui/buzzer.webp` | `MAHNWn7XIMk` | page 8 element `LBmV70pD2RJFh1Vg` (red cap + grey base, no adjustments), white/black matte, 2× (538×464); word is live text; shared with Step 3; the #22 export (539×465, same element) was kept on merge | `DAHZp6YVBJI` | #27 |
+| `ambient/bee.webp` | `MAHAz-S1CSc` | page 2 element `LB8CJfLNdTcKH4Tc` (ผึ้ง card image), isolated on its own page (copy page 33) and exported transparent, trimmed, 240 px wide (2× the 120 px flyer) | `DAHZp4iVMdI` | #18 |
+| `ambient/cloud-1.webp` | `MAHZj1fDy7E` | cloud baked into the garden background (page 2), cut out of `backgrounds/garden.webp` at stage 1000,68 with alpha from the red channel (`-level 55%,88%`; sky is blue, cloud white), 1× | – (from #16 export) | #18 |
+| `ambient/cloud-2.webp` | `MAHZj1fDy7E` | garden background cloud at stage 455,135, same red-channel key, 1× | – (from #16 export) | #18 |
+| `ambient/cloud-3.webp` | `MAHZj5W9nK8` | pond background (page 3) cloud at stage 930,268, cut out of `backgrounds/pond.webp`, same key, 1× | – (from #16 export) | #18 |
+| `ambient/flower-yellow.webp` | `MAHZj1fDy7E` | garden background flower head at stage 0,665, alpha from the red channel (`-level 72%,88%`; leaves are green), 1× | – (from #16 export) | #18 |
+| `ambient/flower-pink.webp` | `MAHZj1fDy7E` | garden background flower head at stage 10,865, same key, 1× | – (from #16 export) | #18 |
