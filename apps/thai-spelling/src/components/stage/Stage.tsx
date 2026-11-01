@@ -4,11 +4,12 @@ import { Mascot } from '../Mascot'
 import { Ambient } from './Ambient'
 import { fitStage, isPortrait, STAGE_HEIGHT, STAGE_WIDTH } from './fitStage'
 
-export type Scene = 'garden' | 'pond'
+export type Scene = 'garden' | 'pond' | 'cover'
 
 const sceneSrc: Record<Scene, string> = {
   garden: '/assets/canva/backgrounds/garden.webp',
   pond: '/assets/canva/backgrounds/pond.webp',
+  cover: '/assets/canva/backgrounds/cover.webp',
 }
 
 const StageScale = createContext(1)
