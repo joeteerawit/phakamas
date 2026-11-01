@@ -60,7 +60,7 @@
 | Sun, orange, purple, red (decor, rainbow, flowers) | `#FDE047`, `#FB923C`, `#A78BFA`, `#F87171` | `--color-sun`, `--color-orange`, `--color-purple`, `--color-red` |
 | Card/pill tints (dark text only) | `#FEF08A` `#FBCFE8` `#BAE6FD` `#BBF7D0` `#DDD6FE` `#FED7AA` | `--color-tint-yellow/pink/sky/mint/lilac/peach` |
 
-Backdrop: sky gradient + rainbow arc + sun with halo + bright hills + flowers. Storybook border 6px sun yellow; Step counter pill sun yellow; progress bar red→yellow→green gradient. Neighbouring cards cycle tints (`toneAt(i)`) so a grid is never all white.
+Backdrop: sky gradient + rainbow arc + sun with halo + bright hills + flowers. Storybook border 6px sun yellow; Step counter pill sun yellow; progress bar red→yellow→green gradient.
 
 Never use raw hex in components; use tokens. Right/wrong is never colour alone.
 

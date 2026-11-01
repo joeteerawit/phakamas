@@ -87,13 +87,13 @@ export type Sentence = {
   audio: AudioClip
 }
 
-/** A complete course for one final-consonant group (มาตราตัวสะกด). */
+/** A complete Lesson for one final-consonant group (มาตราตัวสะกด). */
 export type Lesson = {
   id: string
   title: string
   subtitle: string
   /** Subject and grade line on the cover. */
-  course: string
+  gradeLine: string
   steps: readonly LessonStep[]
   /** Teacher introduction played on the cover Step. */
   intro: AudioClip

@@ -61,7 +61,7 @@ export function CoverStep({ lesson }: StepProps) {
           </span>
         </p>
         <p className="absolute top-[684px] left-[762px] flex h-[85px] w-[584px] items-center justify-center rounded-full border-4 border-card bg-[#ffe98d] font-sans text-[40px] font-bold whitespace-nowrap text-navy">
-          {lesson.course}
+          {lesson.gradeLine}
         </p>
       </motion.div>
 

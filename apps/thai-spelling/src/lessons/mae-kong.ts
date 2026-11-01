@@ -49,7 +49,7 @@ export const maeKong = {
   id: 'mae-kong',
   title: 'คำคล้องจองพาเพลิน',
   subtitle: 'แม่ กง (ง)',
-  course: 'วิชาภาษาไทย ชั้นประถมศึกษาปีที่ ๒',
+  gradeLine: 'วิชาภาษาไทย ชั้นประถมศึกษาปีที่ ๒',
   steps: [
     { title: 'หน้าปก' },
     { title: 'ดูภาพเรียนรู้คำ' },

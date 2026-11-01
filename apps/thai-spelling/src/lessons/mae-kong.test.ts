@@ -5,11 +5,11 @@ import { maeKong } from './mae-kong'
 const picture = (slug: string) => `/assets/canva/vocabulary/${slug}.webp`
 
 describe('mae-kong lesson data (Canva design DAHZj0Nxyxs)', () => {
-  it('has the cover title, subtitle and course line', () => {
+  it('has the cover title, subtitle and grade line', () => {
     expect(maeKong.id).toBe('mae-kong')
     expect(maeKong.title).toBe('คำคล้องจองพาเพลิน')
     expect(maeKong.subtitle).toBe('แม่ กง (ง)')
-    expect(maeKong.course).toBe('วิชาภาษาไทย ชั้นประถมศึกษาปีที่ ๒')
+    expect(maeKong.gradeLine).toBe('วิชาภาษาไทย ชั้นประถมศึกษาปีที่ ๒')
   })
 
   it('has the 10 Step titles of the design, in order', () => {
