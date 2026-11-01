@@ -3,7 +3,8 @@ import { audioClips } from './audio-clips'
 import { maeKong } from './mae-kong'
 
 // Keys look like /public/assets/audio/intro.mp3.
-const mp3s = Object.keys(import.meta.glob('/public/assets/audio/**/*.mp3'))
+// Background music (#20) is not an AudioClip.
+const mp3s = Object.keys(import.meta.glob(['/public/assets/audio/**/*.mp3', '!/public/assets/audio/music/**']))
 
 describe('audioClips', () => {
   it('finds every AudioClip in the Lesson data, once each', () => {

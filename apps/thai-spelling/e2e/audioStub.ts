@@ -8,6 +8,8 @@ export type StubOptions = {
 
 export type AudioStub = {
   log: string[]
+  /** The background-music element, kept out of `log` so speech assertions stay exact. */
+  music: { paused: boolean; volume: number; loop: boolean } | null
   opts: StubOptions
   /** Ends whatever is playing, as the browser would. */
   finish: () => void
@@ -15,12 +17,14 @@ export type AudioStub = {
 
 /** Replaces HTMLAudioElement and speechSynthesis with fakes that log what played. */
 function stubAudio(opts: StubOptions) {
-  const stub: AudioStub = { log: [], opts, finish: () => {} }
+  const stub: AudioStub = { log: [], music: null, opts, finish: () => {} }
   ;(window as unknown as { __audio: AudioStub }).__audio = stub
   const path = (src: string) => new URL(src, location.href).pathname
 
   class FakeAudio {
     paused = true
+    loop = false
+    volume = 1
     onplaying: (() => void) | null = null
     onended: (() => void) | null = null
     onerror: (() => void) | null = null
@@ -29,6 +33,11 @@ function stubAudio(opts: StubOptions) {
       this.src = src
     }
     play() {
+      if (path(this.src).startsWith('/assets/audio/music/')) {
+        stub.music = this
+        this.paused = false
+        return Promise.resolve()
+      }
       stub.log.push(`play:${path(this.src)}`)
       if (stub.opts.mp3 === 'missing') return Promise.reject(new DOMException('no file', 'NotSupportedError'))
       if (stub.opts.mp3 === 'pending') return new Promise<void>(() => {})
@@ -38,7 +47,7 @@ function stubAudio(opts: StubOptions) {
       return Promise.resolve()
     }
     pause() {
-      if (!this.paused) stub.log.push(`pause:${path(this.src)}`)
+      if (!this.paused && stub.music !== this) stub.log.push(`pause:${path(this.src)}`)
       this.paused = true
     }
   }
@@ -81,6 +90,11 @@ export async function open(page: Page, step: number, opts: Partial<StubOptions> 
 export const audioLog = (page: Page) => page.evaluate(() => (window as unknown as { __audio: AudioStub }).__audio.log)
 export const setStub = (page: Page, opts: Partial<StubOptions>) =>
   page.evaluate((o) => Object.assign((window as unknown as { __audio: AudioStub }).__audio.opts, o), opts)
+export const musicState = (page: Page) =>
+  page.evaluate(() => {
+    const music = (window as unknown as { __audio: AudioStub }).__audio.music
+    return music && { paused: music.paused, volume: music.volume, loop: music.loop }
+  })
 export const endCurrent = (page: Page) =>
   page.evaluate(() => (window as unknown as { __audio: AudioStub }).__audio.finish())
 

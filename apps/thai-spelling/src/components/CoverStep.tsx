@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { RotateCcw } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
-import { playClip, stopAudio, useClipStatus, type AudioStatus } from '../audio/audioManager'
+import { toggleMusic } from '../audio/music'
 import { useLessonSession } from '../session/lessonSession'
 import type { StepProps } from './stepProps'
 import { useRestartLesson } from './useRestartLesson'
@@ -13,13 +13,6 @@ const layer = 'pointer-events-none absolute select-none'
 const pressable =
   'pointer-events-auto absolute block transition-transform duration-150 ease-out active:scale-95 motion-reduce:transition-none ' +
   'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring'
-
-const introLabels: Record<AudioStatus, string> = {
-  idle: 'ฟังคำแนะนำ',
-  loading: 'กำลังโหลดเสียง',
-  playing: 'หยุดเสียง',
-  error: 'ลองฟังอีกครั้ง',
-}
 
 const loop = { repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' } as const
 
@@ -33,8 +26,7 @@ export function CoverStep({ lesson }: StepProps) {
   const resumeStep = useLessonSession(({ session }) =>
     session?.lessonId === lesson.id && session.currentStep > 1 ? session.currentStep : null,
   )
-  const introStatus = useClipStatus(lesson.intro.id)
-  const introBusy = introStatus === 'loading' || introStatus === 'playing'
+  const musicOn = useLessonSession((state) => state.musicOn)
 
   return (
     <section data-full-stage className="pointer-events-none absolute inset-0">
@@ -85,14 +77,27 @@ export function CoverStep({ lesson }: StepProps) {
       <img src={`${COVER}/bushes-left.webp`} alt="" draggable={false} className={`${layer} top-[675px] left-0 h-[405px] w-[869px]`} />
       <img src={`${COVER}/bushes-right.webp`} alt="" draggable={false} className={`${layer} top-[788px] left-[1371px] h-[293px] w-[549px]`} />
 
-      {/* shortcut: plays the intro narration; the music ticket turns this into the music toggle. */}
+      {/* Background music on/off (#20); the choice is saved with the Session store. */}
       <button
         type="button"
-        aria-label={introLabels[introStatus]}
-        onClick={() => (introBusy ? stopAudio() : playClip(lesson.intro))}
-        className={`${pressable} top-[902px] left-[40px] h-[139px] w-[135px] ${introStatus === 'loading' ? 'motion-safe:animate-pulse' : ''}`}
+        aria-label={musicOn ? 'ปิดเพลง' : 'เปิดเพลง'}
+        aria-pressed={musicOn}
+        onClick={toggleMusic}
+        className={`${pressable} top-[902px] left-[40px] h-[139px] w-[135px]`}
       >
-        <img src={`${COVER}/speaker-button.webp`} alt="" draggable={false} className="pointer-events-none size-full object-contain" />
+        <img
+          src={`${COVER}/speaker-button.webp`}
+          alt=""
+          draggable={false}
+          className={`pointer-events-none size-full object-contain transition-[filter] ${musicOn ? '' : 'opacity-70 grayscale'}`}
+        />
+        {!musicOn && (
+          <span
+            data-testid="music-off"
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 left-1/2 h-[14px] w-[150px] -translate-1/2 -rotate-45 rounded-full border-4 border-card bg-[#ff3131]"
+          />
+        )}
       </button>
 
       {resumeStep && (

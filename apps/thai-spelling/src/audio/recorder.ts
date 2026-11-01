@@ -11,13 +11,15 @@ type RecorderState = {
   status: RecorderStatus
   /** Object URL of the finished recording. In memory only (AUD-010): never uploaded or persisted. */
   url: string | null
+  /** The student's recording is playing back (music ducks under it). */
+  playing: boolean
 }
 
 /**
  * The one Recorder (spec §5, AUD-009/010), shared by Steps 7 and 9.
  * One recording at a time; the microphone is asked for only on an explicit start.
  */
-export const useRecorder = create<RecorderState>(() => ({ status: 'idle', url: null }))
+export const useRecorder = create<RecorderState>(() => ({ status: 'idle', url: null, playing: false }))
 
 let recorder: MediaRecorder | null = null
 let stream: MediaStream | null = null
@@ -71,8 +73,11 @@ export function playRecording() {
   if (!url || useAudio.getState().muted) return
   stopAudio()
   stopPlayback()
-  player = new Audio(url)
-  void player.play().catch(() => {})
+  const element = new Audio(url)
+  player = element
+  element.onended = () => player === element && stopPlayback()
+  useRecorder.setState({ playing: true })
+  void element.play().catch(() => player === element && stopPlayback())
 }
 
 /** Stops everything and throws the recording away, e.g. อัดใหม่ or leaving the Step. */
@@ -89,6 +94,7 @@ export function discardRecording() {
 function stopPlayback() {
   player?.pause()
   player = null
+  if (useRecorder.getState().playing) useRecorder.setState({ playing: false })
 }
 
 function release(granted: MediaStream) {

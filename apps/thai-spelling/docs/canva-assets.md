@@ -48,3 +48,4 @@ Cut-outs in #16 were matted exactly: the isolated elements were exported twice a
 | `vocabulary/lung.webp` | `MAHUGweZIyU` | page 5 element `LB1XDdZ5n3D9vytF`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
 | `vocabulary/ngao.webp` | `MAG_z08XdUg` | page 5 element `LBlpbM3DX2HvVPmn`, 2×, white/black matte | `DAHZp-jEM0g` | #24 |
 | `activities/tap-hint.webp` | `MAGyMQTn2pE` | page 5 element `LB7rk8jJlp4xhrXC` (hand pressing a red buzzer, used on every card), 2×, white/black matte | `DAHZp-jEM0g` | #24 |
+| `../audio/music/happy-clappy-loop.mp3` (public/assets/audio/music) | not Canva: the design MP4 export (all 32 pages) has only ~0.5 s click effects, no music | "Happy Clappy Loop" by OwlishMedia, https://opengameart.org/content/happy-clappy-loop (file https://opengameart.org/sites/default/files/HappyClappyLoop.wav), licence **CC0** (no attribution required); 17.4 s loop, re-encoded to mp3 96 kbps (205 KB) | – | #20 |
