@@ -103,6 +103,40 @@ describe('background music', () => {
     expect(music()!.paused).toBe(false)
   })
 
+  it('music off never mutes or blocks speech; global mute still silences both', async () => {
+    const { audio, channel } = await load()
+    const clip = { id: 'spelling/ling', text: 'ลอ อิ งอ ลิง' }
+    const speech = () => FakeAudio.all.filter((a) => a.src === '/assets/audio/spelling/ling.mp3')
+    document.body.click()
+
+    channel.toggleMusic()
+    audio.playClip(clip)
+    expect(music()!.paused).toBe(true)
+    expect(speech()).toHaveLength(1)
+    expect(speech()[0]!.paused).toBe(false)
+    expect(audio.useAudio.getState()).toMatchObject({ clipId: clip.id, status: 'loading', muted: false })
+
+    // Music back on resumes under the clip without touching it.
+    channel.toggleMusic()
+    expect(music()).toMatchObject({ paused: false, volume: 0.06 })
+    expect(speech()[0]!.paused).toBe(false)
+
+    audio.toggleMute()
+    expect(speech()[0]!.paused).toBe(true)
+    expect(music()!.paused).toBe(true)
+    audio.playClip(clip)
+    expect(speech()).toHaveLength(1)
+  })
+
+  it('a saved "off" still lets the first tap play speech', async () => {
+    localStorage.setItem('thai-spelling:lesson-session', JSON.stringify({ state: { session: null, musicOn: false }, version: 1 }))
+    const { audio } = await load()
+    document.body.click()
+    audio.playClip({ id: 'vocabulary/ling', text: 'ลิง' })
+    expect(FakeAudio.all.find((a) => a.src === '/assets/audio/vocabulary/ling.mp3')?.paused).toBe(false)
+    expect(music()?.paused ?? true).toBe(true)
+  })
+
   it('pauses while the microphone is open and ducks under the recorder playback', async () => {
     const { recorder } = await load()
     document.body.click()

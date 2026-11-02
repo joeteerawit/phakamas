@@ -3,7 +3,7 @@ import type { AudioClip, Lesson } from './types.ts'
 /**
  * Every AudioClip anywhere in `lesson`, in data order, de-duplicated by id.
  * Walks the data generically so clips added by later Steps are picked up
- * by scripts/gen-audio.py without touching this file.
+ * by scripts/gen-audio.sh without touching this file.
  */
 export function audioClips(lesson: Lesson): AudioClip[] {
   const clips = new Map<string, AudioClip>()

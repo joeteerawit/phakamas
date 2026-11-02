@@ -395,7 +395,7 @@ public/assets/
 ใช้ `AudioManager` ส่วนกลางป้องกันเสียงซ้อน
 
 **Placeholder assets (ก่อนได้ของจริง):**
-- เสียง: สร้าง mp3 ล่วงหน้าด้วย PyThaiTTS + FastThaiG2P ผ่าน `scripts/gen-audio.py` ที่อ่านข้อความจาก `src/lessons/mae-kong.ts` แล้ว commit ไฟล์เข้า repo (ถ้า license ของ dataset ไม่ชัด ให้สลับไป KhanomTan v1.1) ต้องแทนด้วยเสียงครูจริงก่อนเปิดใช้งาน (AUD-001)
+- เสียง: สร้าง mp3 ล่วงหน้าด้วยเสียงภาษาไทยแบบ neural (edge-tts เสียง Premwadee ช้าลง 25%) ผ่าน `scripts/gen-audio.sh` ที่อ่านข้อความจาก `src/lessons/mae-kong.ts` แล้ว commit ไฟล์เข้า repo ส่วนคลิปสะกดคำ (Step 4) อ่านทีละส่วนในช่องยาวเท่ากันส่วนละ 1.2 วินาที เพื่อให้ไฮไลต์ตรงเสียง ใช้เป็นเสียงชั่วคราวเท่านั้น (edge-tts เรียกบริการออนไลน์ของ Microsoft และเงื่อนไขการใช้งานไม่ชัดเจน) ต้องแทนด้วยเสียงครูจริงก่อนเปิดใช้งาน (AUD-001)
 - ภาพ: ภาพคำศัพท์อยู่ที่ `public/assets/canva/vocabulary/<slug>.webp` ซึ่งจะแทนด้วยภาพจาก Canva; ระหว่างนี้ใช้ Microsoft Fluent Emoji 3D (MIT) เมื่อมีภาพที่ตรง และภาพว่างกลาง ๆ สำหรับคำที่เหลือ (unit test ตรวจว่าทุกไฟล์ที่อ้างถึงมีอยู่จริง)
 
 ---

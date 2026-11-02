@@ -32,6 +32,8 @@ export type SpottingWord = {
   /** Spelling read aloud part by part, e.g. ลอ, อิ, งอ, ลิง. */
   spelling: readonly string[]
   audio: AudioClip
+  /** The spelling read slowly, one equal-length slot per part (see scripts/gen-audio.sh). */
+  spellingAudio: AudioClip
 }
 
 /** The final-consonant spotting Step: heading, explanation narration and marked words. */

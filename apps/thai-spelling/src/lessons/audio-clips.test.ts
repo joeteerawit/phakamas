@@ -17,6 +17,12 @@ describe('audioClips', () => {
       'vocabulary/khang',
       'vocabulary/phueng',
       'explanations/mae-kong',
+      'spelling/ling',
+      'spelling/chang',
+      'spelling/dang',
+      'spelling/rang',
+      'spelling/khang',
+      'spelling/phueng',
       'vocabulary/ngu',
       'vocabulary/ban',
       'vocabulary/kom',
@@ -37,7 +43,7 @@ describe('audioClips', () => {
     ])
   })
 
-  it('has a committed mp3 for every audio ID (run scripts/gen-audio.py if this fails)', () => {
+  it('has a committed mp3 for every audio ID (run scripts/gen-audio.sh if this fails)', () => {
     const missing = audioClips(maeKong)
       .map((clip) => `/public/assets/audio/${clip.id}.mp3`)
       .filter((path) => !mp3s.includes(path))

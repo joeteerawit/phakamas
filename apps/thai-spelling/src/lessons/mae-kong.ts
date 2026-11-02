@@ -21,6 +21,7 @@ const spot = ({ audio }: VocabularyWord, final: number, spelling: string): Spott
   syllables: [{ text: audio.text, final }],
   spelling: spelling.split('-'),
   audio,
+  spellingAudio: { id: audio.id.replace('vocabulary/', 'spelling/'), text: spelling.replaceAll('-', ' ') },
 })
 
 // Design order, two rows of six. งู and เงา start with ง but do not end in it.

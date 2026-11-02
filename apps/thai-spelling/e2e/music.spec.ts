@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
-import { endCurrent, type Mic, musicState, open, stubMic } from './audioStub.js'
+import { audioLog, endCurrent, type Mic, musicState, open, stubMic } from './audioStub.js'
 
 const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true })
 const volume = async (page: Page) => (await musicState(page))?.volume
@@ -43,6 +43,29 @@ test.describe('Background music', () => {
     await button(page, 'เปิดเพลง').click()
     await expect(button(page, 'ปิดเพลง')).toHaveAttribute('aria-pressed', 'true')
     await expect.poll(() => paused(page)).toBe(false)
+  })
+
+  test('music off leaves speech playing; global mute still silences it', async ({ page }) => {
+    const spelling = 'play:/assets/audio/spelling/ling.mp3'
+    await open(page, 1)
+    await button(page, 'ปิดเพลง').click()
+    await page.getByRole('link', { name: 'เริ่มเรียน' }).click()
+    await expect.poll(() => audioLog(page)).toEqual(['play:/assets/audio/intro.mp3'])
+
+    await page.getByRole('button', { name: /^ลิง / }).click()
+    await expect.poll(() => audioLog(page)).toContain('play:/assets/audio/vocabulary/ling.mp3')
+    for (const step of [3, 4]) {
+      await page.getByRole('link', { name: 'ถัดไป' }).click()
+      await expect(page).toHaveURL(`/lesson/mae-kong/${step}`)
+    }
+    await page.getByRole('button', { name: 'ฟังคำว่า ลิง' }).click()
+    await expect.poll(() => audioLog(page)).toContain(spelling)
+    expect(await paused(page)).toBe(true)
+
+    await button(page, 'ปิดเสียง').click()
+    await page.getByRole('button', { name: 'ฟังคำว่า ลิง' }).click()
+    await page.waitForTimeout(300)
+    expect((await audioLog(page)).filter((entry) => entry === spelling)).toHaveLength(1)
   })
 
   test('global mute silences the music', async ({ page }) => {

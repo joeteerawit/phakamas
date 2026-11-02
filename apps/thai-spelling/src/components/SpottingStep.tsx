@@ -40,7 +40,7 @@ export function SpottingStep({ lesson }: StepProps) {
     setSweep(null)
   }
   const play = (word: SpottingWord) => {
-    playClip(word.audio)
+    playClip(word.spellingAudio)
     setSweep({ word, part: 0 })
   }
 
@@ -106,7 +106,7 @@ type SpottingCardProps = {
 
 function SpottingCard({ word, left, activePart, onPlay }: SpottingCardProps) {
   const reduceMotion = useReducedMotion()
-  const playing = useClipStatus(word.audio.id) === 'playing'
+  const playing = useClipStatus(word.spellingAudio.id) === 'playing'
   const glowing = activePart !== null
   const text = word.audio.text
 
