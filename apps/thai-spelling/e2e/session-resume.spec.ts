@@ -3,10 +3,14 @@ import { expectTapTarget } from './tapTarget.js'
 
 const stepBadge = (page: Page) => page.getByText(/^ขั้น \d+\/10$/)
 const nextLink = (page: Page) => page.getByRole('link', { name: 'ถัดไป' })
-const homeLink = (page: Page) => page.getByRole('link', { name: 'กลับไปขั้นแรก' })
 const resumeLink = (page: Page) => page.getByRole('link', { name: /^เรียนต่อ/ })
 const restartButton = (page: Page) => page.getByRole('button', { name: 'เริ่มใหม่' })
 const startLink = (page: Page) => page.getByRole('link', { name: 'เริ่มเรียน' })
+// Home clears the Session, so reach the cover by URL to see the resume offer.
+async function gotoCoverFrom(page: Page, step: number) {
+  await expect(stepBadge(page)).toHaveText(`ขั้น ${step}/10`)
+  await page.goto('/lesson/mae-kong/1')
+}
 
 test('a fresh browser shows only เริ่มเรียน on the cover', async ({ page }) => {
   await page.goto('/lesson/mae-kong/1')
@@ -25,8 +29,7 @@ test('the Session survives refresh and เรียนต่อ returns to the l
   await page.reload()
   await expect(stepBadge(page)).toHaveText('ขั้น 4/10')
 
-  await homeLink(page).click()
-  await page.reload()
+  await gotoCoverFrom(page, 4)
   await expect(startLink(page)).toHaveCount(0)
   await resumeLink(page).click()
   await expect(page).toHaveURL(/\/lesson\/mae-kong\/4$/)
@@ -35,13 +38,13 @@ test('the Session survives refresh and เรียนต่อ returns to the l
 
 test('cover resume label names the Step', async ({ page }) => {
   await page.goto('/lesson/mae-kong/6')
-  await homeLink(page).click()
+  await gotoCoverFrom(page, 6)
   await expect(resumeLink(page)).toHaveText('เรียนต่อ (ขั้น 6)')
 })
 
 test('เริ่มใหม่ clears the Session and starts from Step 2', async ({ page }) => {
   await page.goto('/lesson/mae-kong/7')
-  await homeLink(page).click()
+  await gotoCoverFrom(page, 7)
   await restartButton(page).click()
   await expect(page).toHaveURL(/\/lesson\/mae-kong\/2$/)
 
@@ -70,7 +73,7 @@ test('browser Back keeps the Session intact', async ({ page }) => {
 test('resume buttons fit at 360px with ≥44px targets and no horizontal scroll', async ({ page }) => {
   await page.setViewportSize({ width: 740, height: 360 })
   await page.goto('/lesson/mae-kong/5')
-  await homeLink(page).click()
+  await gotoCoverFrom(page, 5)
   for (const target of [resumeLink(page), restartButton(page)]) await expectTapTarget(target)
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
   expect(overflow).toBe(0)

@@ -85,21 +85,6 @@ test.describe('Step 7 rhyme reading', () => {
     await expect(button(page, 'ฟังเสียงตัวเอง')).toBeVisible()
   })
 
-  test('mute stops the student recording and keeps it silent', async ({ page }) => {
-    await open(page)
-    await button(page, 'ลองอ่านเอง').click()
-    await button(page, 'หยุดบันทึก').click()
-    await button(page, 'ฟังเสียงตัวเอง').click()
-    await expect.poll(async () => playedRecording(await log(page))).toBe(true)
-
-    await page.getByRole('button', { name: 'ปิดเสียง' }).click()
-    await expect.poll(async () => pausedRecording(await log(page))).toBe(true)
-
-    const before = (await log(page)).length
-    await button(page, 'ฟังเสียงตัวเอง').click()
-    expect((await log(page)).slice(before)).toEqual([])
-  })
-
   test('step mode: previous/next change the line and play it', async ({ page }) => {
     await open(page)
     await button(page, 'อ่านตามทีละวรรค').click()

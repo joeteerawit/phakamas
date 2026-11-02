@@ -7,14 +7,13 @@ type AudioState = {
   /** The clip being loaded/played, or whose playback failed. */
   clipId: string | null
   status: AudioStatus
-  muted: boolean
 }
 
 /**
- * The one AudioManager (spec §5): one sound at a time, global mute,
+ * The one AudioManager (spec §5): one sound at a time,
  * mp3 by audio ID → Web Speech th-TH fallback → `error` (the UI offers retry).
  */
-export const useAudio = create<AudioState>(() => ({ clipId: null, status: 'idle', muted: false }))
+export const useAudio = create<AudioState>(() => ({ clipId: null, status: 'idle' }))
 
 /** Status of `clipId`; every other clip reads as idle. */
 export const useClipStatus = (clipId: string): AudioStatus =>
@@ -26,7 +25,6 @@ let playToken = 0
 
 export function playClip(clip: AudioClip) {
   stopAudio()
-  if (useAudio.getState().muted) return
 
   const token = ++playToken
   const isCurrent = () => token === playToken
@@ -59,12 +57,6 @@ export function stopAudio() {
   audio = null
   globalThis.speechSynthesis?.cancel()
   useAudio.setState({ clipId: null, status: 'idle' })
-}
-
-export function toggleMute() {
-  const muted = !useAudio.getState().muted
-  useAudio.setState({ muted })
-  if (muted) stopAudio()
 }
 
 async function speak(clip: AudioClip, set: (status: AudioStatus) => void, isCurrent: () => boolean) {

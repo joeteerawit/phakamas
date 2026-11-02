@@ -122,21 +122,5 @@ test.describe('Step 2 vocabulary cards', () => {
     await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')))
     await expect.poll(() => audioLog(page)).toContain('pause:/assets/audio/vocabulary/ling.mp3')
   })
-
-  test('global mute stops the sound and silences new taps', async ({ page }) => {
-    await open(page, 2)
-    await card(page, 'ลิง').click()
-    await expect(card(page, 'ลิง')).toContainText('กำลังเล่น')
-
-    const mute = page.getByRole('button', { name: 'ปิดเสียง' })
-    await mute.click()
-    await expect(mute).toHaveAttribute('aria-pressed', 'true')
-    await card(page, 'ช้าง').click()
-    expect(await audioLog(page)).toEqual(['play:/assets/audio/vocabulary/ling.mp3', 'pause:/assets/audio/vocabulary/ling.mp3'])
-
-    await mute.click()
-    await card(page, 'ช้าง').click()
-    await expect.poll(() => audioLog(page)).toContain('play:/assets/audio/vocabulary/chang.mp3')
-  })
 })
 

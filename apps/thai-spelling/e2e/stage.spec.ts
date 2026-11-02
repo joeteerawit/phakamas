@@ -35,10 +35,10 @@ test('chrome buttons are at least 44px on a 390px-tall landscape phone', async (
   await page.setViewportSize({ width: 844, height: 390 })
   await page.goto('/lesson/mae-kong/5')
   for (const name of ['กลับไปขั้นแรก', 'ย้อนกลับ', 'ถัดไป']) await expectTapTarget(page.getByRole('link', { name }))
-  await expectTapTarget(page.getByRole('button', { name: 'ปิดเสียง' }))
+  await expectTapTarget(page.getByRole('button', { name: 'ปิดเพลง' }))
 })
 
-test('Home keeps Session progress: the cover offers to resume', async ({ page }) => {
+test('Home clears the Session: the cover starts again from the beginning', async ({ page }) => {
   await page.goto('/lesson/mae-kong/1')
   await page.getByRole('link', { name: 'เริ่มเรียน' }).click()
   await page.getByRole('link', { name: 'ถัดไป' }).click()
@@ -47,7 +47,9 @@ test('Home keeps Session progress: the cover offers to resume', async ({ page })
 
   await page.getByRole('link', { name: 'กลับไปขั้นแรก' }).click()
   await expect(page).toHaveURL(/\/lesson\/mae-kong\/1$/)
-  await expect(page.getByRole('link', { name: 'เรียนต่อ (ขั้น 4)' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'เริ่มเรียน' })).toBeVisible()
+  await expect(page.getByRole('link', { name: /^เรียนต่อ/ })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'เริ่มใหม่' })).toHaveCount(0)
 })
 
 test('a portrait phone shows the rotate overlay and blocks the stage; landscape hides it', async ({ page }) => {

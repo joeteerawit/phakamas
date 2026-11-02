@@ -1,13 +1,13 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { Volume2, VolumeX } from 'lucide-react'
 import { AnimatePresence, motion, useIsPresent, useReducedMotion } from 'motion/react'
 import { useEffect, useState, type ReactNode } from 'react'
-import { stopAudio, toggleMute, useAudio } from '../audio/audioManager'
+import { stopAudio } from '../audio/audioManager'
+import { toggleMusic } from '../audio/music'
 import type { Lesson } from '../lessons'
 import { lessonActivities, useUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { cx, pressable as pressFeedback } from './clay/buttonClass'
-import { ConfirmDialog } from './clay/ConfirmDialog'
 import { FeedbackToast, type Feedback } from './clay/FeedbackToast'
 import { Stage, type Scene } from './stage/Stage'
 import { Celebration, endCelebration, StarCounter } from './Stars'
@@ -30,7 +30,7 @@ const pressable = cx(pressFeedback, 'absolute block')
 
 /**
  * Shared Step layout (spec §1.3, MASTER.md "Canva garden"): every Step sits on the 1920×1080 stage
- * with the title sign, Home, mute, Back and Next from the Canva design. Positions are stage pixels
+ * with the title sign, Home, music, Back and Next from the Canva design. Positions are stage pixels
  * copied from design DAHZj0Nxyxs page 2.
  */
 export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garden', children }: StepLayoutProps) {
@@ -42,13 +42,13 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
 
   const { direction, moved } = useStepDirection(stepNumber)
   const reduceMotion = useReducedMotion()
-  const muted = useAudio((state) => state.muted)
+  const musicOn = useLessonSession((state) => state.musicOn)
   // AUD-004: leaving a Step stops its sound; the cover's intro (started by ▶) carries on into Step 2.
   useEffect(() => (isFirst ? undefined : stopAudio), [stepNumber, isFirst])
   useEffect(() => endCelebration, [stepNumber])
 
   // Spec §4: ถัดไป completes a plain Step; on an Activity it saves partial work or, untouched, marks it skipped.
-  // Back and Home never do either.
+  // Back never does either; Home clears the Session.
   const activity = lessonActivities(lesson).find((a) => a.step === stepNumber)
   const leaveViaNext = () => {
     const { completeStep, savePartialActivity, skipActivity } = useLessonSession.getState()
@@ -58,10 +58,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
     else skipActivity(activity.id, activity.maxScore)
   }
 
-  // TC-019: Home asks first while the Activity has unchecked answers. Home keeps Session progress.
-  const unchecked = useUncheckedWork((state) => state.unchecked)
-  const [confirmHome, setConfirmHome] = useState(false)
-  const navigate = useNavigate()
+  const resetSession = useLessonSession((state) => state.resetSession)
 
   return (
     <Stage scene={scene}>
@@ -84,19 +81,22 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
         ขั้น {stepNumber}/{totalSteps}
       </p>
 
-      <button
-        type="button"
-        aria-label="ปิดเสียง"
-        aria-pressed={muted}
-        onClick={toggleMute}
-        className={`${pressable} z-10 top-[32px] left-[1620px] flex size-[122px] items-center justify-center rounded-full border-[6px] border-card bg-pill text-navy`}
-      >
-        {muted ? (
-          <VolumeX aria-hidden="true" className="size-16" strokeWidth={2.5} />
-        ) : (
-          <Volume2 aria-hidden="true" className="size-16" strokeWidth={2.5} />
-        )}
-      </button>
+      {/* The cover has its own music speaker. */}
+      {!isFirst && (
+        <button
+          type="button"
+          aria-label={musicOn ? 'ปิดเพลง' : 'เปิดเพลง'}
+          aria-pressed={musicOn}
+          onClick={toggleMusic}
+          className={`${pressable} z-10 top-[32px] left-[1620px] flex size-[122px] items-center justify-center rounded-full border-[6px] border-card bg-pill text-navy`}
+        >
+          {musicOn ? (
+            <Volume2 aria-hidden="true" className="size-16" strokeWidth={2.5} />
+          ) : (
+            <VolumeX aria-hidden="true" className="size-16" strokeWidth={2.5} />
+          )}
+        </button>
+      )}
 
       {!isFirst && (
         <Link
@@ -104,11 +104,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
           params={stepParams(1)}
           aria-label="กลับไปขั้นแรก"
           className={`${pressable} top-[23px] left-[1765px] h-[140px] w-[135px]`}
-          onClick={(event) => {
-            if (!unchecked) return
-            event.preventDefault()
-            setConfirmHome(true)
-          }}
+          onClick={resetSession}
         >
           <img src={`${CHROME}/home-button.webp`} alt="" draggable={false} className={chromeImage} />
         </Link>
@@ -149,18 +145,6 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
           </Link>
         )}
       </nav>
-
-      <ConfirmDialog
-        open={confirmHome}
-        message="ยังไม่ได้ตรวจคำตอบ จะออกจากขั้นนี้ไหม?"
-        confirmLabel="ออกจากขั้นนี้"
-        cancelLabel="ทำต่อ"
-        onCancel={() => setConfirmHome(false)}
-        onConfirm={() => {
-          setConfirmHome(false)
-          void navigate({ to: '/lesson/$lessonId/$step', params: stepParams(1) })
-        }}
-      />
 
       <Celebration lesson={lesson} />
       <FeedbackToast feedback={feedback} className="absolute inset-x-0 bottom-[48px] z-30 flex justify-center" />

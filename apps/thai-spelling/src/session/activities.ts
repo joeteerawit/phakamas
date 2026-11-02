@@ -22,23 +22,18 @@ export function lessonActivities(lesson: Lesson): LessonActivity[] {
 export const lessonActivity = (lesson: Lesson, id: ActivityId) => lessonActivities(lesson).find((a) => a.id === id)!
 
 type OpenActivity = {
-  /** The open Activity has answers not yet checked; Home asks before leaving (TC-019). */
-  unchecked: boolean
   /** A result ถัดไป records instead of skipped, e.g. Step 8's matched pairs so far. */
   partial: { score: number; answers: unknown } | null
 }
 
 /** The open Activity Step's unsaved work. Not persisted. */
-export const useUncheckedWork = create<OpenActivity>(() => ({ unchecked: false, partial: null }))
+export const useUncheckedWork = create<OpenActivity>(() => ({ partial: null }))
 
 /**
- * An Activity Step reports whether it has unchecked answers; cleared when it unmounts.
- * Unchecked work also marks the Activity `in_progress` in the Session.
+ * An Activity Step reports whether it has unchecked answers, which marks it `in_progress` in the Session.
  */
 export function useReportUncheckedWork({ id, maxScore }: LessonActivity, unchecked: boolean) {
   useEffect(() => {
-    useUncheckedWork.setState({ unchecked })
     if (unchecked) useLessonSession.getState().markActivityInProgress(id, maxScore)
-    return () => useUncheckedWork.setState({ unchecked: false })
   }, [id, maxScore, unchecked])
 }

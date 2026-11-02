@@ -29,31 +29,27 @@ test('Back and Home leave an unchecked Activity without marking it skipped', asy
   expect(await activities(page)).toEqual({})
 })
 
-test('TC-019: Home with unchecked answers asks first; staying keeps the work', async ({ page }) => {
+test('TC-019: Home with unchecked answers clears the Session without asking', async ({ page }) => {
   await open(page, 5)
   await choice(page, 'ลิง').click()
   await homeLink(page).click()
-  await expect(dialog(page)).toBeVisible()
-  await expect(dialog(page)).toContainText('ยังไม่ได้ตรวจคำตอบ')
-
-  await dialog(page).getByRole('button', { name: 'ทำต่อ' }).click()
-  await expect(dialog(page)).toBeHidden()
-  await expect(page).toHaveURL(/\/5$/)
-  await expect(choice(page, 'ลิง')).toHaveAttribute('aria-pressed', 'true')
-
-  await homeLink(page).click()
-  await dialog(page).getByRole('button', { name: 'ออกจากขั้นนี้' }).click()
   await expect(page).toHaveURL(/\/1$/)
-  // Touched but unchecked: in progress, never skipped.
-  expect(await activities(page)).toEqual({ wordSelection: expect.objectContaining({ status: 'in_progress', bestScore: 0 }) })
+  await expect(dialog(page)).toHaveCount(0)
+  expect(await activities(page)).toEqual({})
 })
 
-test('Home leaves straight away once the answers are checked', async ({ page }) => {
+test('Home clears checked scores too', async ({ page }) => {
   await open(page, 5)
   await selectAllCorrect(page)
+  expect(await activities(page)).toHaveProperty('wordSelection')
   await homeLink(page).click()
   await expect(page).toHaveURL(/\/1$/)
   await expect(dialog(page)).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'เริ่มเรียน' })).toBeVisible()
+  expect(await activities(page)).toEqual({})
+
+  await page.goto('/lesson/mae-kong/10')
+  await expect(scoreRow(page, 'แม่กงอยู่ไหน?')).toContainText('ยังไม่ได้ทำ')
 })
 
 test('TC-017: Step 10 shows each bestScore and Stars, ยังไม่ได้ทำ for the rest, total Stars /9, and survives refresh', async ({ page }) => {

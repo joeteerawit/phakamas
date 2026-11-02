@@ -12,7 +12,8 @@ const FADE_STEPS = 10
 /**
  * The music channel of the AudioManager (#20). A separate module because the recorder imports the
  * AudioManager, and music has to watch both. Starts on the first gesture (autoplay policy), loops,
- * ducks under speech and recorder playback, pauses while the microphone is open, obeys global mute.
+ * ducks under speech and recorder playback, pauses while the microphone is open.
+ * Turning music off only stops this channel: speech and recorder playback keep working.
  */
 let started = false
 let music: HTMLAudioElement | null = null
@@ -24,10 +25,10 @@ export const toggleMusic = () => {
 }
 
 function sync() {
-  const { status, muted } = useAudio.getState()
+  const { status } = useAudio.getState()
   const recorder = useRecorder.getState()
   const micOpen = recorder.status === 'requesting' || recorder.status === 'recording'
-  if (!started || muted || micOpen || !useLessonSession.getState().musicOn) {
+  if (!started || micOpen || !useLessonSession.getState().musicOn) {
     clearInterval(fade)
     music?.pause()
     return

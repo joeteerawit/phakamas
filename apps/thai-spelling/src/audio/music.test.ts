@@ -94,16 +94,7 @@ describe('background music', () => {
     expect(music()?.paused ?? true).toBe(true)
   })
 
-  it('global mute silences the music', async () => {
-    const { audio } = await load()
-    document.body.click()
-    audio.toggleMute()
-    expect(music()!.paused).toBe(true)
-    audio.toggleMute()
-    expect(music()!.paused).toBe(false)
-  })
-
-  it('music off never mutes or blocks speech; global mute still silences both', async () => {
+  it('music off never blocks speech', async () => {
     const { audio, channel } = await load()
     const clip = { id: 'spelling/ling', text: 'ลอ อิ งอ ลิง' }
     const speech = () => FakeAudio.all.filter((a) => a.src === '/assets/audio/spelling/ling.mp3')
@@ -114,18 +105,12 @@ describe('background music', () => {
     expect(music()!.paused).toBe(true)
     expect(speech()).toHaveLength(1)
     expect(speech()[0]!.paused).toBe(false)
-    expect(audio.useAudio.getState()).toMatchObject({ clipId: clip.id, status: 'loading', muted: false })
+    expect(audio.useAudio.getState()).toMatchObject({ clipId: clip.id, status: 'loading' })
 
     // Music back on resumes under the clip without touching it.
     channel.toggleMusic()
     expect(music()).toMatchObject({ paused: false, volume: 0.06 })
     expect(speech()[0]!.paused).toBe(false)
-
-    audio.toggleMute()
-    expect(speech()[0]!.paused).toBe(true)
-    expect(music()!.paused).toBe(true)
-    audio.playClip(clip)
-    expect(speech()).toHaveLength(1)
   })
 
   it('a saved "off" still lets the first tap play speech', async () => {

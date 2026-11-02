@@ -70,7 +70,7 @@ export function stopRecording() {
 
 export function playRecording() {
   const { url } = useRecorder.getState()
-  if (!url || useAudio.getState().muted) return
+  if (!url) return
   stopAudio()
   stopPlayback()
   const element = new Audio(url)
@@ -102,9 +102,9 @@ function release(granted: MediaStream) {
   if (stream === granted) stream = null
 }
 
-// One sound at a time: a teacher clip starting, or mute, stops the student's playback.
+// One sound at a time: a teacher clip starting stops the student's playback.
 useAudio.subscribe((state) => {
-  if (state.status === 'loading' || state.muted) stopPlayback()
+  if (state.status === 'loading') stopPlayback()
 })
 
 /** Friendly messages for the recorder's error states (shown by RecorderStatus). */

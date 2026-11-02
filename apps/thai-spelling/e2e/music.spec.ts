@@ -45,7 +45,7 @@ test.describe('Background music', () => {
     await expect.poll(() => paused(page)).toBe(false)
   })
 
-  test('music off leaves speech playing; global mute still silences it', async ({ page }) => {
+  test('music off from the cover leaves speech playing', async ({ page }) => {
     const spelling = 'play:/assets/audio/spelling/ling.mp3'
     await open(page, 1)
     await button(page, 'ปิดเพลง').click()
@@ -61,19 +61,23 @@ test.describe('Background music', () => {
     await page.getByRole('button', { name: 'ฟังคำว่า ลิง' }).click()
     await expect.poll(() => audioLog(page)).toContain(spelling)
     expect(await paused(page)).toBe(true)
-
-    await button(page, 'ปิดเสียง').click()
-    await page.getByRole('button', { name: 'ฟังคำว่า ลิง' }).click()
-    await page.waitForTimeout(300)
-    expect((await audioLog(page)).filter((entry) => entry === spelling)).toHaveLength(1)
   })
 
-  test('global mute silences the music', async ({ page }) => {
-    await open(page, 2)
-    await button(page, 'ปิดเสียง').click()
-    await page.waitForTimeout(300)
+  test('the Step speaker stops only the music, speech keeps playing and new taps still sound', async ({ page }) => {
+    const ling = '/assets/audio/spelling/ling.mp3'
+    await open(page, 4)
+    await page.getByRole('button', { name: 'ฟังคำว่า ลิง' }).click()
+    await expect.poll(() => audioLog(page)).toContain(`play:${ling}`)
+
+    await button(page, 'ปิดเพลง').click()
+    await expect(button(page, 'เปิดเพลง')).toHaveAttribute('aria-pressed', 'false')
     expect(await paused(page)).toBe(true)
-    await button(page, 'ปิดเสียง').click()
+    expect(await audioLog(page)).not.toContain(`pause:${ling}`)
+
+    await page.getByRole('button', { name: 'ฟังคำว่า ช้าง' }).click()
+    await expect.poll(() => audioLog(page)).toContain('play:/assets/audio/spelling/chang.mp3')
+
+    await button(page, 'เปิดเพลง').click()
     await expect.poll(() => paused(page)).toBe(false)
   })
 
