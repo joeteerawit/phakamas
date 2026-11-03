@@ -1,4 +1,5 @@
 import { expect, type Page, test } from '@playwright/test'
+import { overlaps, renderedFontSize, stageBox, waitUntilStill } from './stageBox.js'
 import { expectTapTarget } from './tapTarget.js'
 
 const MAE_KONG = ['ดัง', 'สูง', 'ผึ้ง', 'ลิง', 'ช้าง', 'ลุง', 'รัง', 'ค่าง']
@@ -126,10 +127,10 @@ test('Next after checking keeps the checked result', async ({ page }) => {
   expect(await activity(page)).toMatchObject({ status: 'completed', bestScore: 5, attemptCount: 1 })
 })
 
-test('each card shows its Canva picture and tapping it plays the word', async ({ page }) => {
+test('each card shows its comic picture and tapping it plays the word', async ({ page }) => {
   await open(page)
-  await expect(choice(page, 'งู').locator('img').first()).toHaveAttribute('src', '/assets/canva/vocabulary/ngu.webp')
-  await expect(choice(page, 'เงา').locator('img').first()).toHaveAttribute('src', '/assets/canva/vocabulary/ngao.webp')
+  await expect(choice(page, 'งู').locator('img').first()).toHaveAttribute('src', '/assets/comic/word-ngu.webp')
+  await expect(choice(page, 'เงา').locator('img').first()).toHaveAttribute('src', '/assets/comic/word-ngao.webp')
   await choice(page, 'บ้าน').click()
   await expect.poll(() => played(page)).toContain('/assets/audio/vocabulary/ban.mp3')
 })
@@ -162,6 +163,43 @@ test('fits a 390px-tall phone with ≥44px targets, keyboard toggles a choice', 
   await expect(toast(page)).toContainText('/12')
   await page.getByRole('button', { name: 'เริ่มใหม่' }).click()
   await expect(choice(page, 'รัง')).toHaveAttribute('aria-pressed', 'false')
+})
+
+for (const viewport of [
+  { width: 1920, height: 1080 },
+  { width: 844, height: 390 },
+]) {
+  test(`the action buttons have at least 40 stage px of room under the cards at ${viewport.width}×${viewport.height}`, async ({ page }) => {
+    await page.setViewportSize(viewport)
+    await open(page)
+    const cards = [...MAE_KONG, ...DISTRACTORS].map((word) => choice(page, word))
+    await waitUntilStill(...cards)
+    const lowest = Math.max(...(await Promise.all(cards.map((card) => stageBox(page, card)))).map((box) => box.bottom))
+    for (const name of ['ตรวจคำตอบ', 'เริ่มใหม่']) {
+      const button = await stageBox(page, page.getByRole('button', { name }))
+      expect(button.top - lowest, `${name} below the lowest card`).toBeGreaterThanOrEqual(40)
+    }
+  })
+}
+
+test('on a 390px-tall phone the toast text is at least 16px and the toast clears the buttons and cards', async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 })
+  await open(page)
+  // 10/12 gives the longest Step 5 message.
+  for (const word of [...MAE_KONG.filter((w) => w !== 'ค่าง'), 'งู']) await choice(page, word).click()
+  await check(page).click()
+  await expect(toast(page)).toContainText('10/12')
+  const box = toast(page).locator('> div')
+  const cards = [...MAE_KONG, ...DISTRACTORS].map((word) => choice(page, word))
+  await waitUntilStill(box, ...cards)
+
+  expect(await renderedFontSize(page, box.locator('p')), 'toast text CSS px').toBeGreaterThanOrEqual(16)
+  const at = await stageBox(page, box)
+  for (const name of ['ตรวจคำตอบ', 'เริ่มใหม่']) {
+    expect(overlaps(at, await stageBox(page, page.getByRole('button', { name }))), `toast covers ${name}`).toBe(false)
+  }
+  const lowest = Math.max(...(await Promise.all(cards.map((card) => stageBox(page, card)))).map((card) => card.bottom))
+  expect(at.top, 'toast below the cards').toBeGreaterThan(lowest)
 })
 
 test('reduced motion still shows the result states', async ({ page }) => {

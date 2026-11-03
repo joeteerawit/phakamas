@@ -1,19 +1,20 @@
 import type { Scene } from './Stage'
 
-/** Ambient cut-outs (docs/canva-assets.md). */
-const AMBIENT = '/assets/canva/ambient'
+/** Comic cut-outs shared with the cover (docs/comic-art.md). */
+const COMIC = '/assets/comic'
 
 // Stage pixels. Negative delays start each cloud part-way across instead of all off-screen.
+// Small and faded (70%) so they stay scenery behind the Step's buttons, not shapes competing with them.
 const clouds = [
-  { src: 'cloud-1.webp', top: 70, width: 355, duration: 110, delay: -30 },
-  { src: 'cloud-2.webp', top: 150, width: 213, duration: 80, delay: -60 },
-  { src: 'cloud-3.webp', top: 230, width: 335, duration: 140, delay: -100 },
+  { top: 70, width: 250, duration: 110, delay: -30 },
+  { top: 150, width: 150, duration: 80, delay: -60 },
+  { top: 230, width: 235, duration: 140, delay: -100 },
 ]
 
 const sways = [
-  { src: 'flower-yellow.webp', left: 30, top: 690, width: 98, delay: 0 },
-  { src: 'flower-pink.webp', left: 125, top: 790, width: 118, delay: -1.3 },
-  { src: 'flower-pink.webp', left: 1790, top: 760, width: 118, delay: -2.1 },
+  { left: 30, top: 690, width: 98, delay: 0 },
+  { left: 125, top: 790, width: 118, delay: -1.3 },
+  { left: 1790, top: 760, width: 118, delay: -2.1 },
 ]
 
 /**
@@ -25,12 +26,12 @@ export function Ambient({ scene }: { scene: Scene }) {
     <div aria-hidden="true" data-testid="ambient" className="pointer-events-none absolute inset-0 overflow-hidden select-none">
       {clouds.map((cloud) => (
         <img
-          key={cloud.src}
-          src={`${AMBIENT}/${cloud.src}`}
+          key={cloud.top}
+          src={`${COMIC}/decor-cloud.webp`}
           alt=""
           draggable={false}
           data-testid="ambient-cloud"
-          className="absolute left-0 animate-cloud-drift opacity-90 will-change-transform motion-reduce:animate-none"
+          className="absolute left-0 animate-cloud-drift opacity-70 will-change-transform motion-reduce:animate-none"
           style={{ top: cloud.top, width: cloud.width, animationDuration: `${cloud.duration}s`, animationDelay: `${cloud.delay}s` }}
         />
       ))}
@@ -47,8 +48,8 @@ export function Ambient({ scene }: { scene: Scene }) {
 
       {sways.map((sway) => (
         <img
-          key={`${sway.src}-${sway.left}`}
-          src={`${AMBIENT}/${sway.src}`}
+          key={sway.left}
+          src={`${COMIC}/decor-flowers.webp`}
           alt=""
           draggable={false}
           data-testid="ambient-sway"
@@ -59,7 +60,7 @@ export function Ambient({ scene }: { scene: Scene }) {
 
       <div data-testid="ambient-flyer" className="absolute top-[400px] left-0 animate-fly-across will-change-transform motion-reduce:hidden">
         <img
-          src={`${AMBIENT}/bee.webp`}
+          src={`${COMIC}/decor-bee.webp`}
           alt=""
           draggable={false}
           className="w-[120px] animate-fly-bob"

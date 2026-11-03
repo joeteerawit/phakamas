@@ -11,10 +11,11 @@ import { useLessonSession } from '../session/lessonSession'
 import { creamCard, cx, pressable } from './clay/buttonClass'
 import type { ActivityStepProps } from './stepProps'
 
-// Stage pixels from design DAHZj0Nxyxs page 5. Rows sit 40px higher than the design so the
-// ≥44px check buttons fit under them on a 390px phone.
+// Stage pixels; columns from design DAHZj0Nxyxs page 5. The rows sit higher and closer together than the
+// design so the ≥44px action buttons (top 896) get about 60px of clear space under the cards (bottom 836),
+// while a lifted top-row card still clears the title plank, Star counter and Step badge.
 const COLUMNS = [278, 523, 768, 1013, 1258, 1503]
-const ROWS = [225, 606]
+const ROWS = [175, 525]
 
 type Result = 'right' | 'wrong' | 'missed'
 
@@ -105,8 +106,8 @@ export function WordSelectionStep({ lesson, onFeedback }: ActivityStepProps) {
 
 const actionClass = cx(
   pressable,
-  'absolute top-[928px] flex h-[124px] w-[400px] items-center justify-center gap-[16px] rounded-full border-[6px] border-cream-border',
-  'font-heading text-[48px] font-bold text-navy shadow-[0_8px_0_rgba(0,0,0,0.2)]',
+  'absolute top-[896px] flex h-[124px] w-[400px] items-center justify-center gap-[16px] rounded-full border-[6px] border-comic-ink',
+  'font-heading text-[48px] font-bold text-navy shadow-comic',
 )
 
 type PictureCardProps = {
@@ -146,10 +147,12 @@ function PictureCard({ choice, left, top, selected, result, round, onToggle }: P
       {/* Keyed by check round so the same result animates again on the next check. */}
       <motion.span
         key={round}
+        data-highlight={(selected && !result) || undefined}
         animate={result && !reduceMotion ? motionFor[result] : undefined}
-        className={cx('absolute inset-0 block rounded-[40px] border-4', cardLook(selected, result))}
+        className={cx('absolute inset-0 block', cardLook(result))}
       >
-        <span className="absolute top-[204px] right-[12px] font-heading text-[54px] leading-[1.2] font-bold text-navy">
+        {/* Right-aligned so the widest word (บ้าน) clears the tap hint. */}
+        <span className="absolute top-[204px] right-[8px] font-heading text-[54px] leading-[1.2] font-bold text-navy">
           {choice.word}
         </span>
         {result && <span className="sr-only"> {resultText[result]}</span>}
@@ -160,16 +163,16 @@ function PictureCard({ choice, left, top, selected, result, round, onToggle }: P
           className="pointer-events-none absolute top-[22px] left-[10px] h-[180px] w-[190px] object-contain"
         />
         <img
-          src="/assets/canva/activities/tap-hint.webp"
+          src="/assets/comic/ui-tap.webp"
           alt=""
           draggable={false}
-          className="pointer-events-none absolute top-[205px] left-[22px] h-[85px] w-[87px] object-contain"
+          className="pointer-events-none absolute top-[206px] left-[8px] h-[80px] w-[60px] object-contain"
         />
         {result && (
           <span
             aria-hidden="true"
             className={cx(
-              'absolute -top-[18px] -right-[18px] flex size-[64px] items-center justify-center rounded-full border-4 border-card text-on-primary',
+              'absolute -top-[18px] -right-[18px] flex size-[64px] items-center justify-center rounded-full border-4 border-comic-ink text-on-primary',
               { right: 'bg-correct', wrong: 'bg-wrong', missed: 'bg-final' }[result],
             )}
           >
@@ -182,12 +185,16 @@ function PictureCard({ choice, left, top, selected, result, round, onToggle }: P
   )
 }
 
-/** Card colours per state; right/wrong/missed also get a badge icon and sr-only text, never colour alone. */
-function cardLook(selected: boolean, result: Result | undefined) {
-  if (result === 'right') return 'border-solid border-correct bg-cream shadow-glow-sun'
-  if (result === 'wrong') return 'border-solid border-wrong bg-wrong-tint'
-  if (result === 'missed') return 'border-solid border-final bg-cream shadow-ring-missed'
-  return selected ? 'border-solid border-accent bg-cream shadow-glow-sun' : creamCard
+/**
+ * Card look per state: the comic card (its ring turns faster while selected), or a solid result colour with
+ * no ring. Right/wrong/missed also get a badge icon and sr-only text, never colour alone.
+ */
+function cardLook(result: Result | undefined) {
+  const solid = 'rounded-[40px] border-[6px] border-solid'
+  if (result === 'right') return `${solid} border-correct bg-cream shadow-glow-sun`
+  if (result === 'wrong') return `${solid} border-wrong bg-wrong-tint`
+  if (result === 'missed') return `${solid} border-final bg-cream shadow-ring-missed`
+  return creamCard
 }
 
 const SPARKS = Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 4)

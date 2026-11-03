@@ -12,20 +12,23 @@ import type { ActivityStepProps } from './stepProps'
 
 const WRONG_FLASH_MS = 700
 const TOAST_MS = 2500
-const BUZZER = '/assets/canva/ui/buzzer.webp'
+const BUZZER = '/assets/comic/ui-buzzer.webp'
 
 /** A point on the 1920×1080 stage. */
 type StagePoint = { x: number; y: number }
 
 const SIZE = { width: 269, height: 232 }
 /** From a buzzer's top to the middle of the word on its red cap. */
-const CAP_TEXT_Y = 88
-/** Buzzer top-left corners from design page 8, in `lesson.rhymeMatching.words` order (TL, TR, BL, BR). */
+const CAP_TEXT_Y = 80
+/**
+ * Buzzer top-left corners, in `lesson.rhymeMatching.words` order (TL, TR, BL, BR). Design page 8's left
+ * column and rows, with the right column mirrored about x = 960 so the grid and its gaps are symmetric.
+ */
 const SPOTS: readonly StagePoint[] = [
   { x: 343, y: 308 },
-  { x: 1229, y: 316 },
+  { x: 1308, y: 308 },
   { x: 343, y: 630 },
-  { x: 1220, y: 637 },
+  { x: 1308, y: 630 },
 ]
 /** Middle of the word on the red cap; match lines join these. */
 const capCentre = ({ x, y }: StagePoint): StagePoint => ({ x: x + SIZE.width / 2, y: y + CAP_TEXT_Y })
@@ -181,7 +184,8 @@ export function RhymeMatchingStep({ lesson, onFeedback }: ActivityStepProps) {
                       : '[filter:drop-shadow(0_14px_8px_rgb(0_0_0/0.35))] group-active:[filter:drop-shadow(0_4px_3px_rgb(0_0_0/0.35))]',
                   )}
                 />
-                <span className="absolute inset-x-0 top-[35px] text-center font-heading text-[88px] leading-[1.2] font-bold text-navy">
+                {/* Inked white lettering stays readable on the red dome. */}
+                <span className="absolute inset-x-0 top-[30px] text-center font-heading text-[84px] leading-[1.2] font-bold text-card text-inked">
                   {word}
                 </span>
                 {locked && (
@@ -209,7 +213,7 @@ export function RhymeMatchingStep({ lesson, onFeedback }: ActivityStepProps) {
         onClick={restart}
         className={cx(
           pressable,
-          'absolute top-[920px] left-1/2 flex -translate-x-1/2 items-center gap-[12px] rounded-full border-4 border-card bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold text-navy',
+          'absolute top-[920px] left-1/2 flex -translate-x-1/2 items-center gap-[12px] rounded-full border-[5px] border-comic-ink bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold text-navy shadow-comic',
         )}
       >
         <RotateCcw aria-hidden="true" className="size-[40px]" strokeWidth={3} />

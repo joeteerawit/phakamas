@@ -11,7 +11,7 @@ type ConfirmDialogProps = {
   onCancel: () => void
 }
 
-/** Clay confirm on a native modal `<dialog>`: focus trap, Esc = cancel, focus returns to the opener. */
+/** Comic confirm on a native modal `<dialog>`: focus trap, Esc = cancel, focus returns to the opener. */
 export function ConfirmDialog({ open, message, confirmLabel, cancelLabel, onConfirm, onCancel }: ConfirmDialogProps) {
   const ref = useRef<HTMLDialogElement>(null)
   useEffect(() => {
@@ -25,7 +25,7 @@ export function ConfirmDialog({ open, message, confirmLabel, cancelLabel, onConf
       ref={ref}
       aria-labelledby="confirm-message"
       onClose={onCancel}
-      className="m-auto w-[min(28rem,calc(100%-2*var(--space-md)))] rounded-clay border-[3px] border-border bg-card p-(--space-md) text-foreground shadow-clay backdrop:bg-foreground/40 open:starting:scale-95 open:starting:opacity-0 transition-[opacity,scale] duration-200 ease-out motion-reduce:transition-none"
+      className="m-auto w-[min(28rem,calc(100%-2*var(--space-md)))] overflow-visible rounded-clay border-[6px] border-comic-ink bg-cream p-(--space-md) text-foreground shadow-comic backdrop:bg-foreground/40 open:starting:scale-95 open:starting:opacity-0 transition-[opacity,scale] duration-200 ease-out motion-reduce:transition-none"
     >
       <div className="flex flex-col items-center gap-(--space-md) text-center">
         <Mascot size="sm" decorative />

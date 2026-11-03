@@ -52,10 +52,10 @@ export function CoverStep({ lesson }: StepProps) {
         <h2 className="absolute top-[345px] left-[400px] w-[1120px] text-center font-heading text-[84px] leading-[1.4] font-bold whitespace-nowrap text-navy">
           {lesson.title}
         </h2>
-        <p className="absolute top-[480px] left-[740px] flex h-[124px] w-[440px] items-center justify-center rounded-full border-[8px] border-comic-ink bg-comic-pill">
+        <p className="absolute top-[480px] left-[740px] flex h-[124px] w-[440px] items-center justify-center rounded-full border-[8px] border-comic-ink bg-pill">
           <span className="font-heading text-[74px] leading-[1.2] font-bold whitespace-nowrap text-comic-red">{lesson.subtitle}</span>
         </p>
-        <p className="absolute top-[625px] left-[640px] flex h-[70px] w-[640px] items-center justify-center rounded-full border-[5px] border-comic-ink bg-cream font-sans text-[36px] font-bold whitespace-nowrap text-navy">
+        <p className="absolute top-[625px] left-[640px] flex h-[70px] w-[640px] items-center justify-center rounded-full border-[5px] border-comic-ink bg-cover-cream font-sans text-[36px] font-bold whitespace-nowrap text-navy">
           {lesson.gradeLine}
         </p>
       </motion.div>
@@ -79,7 +79,7 @@ export function CoverStep({ lesson }: StepProps) {
           aria-label={musicOn ? 'ปิดเพลง' : 'เปิดเพลง'}
           aria-pressed={musicOn}
           onClick={toggleMusic}
-          className={`${pressable} bottom-[32px] left-[40px] h-[139px] w-[135px]`}
+          className={`${pressable} bottom-[32px] left-[40px] h-[139px] w-[135px] rounded-full`}
         >
           <img
             src={`${COVER}/speaker-button.webp`}
@@ -112,7 +112,7 @@ export function CoverStep({ lesson }: StepProps) {
           params={{ lessonId: lesson.id, step: String(resumeStep ?? 2) }}
           // The cover speaker is the music toggle, so the teacher intro plays on the Session's first ▶ instead.
           onClick={resumeStep ? undefined : () => playClip(lesson.intro)}
-          className={`${pressable} right-[32px] bottom-[24px] size-[187px]`}
+          className={`${pressable} right-[32px] bottom-[24px] size-[187px] rounded-full`}
         >
           <span className="sr-only">{resumeStep ? `เรียนต่อ (ขั้น ${resumeStep})` : 'เริ่มเรียน'}</span>
           <motion.img

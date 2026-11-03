@@ -15,7 +15,7 @@ export type AudioClip = {
 /** A picture card on the vocabulary Step. */
 export type VocabularyWord = {
   word: string
-  /** Picture under /assets/canva/vocabulary/. */
+  /** Comic picture card, /assets/comic/word-<slug>.webp. */
   image: string
   audio: AudioClip
 }
@@ -83,7 +83,7 @@ export type RhymeLine = AudioClip & {
 
 /** A sentence on Step 9, illustrated by several pictures side by side. */
 export type Sentence = {
-  /** Pictures under /assets/canva/vocabulary/. */
+  /** Comic picture cards, /assets/comic/word-<slug>.webp (บ่าง is still a Canva picture). */
   images: readonly string[]
   /** `text` is the sentence shown on its card. */
   audio: AudioClip

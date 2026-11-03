@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { DEFAULT_LESSON_ID, getLesson, parseStepNumber } from './index'
 import { maeKong } from './mae-kong'
 
-const picture = (slug: string) => `/assets/canva/vocabulary/${slug}.webp`
+const picture = (slug: string) => `/assets/comic/word-${slug}.webp`
 
 describe('mae-kong lesson data (Canva design DAHZj0Nxyxs)', () => {
   it('has the cover title, subtitle and grade line', () => {
@@ -101,7 +101,7 @@ describe('mae-kong lesson data (Canva design DAHZj0Nxyxs)', () => {
       ['เงา', false],
     ])
     for (const { word, image, audio } of choices) {
-      expect(image).toMatch(/^\/assets\/canva\/vocabulary\/[a-z-]+\.webp$/)
+      expect(image).toMatch(/^\/assets\/comic\/word-[a-z-]+\.webp$/)
       expect(audio.text).toBe(word)
     }
   })

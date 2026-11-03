@@ -5,15 +5,15 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { stopAudio } from '../audio/audioManager'
 import { toggleMusic } from '../audio/music'
 import type { Lesson } from '../lessons'
-import { lessonActivities, useUncheckedWork } from '../session/activities'
+import { lessonActivities, useUncheckedWork, type ActivityId } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { cx, pressable as pressFeedback } from './clay/buttonClass'
 import { FeedbackToast, type Feedback } from './clay/FeedbackToast'
 import { Stage, useStageBleed, type Scene } from './stage/Stage'
 import { Celebration, endCelebration, StarCounter } from './Stars'
 
-/** Shared chrome exported from Canva (docs/canva-assets.md). */
-const CHROME = '/assets/canva/chrome'
+/** Shared comic chrome (docs/comic-art.md). */
+const COMIC = '/assets/comic'
 
 type StepLayoutProps = {
   lesson: Lesson
@@ -26,7 +26,15 @@ type StepLayoutProps = {
 }
 
 const chromeImage = 'pointer-events-none size-full select-none object-contain'
+// Home, Back and Next share one size; each keeps its window-corner offset. Round, so the focus ring follows the art.
+const cornerButton = 'h-[150px] w-[146px] rounded-full'
 const pressable = cx(pressFeedback, 'absolute block')
+/**
+ * The feedback toast sits bottom centre; its widest, in stage px, keeps it between each Activity's bottom
+ * buttons: Step 5's ตรวจคำตอบ and เริ่มใหม่, Step 6's controls either side of the word bank. Step 8 has only
+ * a centred เริ่มใหม่, so its one-line messages may use the room between Back and Next.
+ */
+const TOAST_WIDTH: Record<ActivityId, number> = { wordSelection: 580, wordFilling: 732, rhymeMatching: 960 }
 
 /**
  * Shared Step layout (spec §1.3, MASTER.md "Canva garden"): every Step sits on the 1920×1080 stage
@@ -69,7 +77,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
         ) : (
           <div
             className="absolute top-[29px] left-[47px] flex h-[115px] w-[382px] items-center justify-center bg-contain bg-center bg-no-repeat px-[24px]"
-            style={{ backgroundImage: `url(${CHROME}/title-sign.webp)` }}
+            style={{ backgroundImage: `url(${COMIC}/ui-plank.webp)` }}
           >
             <h1 className="truncate font-heading text-[38px] leading-[1.4] font-bold text-navy">{title}</h1>
           </div>
@@ -78,7 +86,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
         {(activity || isLast) && <StarCounter lesson={lesson} />}
 
         {/* Design page 1 has no Step badge; the cover keeps it for screen readers. */}
-        <p className={isFirst ? 'sr-only' : 'absolute top-[52px] left-1/2 -translate-x-1/2 rounded-full border-4 border-card bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold whitespace-nowrap text-navy'}>
+        <p className={isFirst ? 'sr-only' : 'absolute top-[52px] left-1/2 -translate-x-1/2 rounded-full border-[5px] border-comic-ink bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold whitespace-nowrap text-navy shadow-comic'}>
           ขั้น {stepNumber}/{totalSteps}
         </p>
 
@@ -89,7 +97,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
             aria-label={musicOn ? 'ปิดเพลง' : 'เปิดเพลง'}
             aria-pressed={musicOn}
             onClick={toggleMusic}
-            className={`${pressable} z-10 top-[32px] right-[178px] flex size-[122px] items-center justify-center rounded-full border-[6px] border-card bg-pill text-navy`}
+            className={`${pressable} z-10 top-[32px] right-[178px] flex size-[122px] items-center justify-center rounded-full border-[6px] border-comic-ink bg-pill text-navy shadow-comic`}
           >
             {musicOn ? (
               <Volume2 aria-hidden="true" className="size-16" strokeWidth={2.5} />
@@ -104,10 +112,10 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
             to="/lesson/$lessonId/$step"
             params={stepParams(1)}
             aria-label="กลับไปขั้นแรก"
-            className={`${pressable} top-[23px] right-[20px] h-[140px] w-[135px]`}
+            className={`${pressable} top-[23px] right-[20px] ${cornerButton}`}
             onClick={resetSession}
           >
-            <img src={`${CHROME}/home-button.webp`} alt="" draggable={false} className={chromeImage} />
+            <img src={`${COMIC}/ui-home.webp`} alt="" draggable={false} className={chromeImage} />
           </Link>
         )}
       </WindowEdges>
@@ -129,9 +137,10 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
             to="/lesson/$lessonId/$step"
             params={stepParams(stepNumber - 1)}
             aria-label="ย้อนกลับ"
-            className={`${pressable} bottom-[13px] left-[29px] h-[163px] w-[158px]`}
+            className={`${pressable} bottom-[13px] left-[29px] ${cornerButton}`}
           >
-            <img src={`${CHROME}/back-button.webp`} alt="" draggable={false} className={chromeImage} />
+            {/* The ▶ button mirrored. */}
+            <img src={`${COMIC}/play-button.webp`} alt="" draggable={false} className={`${chromeImage} -scale-x-100`} />
           </Link>
         )}
         {/* The cover's own ▶ replaces Next. */}
@@ -141,15 +150,19 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
             params={stepParams(isLast ? 1 : stepNumber + 1)}
             aria-label={isLast ? 'กลับหน้าแรก' : 'ถัดไป'}
             onClick={isLast ? undefined : leaveViaNext}
-            className={`${pressable} right-[34px] bottom-[13px] h-[152px] w-[148px]`}
+            className={`${pressable} right-[34px] bottom-[13px] ${cornerButton}`}
           >
-            <img src={`${CHROME}/next-button.webp`} alt="" draggable={false} className={chromeImage} />
+            <img src={`${COMIC}/play-button.webp`} alt="" draggable={false} className={chromeImage} />
           </Link>
         )}
       </WindowEdges>
 
       <Celebration lesson={lesson} />
-      <FeedbackToast feedback={feedback} className="absolute inset-x-0 bottom-[48px] z-30 flex justify-center" />
+      <FeedbackToast
+        feedback={feedback}
+        maxWidth={activity ? TOAST_WIDTH[activity.id] : TOAST_WIDTH.wordFilling}
+        className="absolute inset-x-0 bottom-[40px] z-30 flex justify-center"
+      />
     </Stage>
   )
 }

@@ -7,8 +7,8 @@ import { popIn } from './motion/PopIn'
 import { SpeakerButton } from './SpeakerButton'
 import type { StepProps } from './stepProps'
 
-/** Card lefts in stage pixels, from design DAHZj0Nxyxs page 2. */
-const cardLefts = [137, 429, 720, 1011, 1302, 1594]
+/** Card lefts in stage pixels: design DAHZj0Nxyxs page 2's spacing, moved 33px left so the row (104–1816) is centred on x = 960. */
+const cardLefts = [104, 396, 687, 978, 1269, 1561]
 
 // Visually hidden; keeps the card's state in its accessible name.
 const statusText: Record<AudioStatus | 'visited', string> = {
@@ -26,8 +26,8 @@ export function VocabularyStep({ lesson }: StepProps) {
 
   return (
     <section data-full-stage className="relative size-full">
-      {/* Design puts the pill at left 1387; it ends at 1600 here to clear the shared mute button at 1620. */}
-      <p className="absolute top-[58px] right-[320px] flex h-[71px] items-center rounded-full border-4 border-card bg-pill px-[28px] font-heading text-[38px] font-bold whitespace-nowrap text-navy">
+      {/* Centred over the card row on x = 960, clear of the top chrome, instead of the design's top right. */}
+      <p className="absolute top-[236px] left-[960px] flex -translate-x-1/2 h-[71px] items-center rounded-full border-[5px] border-comic-ink bg-pill px-[28px] font-heading text-[38px] font-bold whitespace-nowrap text-navy shadow-comic">
         คลิกที่ภาพเพื่อฟังเสียง
       </p>
       <ul>
@@ -72,11 +72,11 @@ function VocabularyCard({ item, visited, onPlay }: VocabularyCardProps) {
       ref={scope}
       type="button"
       onClick={tap}
+      data-highlight={status === 'playing' || undefined}
       className={cx(
         'pointer-events-auto relative block size-full cursor-pointer select-none',
         creamCard,
         'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring',
-        status === 'playing' && 'ring-8 ring-pill',
       )}
     >
       <img
@@ -85,7 +85,7 @@ function VocabularyCard({ item, visited, onPlay }: VocabularyCardProps) {
         draggable={false}
         className="pointer-events-none absolute top-[22px] left-[8px] h-[249px] w-[239px] object-contain"
       />
-      <span className="absolute top-[266px] left-[124px] w-[127px] text-center font-heading text-[56px] leading-[1.4] font-bold text-navy">
+      <span className="absolute top-[266px] left-[114px] w-[117px] text-center font-heading text-[56px] leading-[1.4] font-bold text-navy">
         {item.word}
       </span>
       <span className="sr-only"> {statusText[status === 'idle' && visited ? 'visited' : status]}</span>

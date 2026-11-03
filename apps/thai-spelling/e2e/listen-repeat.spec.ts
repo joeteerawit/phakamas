@@ -1,4 +1,4 @@
-import { expect, type Page, test } from '@playwright/test'
+import { expect, type Locator, type Page, test } from '@playwright/test'
 import { expectTapTarget } from './tapTarget.js'
 import { audioLog, endCurrent, type Mic, open as openStep, stubMic } from './audioStub.js'
 
@@ -45,7 +45,7 @@ test.describe('Step 3 listen and repeat', () => {
     for (const [i, [word, slug]] of words.entries()) {
       await expect(page.getByText(`คำที่ ${i + 1}/6`)).toBeVisible()
       await expect(wordCard(page).getByRole('heading')).toHaveText(word)
-      await expect(wordCard(page).locator('img')).toHaveAttribute('src', `/assets/canva/vocabulary/${slug}.webp`)
+      await expect(wordCard(page).locator('img')).toHaveAttribute('src', `/assets/comic/word-${slug}.webp`)
       if (i < words.length - 1) await nextWord(page).click()
     }
     await expect(nextWord(page)).toBeDisabled()
@@ -103,7 +103,7 @@ test.describe('Step 3 listen and repeat', () => {
   test('sits on the pond scene with a cream word card', async ({ page }) => {
     await open(page, 3)
     await expect(page.getByTestId('stage-scene')).toHaveCSS('background-image', /pond\.webp/)
-    await expect(wordCard(page)).toHaveCSS('background-color', 'rgb(255, 233, 141)')
+    await expect(wordCard(page)).toHaveCSS('background-color', 'rgb(255, 248, 231)')
   })
 
   test('คำก่อนหน้า goes back a word and is disabled on the first', async ({ page }) => {
@@ -156,4 +156,117 @@ test.describe('Step 3 listen and repeat', () => {
       await expectTapTarget(target)
     }
   })
+
+  for (const viewport of [
+    { width: 1920, height: 1080 },
+    { width: 844, height: 390 },
+  ]) {
+    test(`is balanced about x = 960 at ${viewport.width}×${viewport.height}`, async ({ page }) => {
+      await page.setViewportSize(viewport)
+      await open(page, 3)
+      const box = (target: Locator) => stageBox(page, target)
+      // The card springs in: measure once it has stopped moving.
+      let last = ''
+      await expect
+        .poll(async () => {
+          const now = JSON.stringify(await wordCard(page).boundingBox())
+          const still = now === last
+          last = now
+          return still
+        })
+        .toBe(true)
+      const card = await box(wordCard(page))
+      const speaker = await box(listenButton(page))
+      const buzzer = await box(button(page, 'ลองอ่านเอง'))
+      const previous = await box(button(page, 'คำก่อนหน้า'))
+      const next = await box(nextWord(page))
+      const near = (a: number, b: number, what: string) => expect(Math.abs(a - b), what).toBeLessThanOrEqual(2)
+
+      near(card.cx, 960, 'card centre')
+      // The speaker and the red buzzer mirror each other, and so do their label pills.
+      near(speaker.cx + buzzer.cx, 1920, 'speaker and buzzer mirrored')
+      near(speaker.cy, buzzer.cy, 'speaker and buzzer level')
+      near(speaker.width, buzzer.width, 'speaker and buzzer width')
+      near(speaker.height, buzzer.height, 'speaker and buzzer height')
+      const listenLabel = await box(page.getByTestId('listen-label'))
+      const buzzerLabel = await box(page.getByText('กดแล้วอ่านตาม', { exact: true }))
+      near(listenLabel.cx + buzzerLabel.cx, 1920, 'labels mirrored')
+      near(listenLabel.cy, buzzerLabel.cy, 'labels level')
+      // The arrows sit the same distance from the card, the same size and level, clear of both columns.
+      near(card.left - previous.right, next.left - card.right, 'arrows equidistant from the card')
+      near(previous.width, next.width, 'arrow widths')
+      near(previous.cy, next.cy, 'arrows level')
+      expect(previous.left).toBeGreaterThan(speaker.right)
+      expect(next.right).toBeLessThan(buzzer.left)
+      // คำที่ 1/6 and the dots are one group, centred under the card.
+      const progress = await box(page.getByRole('navigation', { name: 'ลำดับคำ' }))
+      near(progress.cx, 960, 'progress centre')
+      expect(progress.top).toBeGreaterThanOrEqual(card.bottom)
+      expect(progress.top - card.bottom).toBeLessThanOrEqual(40)
+
+      // ถึงตาหนูอ่านแล้ว, then the completion card, stay under the speaker's label, clear of every control.
+      const clear = async () => {
+        const messages = await box(page.getByTestId('listen-messages'))
+        for (const [name, other] of Object.entries({ speaker, listenLabel, previous, card })) {
+          expect(overlaps(messages, other), `messages clear of ${name}`).toBe(false)
+        }
+        const back = await box(page.getByRole('link', { name: 'ย้อนกลับ' }))
+        expect(overlaps(messages, back), 'messages clear of ย้อนกลับ').toBe(false)
+        expect(messages.bottom).toBeLessThanOrEqual(1080)
+      }
+      await hear(page)
+      await expect(page.getByTestId('listen-messages')).toContainText('ถึงตาหนู')
+      await clear()
+      for (let i = 1; i < words.length; i++) {
+        await nextWord(page).click()
+        await hear(page)
+      }
+      await expect(page.getByTestId('listen-messages')).toContainText('เก่งมาก')
+      await clear()
+    })
+  }
 })
+
+test.describe('Step 3 once every word is heard', () => {
+  for (const viewport of [
+    { width: 1920, height: 1080 },
+    { width: 844, height: 390 },
+  ]) {
+    test(`shows only the completion box, clear of the dots, at ${viewport.width}×${viewport.height}`, async ({ page }) => {
+      await page.setViewportSize(viewport)
+      await open(page, 3)
+      for (let i = 0; i < words.length; i++) {
+        if (i) await nextWord(page).click()
+        await hear(page)
+        // Until the last word, each ending still says ถึงตาหนูอ่านแล้ว.
+        if (i < words.length - 1) await expect(page.getByText('ถึงตาหนูอ่านแล้ว')).toBeVisible()
+      }
+      const messages = page.getByTestId('listen-messages')
+      await expect(messages.getByText('ฟังครบ 6 คำแล้ว')).toBeVisible()
+      await expect(page.getByText('ถึงตาหนูอ่านแล้ว')).toHaveCount(0)
+
+      const again = page.getByRole('button', { name: 'ฝึกอีกรอบ' })
+      await expectTapTarget(again)
+      const box = await stageBox(page, messages)
+      for (const dot of await page.getByRole('navigation', { name: 'ลำดับคำ' }).getByRole('button').all()) {
+        expect(overlaps(box, await stageBox(page, dot)), 'completion box clear of the dots').toBe(false)
+      }
+    })
+  }
+})
+
+type StageBox = { left: number; top: number; right: number; bottom: number; width: number; height: number; cx: number; cy: number }
+
+/** The target's box in 1920×1080 stage pixels, whatever the window size. */
+async function stageBox(page: Page, target: Locator): Promise<StageBox> {
+  const stage = (await page.getByTestId('stage').boundingBox())!
+  const box = (await target.boundingBox())!
+  const scale = stage.width / 1920
+  const left = (box.x - stage.x) / scale
+  const top = (box.y - stage.y) / scale
+  const width = box.width / scale
+  const height = box.height / scale
+  return { left, top, right: left + width, bottom: top + height, width, height, cx: left + width / 2, cy: top + height / 2 }
+}
+
+const overlaps = (a: StageBox, b: StageBox) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom

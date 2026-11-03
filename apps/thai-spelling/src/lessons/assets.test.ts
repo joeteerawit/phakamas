@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { maeKong } from './mae-kong'
 
-// Keys look like /public/assets/canva/vocabulary/ling.webp.
+// Keys look like /public/assets/comic/word-ling.webp.
 const files = Object.keys(import.meta.glob('/public/assets/**/*.{webp,png,svg,jpg}'))
 
 /** Every string in the Lesson data that is an image path. */
@@ -13,7 +13,7 @@ function imagePaths(value: unknown): string[] {
 
 describe('Lesson images', () => {
   it('finds the image paths in the Lesson data', () => {
-    expect(imagePaths(maeKong)).toContain('/assets/canva/vocabulary/ling.webp')
+    expect(imagePaths(maeKong)).toContain('/assets/comic/word-ling.webp')
   })
 
   it('has a file on disk for every image the Lesson references', () => {

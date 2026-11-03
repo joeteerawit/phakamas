@@ -6,7 +6,7 @@ import type { AudioClip, Lesson } from '../lessons'
 import type { ActivityId } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { activityStars, lessonStars } from '../session/stars'
-import { MONKEY_SRC } from './Mascot'
+import { MONKEY_CHEER_SRC } from './Mascot'
 import { popIn } from './motion/PopIn'
 import { useStageBleed } from './stage/Stage'
 
@@ -21,14 +21,14 @@ const FLY_AT_MS = 1500
 // Stage-pixel offset from the big Stars' centre (960, 480) to the Star counter's centre (550, 86).
 const TO_COUNTER = { x: -410, y: -394 }
 
-/** The stage chrome's Star counter: a small wooden pill (MASTER.md wood) next to the title sign. */
+/** The stage chrome's Star counter: a small wooden pill (MASTER.md wood) in ink, next to the title sign. */
 export function StarCounter({ lesson }: { lesson: Lesson }) {
   const results = useLessonSession((state) => state.session?.activities)
   const { total, max } = lessonStars(lesson, results)
   return (
     <p
       data-testid="star-counter"
-      className="absolute top-[46px] left-[455px] flex h-[80px] items-center gap-[8px] rounded-full border-4 border-cream-border bg-wood px-[24px] font-heading text-[40px] font-bold text-on-wood shadow-[inset_0_-6px_0_rgb(0_0_0/0.2)]"
+      className="absolute top-[46px] left-[455px] flex h-[80px] items-center gap-[8px] rounded-full border-[5px] border-comic-ink bg-wood px-[24px] font-heading text-[40px] font-bold text-on-wood shadow-comic"
     >
       <span className="sr-only">ดาวที่ได้</span>
       <span aria-hidden="true">⭐</span>
@@ -79,7 +79,7 @@ function Burst({ stars, clip }: { stars: number; clip: AudioClip }) {
       <span className="sr-only">ได้ {stars} ดาว</span>
       <motion.div
         aria-hidden="true"
-        className="absolute top-[330px] left-[460px] flex h-[300px] w-[1000px] items-center justify-center gap-[24px] text-[220px] leading-none drop-shadow-[0_10px_0_rgba(0,0,0,0.2)]"
+        className="absolute top-[330px] left-[460px] flex h-[300px] w-[1000px] items-center justify-center gap-[24px] text-[220px] leading-none drop-shadow-[8px_10px_0_var(--color-comic-ink)]"
         animate={flying && !still ? { x: TO_COUNTER.x - bleed.x, y: TO_COUNTER.y - bleed.y, scale: 0.15, opacity: 0 } : undefined}
         transition={{ duration: 0.6, ease: 'easeIn' }}
       >
@@ -97,12 +97,12 @@ function Burst({ stars, clip }: { stars: number; clip: AudioClip }) {
   )
 }
 
-/** The cover Mascot hopping in place; still under reduced motion. */
+/** The cheering Mascot hopping in place; still under reduced motion. */
 export function JumpingMascot({ className }: { className: string }) {
   const still = useReducedMotion()
   return (
     <motion.img
-      src={MONKEY_SRC}
+      src={MONKEY_CHEER_SRC}
       alt=""
       draggable={false}
       className={`pointer-events-none absolute select-none object-contain ${className}`}

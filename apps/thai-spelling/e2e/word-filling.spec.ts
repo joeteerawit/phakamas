@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
+import { gapBetween, overlaps, renderedFontSize, stageBox, waitUntilStill } from './stageBox.js'
 import { expectTapTarget } from './tapTarget.js'
 
 // Picture order on Step 6 (src/lessons/mae-kong.ts wordFilling.pictures).
@@ -121,6 +122,61 @@ test('chips, slots and controls are ≥44px tap targets on a 390px-tall landscap
   await page.setViewportSize({ width: 844, height: 390 })
   const targets = [bankWord(page, 'รัง'), slot(page, 1), check(page), page.getByRole('button', { name: 'ล้างคำตอบ' })]
   for (const target of targets) await expectTapTarget(target)
+})
+
+for (const viewport of [
+  { width: 1920, height: 1080 },
+  { width: 844, height: 390 },
+]) {
+  test(`ลองอีกครั้ง and ล้างคำตอบ stay clear of each other and the bank at ${viewport.width}×${viewport.height}`, async ({ page }) => {
+    await page.setViewportSize(viewport)
+    const retry = page.getByRole('button', { name: 'ลองอีกครั้ง' })
+    const clear = page.getByRole('button', { name: 'ล้างคำตอบ' })
+    const [a, b, words] = await Promise.all([stageBox(page, retry), stageBox(page, clear), stageBox(page, bank(page))])
+    // More than the 8px hard shadow, so a gap stays visible.
+    const GAP = 24
+    expect(overlaps(a, b), 'the controls overlap').toBe(false)
+    expect(b.top - a.bottom, 'gap between the controls').toBeGreaterThanOrEqual(GAP)
+    for (const [name, box] of [['ลองอีกครั้ง', a], ['ล้างคำตอบ', b]] as const) {
+      expect(overlaps(box, words), `${name} overlaps the bank`).toBe(false)
+      expect(words.left - box.right, `${name} gap to the bank`).toBeGreaterThanOrEqual(GAP)
+    }
+    if (viewport.height === 390) for (const control of [retry, clear]) await expectTapTarget(control)
+  })
+}
+
+for (const viewport of [
+  { width: 1920, height: 1080 },
+  { width: 844, height: 390 },
+]) {
+  test(`ตรวจคำตอบ is at least 40 stage px from Next at ${viewport.width}×${viewport.height}`, async ({ page }) => {
+    await page.setViewportSize(viewport)
+    const [button, next] = await Promise.all([stageBox(page, check(page)), stageBox(page, page.getByRole('link', { name: 'ถัดไป' }))])
+    expect(gapBetween(button, next), 'ตรวจคำตอบ to Next').toBeGreaterThanOrEqual(40)
+  })
+}
+
+test('control text is at least 15px on a 390px-tall phone', async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 })
+  for (const name of ['ลองอีกครั้ง', 'ล้างคำตอบ', 'ตรวจคำตอบ']) {
+    expect(await renderedFontSize(page, page.getByRole('button', { name })), `${name} CSS px`).toBeGreaterThanOrEqual(15)
+  }
+})
+
+test('on a 390px-tall phone the toast clears the controls and picture cards', async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 })
+  // 1/6 gives the longest Step 6 message.
+  await place(page, 'ลิง', 1)
+  await check(page).click()
+  const toast = page.getByRole('status').locator('> div')
+  await expect(toast).toContainText('กดลองอีกครั้ง')
+  await waitUntilStill(toast)
+  expect(await renderedFontSize(page, toast.locator('p')), 'toast text CSS px').toBeGreaterThanOrEqual(16)
+  const at = await stageBox(page, toast)
+  for (const name of ['ลองอีกครั้ง', 'ล้างคำตอบ', 'ตรวจคำตอบ']) {
+    expect(overlaps(at, await stageBox(page, page.getByRole('button', { name }))), `toast covers ${name}`).toBe(false)
+  }
+  for (let n = 1; n <= 6; n++) expect(overlaps(at, await stageBox(page, slot(page, n))), `toast covers card ${n}`).toBe(false)
 })
 
 test('a placed chip flies to its slot; with reduced motion it jumps there', async ({ page }) => {

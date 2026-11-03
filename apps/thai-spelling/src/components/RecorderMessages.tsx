@@ -16,7 +16,7 @@ export function RecorderMessages() {
         )}
       </p>
       {(status === 'denied' || status === 'unsupported') && (
-        <p role="alert" className="w-full rounded-clay border-[3px] border-border bg-tint-peach p-(--space-sm) text-center font-semibold">
+        <p role="alert" className="w-full rounded-clay border-4 border-comic-ink bg-tint-peach shadow-comic p-(--space-sm) text-center font-semibold">
           {recorderErrors[status]}
         </p>
       )}

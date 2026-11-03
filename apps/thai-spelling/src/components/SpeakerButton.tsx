@@ -1,7 +1,7 @@
 import { cx, pressable } from './clay/buttonClass'
 
-/** The orange Canva speaker (docs/canva-assets.md); 142 px, so keep it ≤ ~140 stage px. */
-export const SPEAKER_SRC = '/assets/canva/chrome/speaker-button.webp'
+/** The blue comic speaker (docs/comic-art.md); 270×278 px, so it stays sharp up to ~270 stage px. */
+export const SPEAKER_SRC = '/assets/comic/speaker-button.webp'
 
 type SpeakerButtonProps = {
   /** Size and stage position, e.g. `top-[30px] left-[1470px] size-[124px]`. */
@@ -16,7 +16,7 @@ type SpeakerButtonProps = {
   onClick?: () => void
 }
 
-/** The orange speaker of Steps 2–4, with sound waves while its clip plays. */
+/** The speaker of Steps 2–4, with sound waves while its clip plays. */
 export function SpeakerButton({ className, playing = false, loading = false, label, onClick }: SpeakerButtonProps) {
   const content = (
     <>

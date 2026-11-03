@@ -1,8 +1,8 @@
 @import 'tailwindcss';
 
 /*
- * Clay garden theme. Every value comes from
- * design-system/thai-spelling/MASTER.md; components use these tokens only.
+ * Garden theme in comic ink (docs/comic-art.md). Values come from
+ * design-system/thai-spelling/MASTER.md and the comic art; components use these tokens only.
  */
 @theme {
   /* Drop Tailwind's default palette so only MASTER colours exist. */
@@ -14,7 +14,8 @@
   --color-on-secondary: #ffffff;
   --color-accent: #f59e0b;
   --color-on-accent: #0f172a;
-  --color-highlight: #ec4899;
+  /* Step 6 empty blanks while a word is selected: comic blue, not pink. */
+  --color-highlight: #2563eb;
   /* Vibrant garden backdrop (kids: bright, saturated). */
   --color-sky-top: #38bdf8;
   --color-sky: #bae6fd;
@@ -44,22 +45,25 @@
   /* Canva garden (MASTER.md "Canva garden"), sampled from design DAHZj0Nxyxs. */
   --color-navy: #1800ad;
   --color-final: #ff3131;
-  --color-cream: #ffe98d;
-  --color-cream-border: #8a3a13;
-  --color-pill: #ffa3dc;
+  /* Comic paper for cards and pills; outlines are ink (docs/comic-art.md). */
+  --color-cream: #fff8e7;
+  --color-cream-border: #111111;
+  /* The cover's grade-line pill keeps the Canva cream of the approved cover. */
+  --color-cover-cream: #ffe98d;
+  /* Comic yellow for pills and pill buttons: navy text 8.8:1, ink 13:1, comic red 3.7:1 (large bold only). */
+  --color-pill: #ffd23f;
   --color-letterbox-sky: #0ca4e7;
   --color-letterbox-grass: #4c9a3c;
-  /* Cover subtitle pill (design page 1). */
+  /* Comic magenta, only in the card ring and the tap burst; no box, pill or button is pink. */
   --color-cover-pill: #ff66c4;
   --color-comic-ink: #111111;
-  --color-comic-pill: #ffd6ec;
+  /* Faded ink for disabled controls on solid paper: 4.7:1 on cream, so still readable but clearly off. */
+  --color-ink-disabled: #707070;
   --color-comic-red: #d4141a;
   /* Step 6 word chips: a paler cream than the cards. */
   --color-cream-light: #fff6b3;
   /* Step 5 card marked wrong (always with a ✗ badge). */
   --color-wrong-tint: #ffc9c2;
-  /* Pressed-edge shade under orange stage buttons. */
-  --color-orange-deep: #c2410c;
 
   --font-sans: 'Anuphan', ui-sans-serif, system-ui, sans-serif;
   --font-heading: 'Mali', 'Anuphan', ui-sans-serif, system-ui, sans-serif;
@@ -83,18 +87,17 @@
   --radius-clay: 1.5rem;
   --radius-storybook: 2.5rem;
 
-  --shadow-clay:
-    0 6px 0 rgba(15, 23, 42, 0.12), 0 12px 24px rgba(15, 23, 42, 0.1),
-    inset 0 -4px 0 rgba(15, 23, 42, 0.08), inset 0 2px 0 rgba(255, 255, 255, 0.7);
-  --shadow-clay-pressed: 0 2px 0 rgba(15, 23, 42, 0.12), inset 0 2px 4px rgba(15, 23, 42, 0.12);
   /* Canva stage feedback (stage pixels). */
   --shadow-glow-sun: 0 0 0 6px var(--color-sun), 0 0 40px 12px rgb(253 224 71 / 0.85);
   --shadow-glow-correct: 0 0 0 6px var(--color-hill), 0 0 48px 12px var(--color-grass);
   --shadow-ring-wrong: 0 0 0 6px var(--color-red);
   --shadow-ring-missed: 0 0 0 6px rgb(255 49 49 / 0.5);
-  --shadow-lift: 0 10px 0 var(--color-cream-border);
-  --shadow-orange-button: 0 10px 0 var(--color-orange-deep);
-  --shadow-orange-button-pressed: 0 4px 0 var(--color-orange-deep);
+  /* Comic hard shadows: flat ink, no blur, down and to the right. */
+  --shadow-comic: 6px 8px 0 var(--color-comic-ink);
+  --shadow-comic-pressed: 2px 3px 0 var(--color-comic-ink);
+  --shadow-lift: 6px 12px 0 var(--color-comic-ink);
+  --shadow-orange-button: 6px 10px 0 var(--color-comic-ink);
+  --shadow-orange-button-pressed: 2px 4px 0 var(--color-comic-ink);
 
   /* Rotate overlay: the phone turns to landscape, holds, and turns back. */
   --animate-rotate-phone: rotate-phone 2.4s ease-in-out infinite;
@@ -192,6 +195,74 @@
 
 @utility bottom-above-bar {
   bottom: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom) + var(--space-sm));
+}
+
+/* The comic card ring's angle. Registered so it animates; without @property the ring stays still. */
+@property --card-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes card-spin {
+  to {
+    --card-angle: 360deg;
+  }
+}
+
+/*
+ * The shared comic card: ink outline, a colourful ring that slowly turns, paper inside and a hard ink
+ * shadow. Highlighted (selected or playing), hovered and focused cards turn faster. Reduced motion: a still ring.
+ */
+@utility comic-card {
+  border: 6px solid transparent;
+  border-radius: 40px;
+  background:
+    linear-gradient(var(--color-cream), var(--color-cream)) padding-box,
+    conic-gradient(
+        from var(--card-angle, 0deg),
+        var(--color-final),
+        var(--color-sun),
+        var(--color-hill),
+        var(--color-sky-top),
+        var(--color-purple),
+        var(--color-cover-pill),
+        var(--color-final)
+      )
+      border-box;
+  background-color: var(--color-cream);
+  box-shadow:
+    0 0 0 4px var(--color-comic-ink),
+    inset 0 0 0 3px var(--color-comic-ink),
+    8px 10px 0 4px var(--color-comic-ink);
+  animation: card-spin 6s linear infinite;
+
+  &[data-highlight] {
+    box-shadow:
+      0 0 0 4px var(--color-comic-ink),
+      inset 0 0 0 3px var(--color-comic-ink),
+      0 0 0 14px var(--color-sun),
+      0 0 40px 18px rgb(253 224 71 / 0.85);
+  }
+
+  &[data-highlight],
+  &:hover,
+  &:focus-visible,
+  &:focus-within,
+  :hover > &,
+  :focus-visible > & {
+    animation-duration: 1.5s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+/* Comic lettering: light text inside a thick ink outline, readable on any colour of art. */
+@utility text-inked {
+  paint-order: stroke fill;
+  -webkit-text-stroke: 0.14em var(--color-comic-ink);
 }
 
 @layer base {

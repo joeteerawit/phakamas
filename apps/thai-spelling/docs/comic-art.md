@@ -12,6 +12,7 @@ Decided by the owner on 2026-11-03: a plain background is not enough, it must in
 - Scene objects stay behind the sign, words and buttons, so nothing moving crosses what a student reads or taps.
 - Movement is gentle and loops. Under reduced motion the scene is still.
 - The scene fills the window on every device, with no letterbox. The sign stays centred and buttons stay in the window's corners.
+- Cards have a slowly moving colourful ring, and every tap gets a boing and a burst (still under reduced motion).
 
 ## Shared style text
 
@@ -35,5 +36,11 @@ Cut-outs ask for a plain flat solid white background (magenta for white objects)
 | `mascot-vine.webp` | Crop of `mascot-swing.webp` | Vine tile, runs on above the stage |
 | `decor-elephant.webp`, `decor-bee.webp`, `decor-butterfly.webp`, `decor-bird.webp` | Figma, nodes 4:2 to 4:5 | Baby elephant, honey bee, butterfly, bluebird |
 | `decor-rabbit.webp`, `decor-flowers.webp`, `decor-sun.webp`, `decor-cloud.webp` | Figma, nodes 4:6 to 4:9 | Sitting rabbit, flower clump, smiling sun, fluffy cloud |
+| `word-ngu.webp`, `word-dang.webp`, `word-ban.webp`, `word-kom.webp`, `word-rang.webp`, `word-khang.webp`, `word-ngao.webp` | Figma, nodes 5:2 to 5:5, 5:8 to 5:10 | Picture cards: friendly snake, megaphone with burst lines, cosy house, child bending down, nest with eggs, dusky langur, child with a long shadow |
+| `word-lung.webp`, `word-sung.webp`, `word-bang.webp` | Figma, nodes 7:3, 8:2, 8:3 | Picture cards: cute cartoon uncle waving; three trees rising like stairs with a big up arrow; flying squirrel gliding |
+| `word-ling.webp`, `word-chang.webp`, `word-phueng.webp` | Copies of `mascot-greet.webp`, `decor-elephant.webp`, `decor-bee.webp` | Picture cards reusing the cover art |
+| `step5-scene.webp` | Figma, node 5:11 | Calm flower garden with a beehive and fence at the edges; open quiet middle |
+| `ui-home.webp`, `ui-buzzer.webp`, `ui-tap.webp` | Figma, nodes 7:4, 7:6, 7:7 | Orange home button, red dome push button, child's finger pressing a button |
+| `ui-plank.webp`, `ui-banner.webp`, `ui-signboard.webp` | Figma, nodes 7:5, 7:8, 7:9 | Blank wooden plank, blank yellow banner plate, blank signboard on two posts |
 
 Figma file: "Thai Spelling - comic art test" (`S7EGKiX45AkDbkCuN1mkQD`). Figma cannot take a reference image, so its Mascot drifted between poses; Mascot poses use Canva with the first Figma Mascot (`MAHZ0iLrjkA`) as the reference.

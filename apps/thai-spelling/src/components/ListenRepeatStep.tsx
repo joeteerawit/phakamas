@@ -22,14 +22,18 @@ const statusText: Partial<Record<AudioStatus, string>> = {
   error: 'เล่นเสียงไม่ได้ ลองอีกครั้ง',
 }
 
-// Every target here is ≥ 122 stage px: 44 CSS px on a 390px-tall landscape phone.
-const roundOrange = `${pressable} flex size-[130px] items-center justify-center rounded-full border-[6px] border-card bg-orange text-card shadow-[0_8px_0_rgb(0_0_0/0.2)]`
+// Every target here is ≥ 122 stage px: 44 CSS px on a 390px-tall landscape phone. Ink on orange for contrast.
+const roundOrange = `${pressable} flex size-[130px] items-center justify-center rounded-full border-[6px] border-comic-ink bg-orange text-comic-ink shadow-comic`
+const inkPill = 'rounded-full border-[5px] border-comic-ink bg-pill px-[28px] text-[40px] leading-[1.4] font-bold whitespace-nowrap shadow-comic'
+// The speaker (left) and the buzzer (right) mirror each other about x = 960: same column, same button box, label pill under it.
+const sideColumn = 'absolute top-[210px] flex w-[340px] flex-col items-center gap-[12px]'
+const bigButton = 'h-[242px] w-[280px]'
 
 /**
  * Step 3 ฟังแล้วอ่านตาม (not in the Canva design; built from its kit on the pond scene, #22).
- * One cream word card at a time, played only on demand; when the clip ends the Mascot says
- * ถึงตาหนูอ่านแล้ว and the red buzzer records the child. Hearing every word earns a star.
- * Positions are stage pixels over the whole stage (data-full-stage).
+ * One cream word card at a time in the middle, played only on demand by the speaker at the left; when the
+ * clip ends the Mascot says ถึงตาหนูอ่านแล้ว under it and the red buzzer at the right records the child.
+ * Hearing every word earns a star. Positions are stage pixels over the whole stage (data-full-stage).
  */
 export function ListenRepeatStep({ lesson }: StepProps) {
   const words = lesson.listenAndRepeat
@@ -71,6 +75,7 @@ export function ListenRepeatStep({ lesson }: StepProps) {
   const yourTurn = endedId === current.audio.id && status === 'idle'
   const playing = status === 'playing'
   const slide = reduceMotion ? 0 : 240
+  const listenLabel = heard.has(current.audio.id) ? 'ฟังอีกครั้ง' : 'ฟังเสียง'
 
   return (
     <section data-full-stage className="relative size-full font-heading text-navy">
@@ -90,28 +95,32 @@ export function ListenRepeatStep({ lesson }: StepProps) {
           transition={reduceMotion ? { duration: 0 } : { type: 'spring', duration: 0.45, bounce: 0.35 }}
           className={cx(
             creamCard,
-            'absolute top-[210px] left-[750px] flex h-[560px] w-[420px] flex-col items-center justify-center gap-[8px] shadow-[0_12px_0_rgb(0_0_0/0.15)]',
+            'absolute top-[210px] left-[750px] flex h-[560px] w-[420px] flex-col items-center justify-center',
           )}
         >
           <img src={current.image} alt="" width={300} height={300} draggable={false} className="size-[300px] object-contain" />
           <h2 className="text-[110px] leading-[1.4] font-bold">{current.word}</h2>
-          <p className="h-[40px] text-[30px] font-semibold">{statusText[status]}</p>
+          {/* Out of the flow, so the picture and word stay centred; it sits below the word's glyphs. */}
+          <p className="absolute inset-x-0 bottom-[10px] text-center text-[30px] leading-[1.3] font-semibold">{statusText[status]}</p>
         </motion.div>
       </AnimatePresence>
 
-      <SpeakerButton
-        label={heard.has(current.audio.id) ? 'ฟังอีกครั้ง' : 'ฟังเสียง'}
-        onClick={listen}
-        playing={playing}
-        className="top-[180px] left-[1100px] size-[140px] rounded-full"
-      />
+      <div className={cx(sideColumn, 'left-[200px]')}>
+        <div className={cx('relative', bigButton)}>
+          <SpeakerButton label={listenLabel} onClick={listen} playing={playing} className="inset-0 size-full" />
+        </div>
+        {/* The button's own name already says this. */}
+        <p aria-hidden="true" data-testid="listen-label" className={inkPill}>
+          {listenLabel}
+        </p>
+      </div>
 
       <button
         type="button"
         aria-label="คำก่อนหน้า"
         disabled={index === 0}
         onClick={() => goTo(index - 1)}
-        className={`${roundOrange} absolute top-[425px] left-[570px]`}
+        className={`${roundOrange} absolute top-[425px] left-[580px]`}
       >
         <ChevronLeft aria-hidden="true" className="size-[80px]" strokeWidth={3} />
       </button>
@@ -120,13 +129,13 @@ export function ListenRepeatStep({ lesson }: StepProps) {
         aria-label="คำถัดไป"
         disabled={index === words.length - 1}
         onClick={() => goTo(index + 1)}
-        className={`${roundOrange} absolute top-[425px] left-[1220px]`}
+        className={`${roundOrange} absolute top-[425px] left-[1210px]`}
       >
         <ChevronRight aria-hidden="true" className="size-[80px]" strokeWidth={3} />
       </button>
 
       <nav aria-label="ลำดับคำ" className="absolute top-[790px] left-[588px] flex w-[744px] flex-col items-center">
-        <p className="rounded-full border-[5px] border-card bg-pill px-[28px] text-[40px] leading-[1.4] font-bold">
+        <p className={inkPill}>
           คำที่ {index + 1}/{words.length}
         </p>
         <ol className="flex">
@@ -137,15 +146,18 @@ export function ListenRepeatStep({ lesson }: StepProps) {
                 aria-label={heard.has(item.audio.id) ? `${item.word} (ฟังแล้ว)` : item.word}
                 aria-current={i === index ? 'step' : undefined}
                 onClick={() => goTo(i)}
-                className={`${pressable} flex size-[124px] items-center justify-center`}
+                className={`${pressable} flex size-[124px] justify-center pt-[16px]`}
               >
-                <span
-                  className={cx(
-                    'block rounded-full border-[5px] border-card transition-all duration-200 motion-reduce:transition-none',
-                    i === index ? 'size-[48px] bg-navy' : 'size-[32px]',
-                    i !== index && (heard.has(item.audio.id) ? 'bg-primary' : 'bg-cream'),
-                  )}
-                />
+                {/* Dots at the top of their tap targets, so they sit just under the pill. */}
+                <span className="flex h-[48px] items-center">
+                  <span
+                    className={cx(
+                      'block rounded-full border-[5px] border-comic-ink transition-all duration-200 motion-reduce:transition-none',
+                      i === index ? 'size-[48px] bg-navy' : 'size-[32px]',
+                      i !== index && (heard.has(item.audio.id) ? 'bg-primary' : 'bg-cream'),
+                    )}
+                  />
+                </span>
               </button>
             </li>
           ))}
@@ -154,33 +166,51 @@ export function ListenRepeatStep({ lesson }: StepProps) {
 
       <Recorder />
 
-      <div role="status" aria-live="polite" className="absolute top-[220px] left-[200px] flex w-[340px] flex-col items-center gap-[24px] text-center">
-        {yourTurn && (
+      {/* Under the speaker's label, centred on the speaker's column (x = 370): clear of the arrows, the dots and the Back button. */}
+      {/* Once every word is heard only the completion box shows, so the column stays uncrowded. */}
+      <div
+        role="status"
+        aria-live="polite"
+        data-testid="listen-messages"
+        className="absolute top-[556px] left-[170px] flex w-[400px] flex-col items-center gap-[16px] text-center"
+      >
+        {yourTurn && !complete && (
           <motion.p
             initial={reduceMotion ? false : { scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="flex flex-col items-center gap-[8px] rounded-[40px] border-[6px] border-card bg-pill p-[20px] text-[44px] leading-[1.4] font-bold"
+            className="flex w-[340px] items-center justify-center gap-[12px] rounded-[40px] border-[6px] border-comic-ink bg-pill px-[16px] py-[12px] text-[40px] leading-[1.3] font-bold shadow-comic"
           >
-            <Mascot decorative className="size-[140px]" />
-            ถึงตาหนูอ่านแล้ว
+            <Mascot decorative className="size-[100px] shrink-0" />
+            <span>
+              ถึงตาหนู
+              <br />
+              อ่านแล้ว
+            </span>
           </motion.p>
         )}
         {complete && (
-          <div className={cx(creamCard, 'flex w-full flex-col items-center gap-[12px] p-[20px]')}>
-            <motion.span
-              initial={reduceMotion ? false : { scale: 0.4, rotate: -30 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: 'spring', duration: 0.4, bounce: 0.5 }}
-            >
-              <Star aria-hidden="true" className="size-[90px] fill-accent text-on-accent" strokeWidth={2} />
-            </motion.span>
-            <p className="text-[36px] leading-[1.4] font-bold">ฟังครบ {words.length} คำแล้ว เก่งมาก!</p>
+          // 42px text (about 15 CSS px on a 390px-tall phone), the Star beside เก่งมาก! so the first line has the full width.
+          <div className={cx(creamCard, 'flex w-full flex-col items-center gap-[12px] px-[12px] py-[14px]')}>
+            <p className="flex flex-col items-center text-[42px] leading-[1.3] font-bold whitespace-nowrap">
+              <span>ฟังครบ {words.length} คำแล้ว</span>
+              <span className="flex items-center gap-[10px]">
+                <motion.span
+                  className="shrink-0"
+                  initial={reduceMotion ? false : { scale: 0.4, rotate: -30 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', duration: 0.4, bounce: 0.5 }}
+                >
+                  <Star aria-hidden="true" className="size-[60px] fill-accent text-on-accent" strokeWidth={2} />
+                </motion.span>
+                เก่งมาก!
+              </span>
+            </p>
             <button
               type="button"
               onClick={() => goTo(0)}
-              className={`${pressable} flex min-h-[124px] items-center gap-[12px] rounded-full border-[6px] border-card bg-orange px-[32px] text-[36px] font-bold text-card`}
+              className={`${pressable} flex min-h-[124px] w-full items-center justify-center gap-[12px] rounded-full border-[6px] border-comic-ink bg-orange px-[24px] text-[42px] font-bold whitespace-nowrap text-comic-ink shadow-comic`}
             >
-              <RotateCcw aria-hidden="true" className="size-[48px]" strokeWidth={3} />
+              <RotateCcw aria-hidden="true" className="size-[52px]" strokeWidth={3} />
               ฝึกอีกรอบ
             </button>
           </div>
@@ -190,7 +220,7 @@ export function ListenRepeatStep({ lesson }: StepProps) {
   )
 }
 
-/** Red buzzer (Canva design page 8) to record, the remaining time, and an orange play-back button. */
+/** Red comic buzzer to record, the remaining time, and an orange play-back button. */
 function Recorder() {
   const status = useRecorder((state) => state.status)
   const reduceMotion = useReducedMotion()
@@ -198,13 +228,13 @@ function Recorder() {
   const secondsLeft = useSecondsLeft(recording)
 
   return (
-    <div className="absolute top-[240px] left-[1380px] flex w-[340px] flex-col items-center gap-[12px]">
+    <div className={cx(sideColumn, 'left-[1380px]')}>
       <button
         type="button"
         aria-label={recording ? 'หยุดบันทึก' : 'ลองอ่านเอง'}
         disabled={status === 'requesting'}
         onClick={recording ? stopRecording : () => void startRecording()}
-        className={`${pressable} relative h-[242px] w-[280px]`}
+        className={cx(pressable, 'relative', bigButton)}
       >
         {recording && (
           <motion.span
@@ -215,8 +245,8 @@ function Recorder() {
             transition={reduceMotion ? { duration: 0 } : { duration: 1, repeat: Infinity }}
           />
         )}
-        <img src="/assets/canva/ui/buzzer.webp" alt="" draggable={false} className="relative size-full object-contain" />
-        <span className="absolute inset-x-0 top-[40px] flex justify-center text-card">
+        <img src="/assets/comic/ui-buzzer.webp" alt="" draggable={false} className="relative size-full object-contain" />
+        <span className="absolute inset-x-0 top-[40px] flex justify-center text-card drop-shadow-[4px_5px_0_var(--color-comic-ink)]">
           {recording ? (
             <Square aria-hidden="true" className="size-[80px] fill-card" strokeWidth={3} />
           ) : (
@@ -225,7 +255,7 @@ function Recorder() {
         </span>
       </button>
 
-      <p className="rounded-full border-[5px] border-card bg-pill px-[28px] text-[40px] leading-[1.4] font-bold">
+      <p className={inkPill}>
         {recording ? <span data-testid="record-time">{secondsLeft} วินาที</span> : 'กดแล้วอ่านตาม'}
       </p>
 

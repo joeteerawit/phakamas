@@ -16,11 +16,20 @@ import { usePointerDrag } from './usePointerDrag'
 const CARD_LEFT = [108, 399, 691, 982, 1273, 1564]
 
 const pill =
-  'flex items-center justify-center rounded-full border-4 border-dashed border-cream-border bg-cream-light font-heading font-bold text-navy'
-const control =
-  'absolute flex h-[122px] w-[320px] items-center justify-center gap-[12px] whitespace-nowrap rounded-full border-[6px] border-card font-heading text-[40px] font-bold text-navy ' +
-  'transition-transform duration-150 ease-out active:scale-95 disabled:opacity-50 motion-reduce:transition-none ' +
-  'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring'
+  'flex items-center justify-center rounded-full border-[5px] border-comic-ink bg-cream-light font-heading font-bold text-navy shadow-comic'
+/*
+ * The bottom row, symmetric about x = 960 (stage px): controls 246–566 | bank 596–1324 | ตรวจคำตอบ 1354–1674.
+ * Bank chips are 224 wide (narrower than the 255 cards) so the 320-wide controls fit their 42px labels with
+ * room at the ends, 30px clear of the bank, and ตรวจคำตอบ stays 66px clear of Next (Back is 71px from the left stack).
+ */
+const controlBase =
+  'absolute flex w-[320px] items-center justify-center whitespace-nowrap border-[6px] border-comic-ink font-heading font-bold text-navy shadow-comic ' +
+  'transition-transform duration-150 ease-out active:scale-95 motion-reduce:transition-none ' +
+  'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring ' +
+  // Disabled: still solid paper, in faded ink with no shadow, so it reads as off without vanishing into the scene.
+  'disabled:cursor-not-allowed disabled:border-ink-disabled disabled:text-ink-disabled disabled:shadow-none disabled:active:scale-100'
+// 122 stage px is 44 CSS px on a 390px-tall phone; 42px type is 15.2 CSS px there.
+const control = `${controlBase} h-[122px] gap-[8px] rounded-full text-[42px]`
 const SHAKE = [0, -16, 16, -10, 10, 0]
 const SPARKLES = [
   { left: 10, top: 20 },
@@ -136,7 +145,8 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
 
   const content = (
     <div ref={root} className="contents">
-      <p className="absolute top-[165px] left-[946px] -translate-x-1/2 whitespace-nowrap font-heading text-[60px] leading-[1.4] font-bold text-navy">
+      {/* A yellow pill so the heading stays readable over drifting clouds; centred over the card row. */}
+      <p className="absolute top-[160px] left-1/2 -translate-x-1/2 rounded-full border-[5px] border-comic-ink bg-pill px-[40px] whitespace-nowrap font-heading text-[56px] leading-[1.4] font-bold text-navy shadow-comic">
         {instruction}
       </p>
 
@@ -161,9 +171,9 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
                 className={cx(
                   'relative size-full transition-shadow duration-300 motion-reduce:transition-none',
                   result === true
-                    ? 'rounded-[40px] border-4 border-correct bg-cream shadow-glow-correct'
+                    ? 'rounded-[40px] border-[6px] border-correct bg-cream shadow-glow-correct'
                     : result === false
-                      ? 'rounded-[40px] border-4 border-wrong bg-cream shadow-ring-wrong'
+                      ? 'rounded-[40px] border-[6px] border-wrong bg-cream shadow-ring-wrong'
                       : creamCard,
                 )}
               >
@@ -177,8 +187,8 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
                 />
                 <div
                   className={cx(
-                    'absolute inset-x-[-4px] bottom-[-4px] h-[97px] rounded-[40px] border-4 border-dashed bg-card',
-                    selected && !word ? 'border-pill' : 'border-cream-border',
+                    'absolute inset-x-0 bottom-0 h-[97px] rounded-[34px] border-4 border-dashed bg-card',
+                    selected && !word ? 'border-highlight' : 'border-comic-ink',
                   )}
                 />
                 <button
@@ -202,7 +212,7 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
                   <span
                     aria-hidden="true"
                     className={cx(
-                      'absolute -top-[22px] -right-[22px] flex size-[64px] items-center justify-center rounded-full border-4 border-card text-card',
+                      'absolute -top-[22px] -right-[22px] flex size-[64px] items-center justify-center rounded-full border-4 border-comic-ink text-card',
                       result ? 'bg-correct' : 'bg-wrong',
                     )}
                   >
@@ -234,7 +244,7 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
         role="group"
         aria-label="คลังคำ"
         data-bank
-        className="absolute top-[790px] left-[542px] flex h-[250px] w-[836px] flex-wrap content-start justify-center gap-x-[35px] gap-y-[4px]"
+        className="absolute top-[760px] left-[596px] flex h-[280px] w-[728px] flex-wrap content-start justify-center gap-x-[28px] gap-y-[36px]"
       >
         {bankWords.length === 0 && (
           <p className="self-center font-heading text-[48px] font-bold text-navy">วางคำครบแล้ว</p>
@@ -246,14 +256,14 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
             aria-pressed={selected === word}
             onClick={drag.click(() => setSelected(selected === word ? null : word))}
             {...dragProps(word)}
-            className="relative flex h-[122px] w-[255px] touch-none items-center rounded-full select-none focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring"
+            className="relative flex h-[122px] w-[224px] touch-none items-center rounded-full select-none focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring"
           >
             <span
               data-word={word}
               className={cx(
                 pill,
                 'h-[87px] w-full text-[60px] leading-[1.4] transition-[translate,box-shadow] duration-150 motion-reduce:transition-none',
-                selected === word && '-translate-y-[10px] border-solid border-pill shadow-lift',
+                selected === word && '-translate-y-[10px] bg-pill shadow-lift!',
               )}
             >
               {word}
@@ -262,16 +272,18 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
         ))}
       </div>
 
-      <button type="button" onClick={retry} disabled={!results.includes(false)} className={cx(control, 'top-[790px] left-[205px] bg-cream')}>
-        <RotateCcw aria-hidden="true" className="size-[44px]" strokeWidth={3} />
+      {/* Level with the bank's two rows; 36px apart so the hard shadows leave a clear gap. */}
+      <button type="button" onClick={retry} disabled={!results.includes(false)} className={cx(control, 'top-[760px] left-[246px] bg-cream')}>
+        <RotateCcw aria-hidden="true" className="size-[38px]" strokeWidth={3} />
         ลองอีกครั้ง
       </button>
-      <button type="button" onClick={clearAll} className={cx(control, 'top-[916px] left-[205px] bg-cream')}>
-        <X aria-hidden="true" className="size-[44px]" strokeWidth={3} />
+      <button type="button" onClick={clearAll} className={cx(control, 'top-[918px] left-[246px] bg-cream')}>
+        <X aria-hidden="true" className="size-[38px]" strokeWidth={3} />
         ล้างคำตอบ
       </button>
-      <button type="button" onClick={check} className={cx(control, 'top-[790px] left-[1400px] bg-pill')}>
-        <Check aria-hidden="true" className="size-[48px]" strokeWidth={3.5} />
+      {/* Mirrors the two-button stack on the left about x = 960: same width, same gap to the bank, both rows tall. */}
+      <button type="button" onClick={check} className={cx(controlBase, 'top-[760px] left-[1354px] h-[280px] flex-col gap-[4px] rounded-[64px] bg-pill text-[44px]')}>
+        <Check aria-hidden="true" className="size-[72px]" strokeWidth={3.5} />
         ตรวจคำตอบ
       </button>
     </div>

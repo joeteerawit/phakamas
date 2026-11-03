@@ -14,21 +14,27 @@ export const pressable =
   'pointer-events-auto cursor-pointer select-none transition-transform duration-150 ease-out active:scale-95 motion-reduce:transition-none ' +
   'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-40'
 
-/** The Canva cream word card: 4px dashed brown border, rounded as on design page 2. */
-export const creamCard = 'rounded-[40px] border-4 border-dashed border-cream-border bg-cream'
+/**
+ * The shared comic card (`comic-card` in styles.css): ink outline, a slowly turning colourful ring, paper
+ * inside. Set `data-highlight` on it while it is selected or playing. Result cards use their own solid colours.
+ */
+export const creamCard = 'comic-card'
 
-/** The Canva orange 3D pill (Step 10 เรียนอีกครั้ง): place and size it at the call site. */
+/** Comic ink outline and hard shadow for pills, chips, counters and round buttons. */
+export const inked = 'border-comic-ink shadow-comic'
+
+/** The orange comic pill (Step 9 recorder, Step 10 เรียนอีกครั้ง): place and size it at the call site. */
 export const orangeButton =
-  `${pressable} flex h-[124px] items-center justify-center gap-[16px] rounded-full border-[6px] border-card bg-orange px-[40px] ` +
-  'font-heading text-[48px] font-bold whitespace-nowrap text-white shadow-orange-button active:translate-y-[6px] active:shadow-orange-button-pressed'
+  `${pressable} flex h-[124px] items-center justify-center gap-[16px] rounded-full border-[6px] border-comic-ink bg-orange px-[40px] ` +
+  'font-heading text-[48px] font-bold whitespace-nowrap text-comic-ink shadow-orange-button active:translate-y-[6px] active:shadow-orange-button-pressed'
 
-// MASTER.md Button: pill, 3px border, clay shadow, press = translateY(4px) +
+// MASTER.md Button in comic ink: pill, 4px ink border, hard shadow, press = translateY(4px) +
 // pressed shadow in 150ms, visible 3px focus ring.
 const base =
   'inline-flex shrink-0 cursor-pointer select-none items-center justify-center gap-(--space-sm) ' +
-  'rounded-full border-[3px] border-border font-sans font-semibold whitespace-nowrap shadow-clay ' +
+  'rounded-full border-4 border-comic-ink font-sans font-semibold whitespace-nowrap shadow-comic ' +
   'transition-[transform,box-shadow] duration-150 ease-out ' +
-  'active:translate-y-1 active:shadow-clay-pressed motion-reduce:transition-none ' +
+  'active:translate-y-1 active:shadow-comic-pressed motion-reduce:transition-none ' +
   'focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring ' +
   'disabled:cursor-not-allowed disabled:opacity-60'
 

@@ -23,7 +23,7 @@ test.describe('Step 8 rhyme matching', () => {
     expect(dang.x).toBeLessThan(rong.x)
     expect(mong.y).toBeLessThan(dang.y)
     expect(fang.y).toBeLessThan(rong.y)
-    await expect(word(page, 'มอง').locator('img[src="/assets/canva/ui/buzzer.webp"]')).toBeAttached()
+    await expect(word(page, 'มอง').locator('img[src="/assets/comic/ui-buzzer.webp"]')).toBeAttached()
   })
 
   test('pressing a buzzer plays its word and selects it', async ({ page }) => {

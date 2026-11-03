@@ -1,7 +1,7 @@
 import type { Lesson, SpottingWord, VocabularyWord, WordSelectionActivity } from './types.ts'
 
-// shortcut: some pictures are emoji or blank placeholders, the Step tickets overwrite them with Canva exports.
-const image = (slug: string) => `/assets/canva/vocabulary/${slug}.webp`
+// Comic picture cards (docs/comic-art.md).
+const image = (slug: string) => `/assets/comic/word-${slug}.webp`
 
 const word = (text: string, slug: string): VocabularyWord => ({
   word: text,

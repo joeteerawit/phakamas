@@ -2,14 +2,17 @@ import { Smartphone } from 'lucide-react'
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from 'react'
 import { MONKEY_SRC } from '../Mascot'
 import { Ambient } from './Ambient'
+import { ClickFeedback } from './ClickFeedback'
 import { fitStage, isPortrait, STAGE_HEIGHT, STAGE_WIDTH } from './fitStage'
 
-export type Scene = 'garden' | 'pond' | 'summary' | 'cover'
+export type Scene = 'garden' | 'pond' | 'summary' | 'step5' | 'cover'
 
 const sceneSrc: Record<Exclude<Scene, 'cover'>, string> = {
   garden: '/assets/canva/backgrounds/garden.webp',
   pond: '/assets/canva/backgrounds/pond.webp',
   summary: '/assets/canva/backgrounds/cover.webp',
+  // Calm comic flower garden (docs/comic-art.md).
+  step5: '/assets/comic/step5-scene.webp',
 }
 
 const StageScale = createContext(1)
@@ -77,6 +80,7 @@ export function Stage({ scene = 'garden', children }: { scene?: Scene; children:
         </StageScale.Provider>
       </div>
       {portrait && <RotateOverlay />}
+      <ClickFeedback />
     </div>
   )
 }
@@ -98,7 +102,7 @@ function RotateOverlay() {
       <img src={MONKEY_SRC} alt="" draggable={false} className="pointer-events-none h-40 w-auto object-contain select-none" />
       <p
         id="rotate-message"
-        className="rounded-full bg-pill px-(--space-md) py-(--space-sm) font-heading text-body-lg font-bold whitespace-nowrap text-navy"
+        className="rounded-full border-4 border-comic-ink bg-pill px-(--space-md) py-(--space-sm) shadow-comic font-heading text-body-lg font-bold whitespace-nowrap text-navy"
       >
         กรุณาหมุนจอเป็นแนวนอน
       </p>

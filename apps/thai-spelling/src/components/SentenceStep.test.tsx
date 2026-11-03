@@ -24,10 +24,10 @@ describe('Step 9 sentence boards', () => {
     expect(board(1)).toHaveTextContent('ลิงน้อยนั่งมองช้าง')
     expect(board(2)).toHaveTextContent('บ่างวิ่งไล่ตามมา')
     expect(within(board(1)).getAllByRole('presentation').map((img) => img.getAttribute('src'))).toEqual([
-      '/assets/canva/vocabulary/ling.webp',
-      '/assets/canva/vocabulary/chang.webp',
+      '/assets/comic/word-ling.webp',
+      '/assets/comic/word-chang.webp',
     ])
-    expect(within(board(2)).getByRole('presentation')).toHaveAttribute('src', '/assets/canva/vocabulary/bang.webp')
+    expect(within(board(2)).getByRole('presentation')).toHaveAttribute('src', '/assets/comic/word-bang.webp')
   })
 
   it('highlights the words one by one, evenly over the clip, while the sentence plays', () => {
