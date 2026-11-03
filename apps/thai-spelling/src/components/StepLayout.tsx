@@ -111,7 +111,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
       )}
 
       {/* Every Step marks its root data-full-stage and is laid out over the whole stage in design pixels (Step 6 portals onto the stage). */}
-      <main className="absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto has-[[data-full-stage]]:pointer-events-none has-[[data-full-stage]]:inset-0 has-[[data-full-stage]]:overflow-hidden">
+      <main className={`absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto has-[[data-full-stage]]:pointer-events-none has-[[data-full-stage]]:inset-0 ${isFirst ? 'has-[[data-full-stage]]:overflow-visible' : 'has-[[data-full-stage]]:overflow-hidden'}`}>
         {/* #18: the old Step slides out and the next slides in, in the travel direction; a fade with reduced motion. */}
         {/* No AnimatePresence initial={false}: it would also freeze every looping animation inside the first Step. */}
         <AnimatePresence mode="wait" custom={{ direction, reduceMotion }}>

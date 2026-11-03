@@ -8,11 +8,11 @@ const sign = (page: Page) => page.getByTestId('cover-sign')
 
 const transformOf = (locator: Locator) => locator.evaluate((el) => getComputedStyle(el).transform)
 
-test('the cover is design page 1: separate background, sign and Mascot, live text, ▶ instead of Next', async ({ page }) => {
+test('the cover has a separate scene, sign and Mascot, live text, ▶ instead of Next', async ({ page }) => {
   await page.goto('/lesson/mae-kong/1')
-  await expect(page.getByTestId('stage')).toHaveCSS('background-image', /backgrounds\/cover\.webp/)
-  await expect(sign(page).locator('img')).toHaveAttribute('src', /cover\/sign\.webp/)
-  await expect(mascot(page).locator('img')).toHaveAttribute('src', /cover\/monkey\.webp/)
+  await expect(page.getByTestId('cover-decor').locator('img').first()).toHaveAttribute('src', /comic\/cover-scene\.webp/)
+  await expect(sign(page).locator('img')).toHaveAttribute('src', /comic\/cover-sign\.webp/)
+  await expect(mascot(page).locator('img')).toHaveAttribute('src', /comic\/mascot-swing\.webp/)
   await expect(page.getByRole('heading', { level: 2 })).toHaveText('คำคล้องจองพาเพลิน')
   await expect(page.getByText('แม่ กง (ง)')).toBeVisible()
   await expect(page.getByText('วิชาภาษาไทย ชั้นประถมศึกษาปีที่ ๒')).toBeVisible()

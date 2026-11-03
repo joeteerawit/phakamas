@@ -51,6 +51,9 @@
   --color-letterbox-grass: #4c9a3c;
   /* Cover subtitle pill (design page 1). */
   --color-cover-pill: #ff66c4;
+  --color-comic-ink: #111111;
+  --color-comic-pill: #ffd6ec;
+  --color-comic-red: #d4141a;
   /* Step 6 word chips: a paler cream than the cards. */
   --color-cream-light: #fff6b3;
   /* Step 5 card marked wrong (always with a ✗ badge). */
@@ -113,6 +116,33 @@
   @keyframes cloud-drift {
     from { transform: translateX(-420px); }
     to { transform: translateX(1940px); }
+  }
+  /* Step 1 scene (docs/comic-art.md). */
+  --animate-sun-pulse: sun-pulse 3s ease-in-out infinite alternate;
+  @keyframes sun-pulse {
+    from { transform: scale(1) rotate(-3deg); }
+    to { transform: scale(1.07) rotate(3deg); }
+  }
+  --animate-amble: amble 9s ease-in-out infinite alternate;
+  @keyframes amble {
+    from { transform: translateX(-30px) rotate(-1deg); }
+    50% { transform: translateX(0) rotate(1.5deg); }
+    to { transform: translateX(40px) rotate(-1deg); }
+  }
+  --animate-hop: hop 2.8s ease-out infinite;
+  @keyframes hop {
+    0%, 55%, 100% { transform: translateY(0) scaleY(1); }
+    62% { transform: translateY(0) scaleY(0.9); }
+    75% { transform: translateY(-46px) scaleY(1.04); }
+    90% { transform: translateY(0) scaleY(0.94); }
+  }
+  --animate-flutter: flutter 7s ease-in-out infinite;
+  @keyframes flutter {
+    0%, 100% { transform: translate(0, 0) scaleX(1); }
+    12%, 37%, 62%, 87% { transform: translate(14px, -18px) scaleX(0.55); }
+    25% { transform: translate(40px, -30px) scaleX(1); }
+    50% { transform: translate(10px, -46px) scaleX(1); }
+    75% { transform: translate(-30px, -20px) scaleX(1); }
   }
   --animate-sway: sway 4s ease-in-out infinite alternate;
   @keyframes sway {

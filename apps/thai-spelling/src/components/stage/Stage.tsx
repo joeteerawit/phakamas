@@ -6,15 +6,21 @@ import { fitStage, isPortrait, STAGE_HEIGHT, STAGE_WIDTH } from './fitStage'
 
 export type Scene = 'garden' | 'pond' | 'cover'
 
-const sceneSrc: Record<Scene, string> = {
+const sceneSrc: Record<Exclude<Scene, 'cover'>, string> = {
   garden: '/assets/canva/backgrounds/garden.webp',
   pond: '/assets/canva/backgrounds/pond.webp',
-  cover: '/assets/canva/backgrounds/cover.webp',
 }
 
 const StageScale = createContext(1)
 /** Current stage scale; client-pixel pointer travel ÷ scale = stage pixels. */
 export const useStageScale = () => useContext(StageScale)
+
+const StageBleed = createContext({ scale: 1, x: 0, y: 0 })
+/**
+ * How the window extends past the stage: `scale` about the stage centre makes a decor layer cover
+ * the window, and `x`/`y` are the stage pixels between each stage edge and the window edge.
+ */
+export const useStageBleed = () => useContext(StageBleed)
 
 const subscribe = (onChange: () => void) => {
   window.addEventListener('resize', onChange)
@@ -30,24 +36,33 @@ export function Stage({ scene = 'garden', children }: { scene?: Scene; children:
   const height = useSyncExternalStore(subscribe, () => window.innerHeight)
   const portrait = isPortrait(width, height)
   const { scale, left, top } = fitStage(width, height)
+  // The comic cover draws its own scene and decor past the stage edge, so it has no letterbox.
+  const bleeds = scene === 'cover'
+  const bleed = {
+    scale: Math.max(width / STAGE_WIDTH, height / STAGE_HEIGHT) / scale,
+    x: (width / scale - STAGE_WIDTH) / 2,
+    y: (height / scale - STAGE_HEIGHT) / 2,
+  }
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-linear-to-b from-letterbox-sky to-letterbox-grass">
       <div
         data-testid="stage"
         inert={portrait}
-        className="absolute origin-top-left overflow-hidden bg-cover"
+        className={`absolute origin-top-left bg-cover ${bleeds ? '' : 'overflow-hidden'}`}
         style={{
           width: STAGE_WIDTH,
           height: STAGE_HEIGHT,
           left,
           top,
           transform: `scale(${scale})`,
-          backgroundImage: `url(${sceneSrc[scene]})`,
+          backgroundImage: scene === 'cover' ? undefined : `url(${sceneSrc[scene]})`,
         }}
       >
-        <Ambient scene={scene} />
-        <StageScale.Provider value={scale}>{children}</StageScale.Provider>
+        {!bleeds && <Ambient scene={scene} />}
+        <StageScale.Provider value={scale}>
+          <StageBleed.Provider value={bleed}>{children}</StageBleed.Provider>
+        </StageScale.Provider>
       </div>
       {portrait && <RotateOverlay />}
     </div>
