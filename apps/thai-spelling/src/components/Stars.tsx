@@ -66,12 +66,21 @@ export function Celebration({ lesson, shakeTarget }: { lesson: Lesson; shakeTarg
 const STEP5_STARS = { x: 960, y: 610 }
 const STEP5_TO_COUNTER = { x: 550 - STEP5_STARS.x, y: 86 - STEP5_STARS.y }
 const SHAKE_PX = [0, -18, 18, -14, 14, -8, 8, 0]
+// Step 5's burst and Stars cover the middle cards, so they are done by 1.2 s and the results show again:
+// the Stars fly at 0.6 s for 0.6 s, the burst fades out from 1.0 s, and both are gone at 1.2 s.
+// The Mascot and confetti stay for the full CELEBRATION_MS.
+const STEP5_FLY_AT_MS = 600
+const STEP5_FLY_S = 0.6
+const STEP5_BURST_OUT_MS = 1000
+const STEP5_BURST_FADE_S = 0.2
+const STEP5_EFFECT_MS = 1200
 
 /**
- * Step 5's check feedback (#35). Full marks: a comic เก่งมาก! burst in live text, a brief shake of the Step,
- * confetti, the Stars flying to their counter and the Mascot jumping for joy. Below full marks only the
- * Mascot's thumbs up shows, beside the score toast. The Mascot stays in the stage's left margin, clear of the
- * cards and both buttons, and nothing here takes a tap. Reduced motion: no shake, flight or confetti.
+ * Step 5's check feedback (#35). Full marks: เก่งมาก! plays, a comic เก่งมาก! burst in live text, a brief shake
+ * of the Step, confetti, the Stars flying to their counter and the Mascot jumping for joy; the burst and Stars
+ * are gone after 1.2 s. Below full marks only the Mascot's thumbs up shows, beside the score toast, and no
+ * clip plays. The Mascot stays in the stage's left margin, clear of the cards and both buttons, and nothing
+ * here takes a tap. Reduced motion: no shake, flight or confetti.
  */
 function CheckFeedback({
   fullMarks,
@@ -87,15 +96,19 @@ function CheckFeedback({
   const still = useReducedMotion()
   const bleed = useStageBleed()
   const [flying, setFlying] = useState(false)
+  const [burstShown, setBurstShown] = useState(true)
+  const [starsShown, setStarsShown] = useState(true)
   useEffect(() => {
-    playClip(clip)
-    const fly = setTimeout(() => setFlying(true), FLY_AT_MS)
-    const end = setTimeout(endCelebration, CELEBRATION_MS)
-    return () => {
-      clearTimeout(fly)
-      clearTimeout(end)
-    }
-  }, [clip])
+    // The praise clip says เก่งมาก!, so it only plays when the toast says so too.
+    if (fullMarks) playClip(clip)
+    const timers = [
+      setTimeout(() => setFlying(true), STEP5_FLY_AT_MS),
+      setTimeout(() => setBurstShown(false), STEP5_BURST_OUT_MS),
+      setTimeout(() => setStarsShown(false), STEP5_EFFECT_MS),
+      setTimeout(endCelebration, CELEBRATION_MS),
+    ]
+    return () => timers.forEach(clearTimeout)
+  }, [clip, fullMarks])
   useEffect(() => {
     const target = shakeTarget.current
     if (!fullMarks || still || !target) return
@@ -117,21 +130,23 @@ function CheckFeedback({
         <>
           {!still && <Confetti />}
           <span className="sr-only">ได้ {stars} ดาว</span>
-          <ComicBurst />
-          <motion.div
-            data-testid="celebration-stars"
-            aria-hidden="true"
-            className="absolute flex h-[160px] w-[800px] -translate-1/2 items-center justify-center gap-[16px] text-[128px] leading-none drop-shadow-[6px_8px_0_var(--color-comic-ink)]"
-            style={{ left: STEP5_STARS.x, top: STEP5_STARS.y }}
-            animate={flying && !still ? { x: STEP5_TO_COUNTER.x - bleed.x, y: STEP5_TO_COUNTER.y - bleed.y, scale: 0.15, opacity: 0 } : undefined}
-            transition={{ duration: 0.6, ease: 'easeIn' }}
-          >
-            {Array.from({ length: stars }, (_, i) => (
-              <motion.span key={i} {...popIn(i + 2, !!still)}>
-                ⭐
-              </motion.span>
-            ))}
-          </motion.div>
+          <AnimatePresence>{burstShown && <ComicBurst />}</AnimatePresence>
+          {starsShown && (
+            <motion.div
+              data-testid="celebration-stars"
+              aria-hidden="true"
+              className="absolute flex h-[160px] w-[800px] -translate-1/2 items-center justify-center gap-[16px] text-[128px] leading-none drop-shadow-[6px_8px_0_var(--color-comic-ink)]"
+              style={{ left: STEP5_STARS.x, top: STEP5_STARS.y }}
+              animate={flying && !still ? { x: STEP5_TO_COUNTER.x - bleed.x, y: STEP5_TO_COUNTER.y - bleed.y, scale: 0.15, opacity: 0 } : undefined}
+              transition={{ duration: STEP5_FLY_S, ease: 'easeIn' }}
+            >
+              {Array.from({ length: stars }, (_, i) => (
+                <motion.span key={i} {...popIn(i + 1, !!still)}>
+                  ⭐
+                </motion.span>
+              ))}
+            </motion.div>
+          )}
         </>
       )}
       <ReactionMascot pose={fullMarks ? 'cheer' : 'encourage'} />
@@ -158,6 +173,7 @@ function ComicBurst() {
       className="absolute top-[180px] left-[460px] flex h-[500px] w-[1000px] items-start justify-center pt-[118px]"
       initial={still ? false : { scale: 0.2, rotate: -14, opacity: 0 }}
       animate={{ scale: 1, rotate: -4, opacity: 1 }}
+      exit={{ opacity: 0, ...(still ? {} : { scale: 0.8 }), transition: { duration: STEP5_BURST_FADE_S, ease: 'easeIn' } }}
       transition={still ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 14 }}
     >
       <svg aria-hidden="true" viewBox="-100 -62 200 124" className="absolute inset-0 size-full overflow-visible">

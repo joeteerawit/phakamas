@@ -19,8 +19,9 @@ test('completing each Activity celebrates and fills the Star counter', async ({ 
   await expect(page.getByTestId('mascot-reaction')).toHaveAttribute('data-pose', 'encourage')
   await expect(page.getByTestId('mascot-reaction').locator('img')).toBeVisible()
   await expect(celebration(page)).toHaveCount(0)
-  await expect.poll(() => audioLog(page)).toContain('play:/assets/audio/feedback/keng-mak.mp3')
   await expect(counter(page)).toContainText('2/9')
+  // เก่งมาก! plays only at full marks; the toast says ลองใหม่นะ here.
+  expect(await audioLog(page)).not.toContain('play:/assets/audio/feedback/keng-mak.mp3')
   // It goes by itself after 2.5 s.
   await expect(page.getByTestId('mascot-reaction')).toHaveCount(0, { timeout: 4000 })
 

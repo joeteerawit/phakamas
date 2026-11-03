@@ -76,13 +76,20 @@ test('full marks plays the burst, shake, Star flight and cheer pose; the burst i
   await open(page, 5)
   await fullMarks(page)
   const counterBox = (await counter(page).boundingBox())!
-  const samples = await sampleEffects(page, () => check(page).click(), 2200)
+  // The burst is gone after 1.2 s, so it is checked while it shows; the Star flight ends by then too.
+  const samples = await sampleEffects(
+    page,
+    async () => {
+      await check(page).click()
+      // The burst's เก่งมาก! is live text in the heading font, not part of an image.
+      await expect(burst(page)).toBeVisible()
+      await expect(burst(page).getByText('เก่งมาก!', { exact: true })).toBeVisible()
+      const font = await burst(page).getByText('เก่งมาก!', { exact: true }).evaluate((el) => getComputedStyle(el).fontFamily)
+      expect(font).toMatch(/^"?Mali/)
+    },
+    1400,
+  )
 
-  // The burst's เก่งมาก! is live text in the heading font, not part of an image.
-  await expect(burst(page)).toBeVisible()
-  await expect(burst(page).getByText('เก่งมาก!', { exact: true })).toBeVisible()
-  const font = await burst(page).getByText('เก่งมาก!', { exact: true }).evaluate((el) => getComputedStyle(el).fontFamily)
-  expect(font).toMatch(/^"?Mali/)
   await expect(reaction(page)).toHaveAttribute('data-pose', 'cheer')
   await expect(reaction(page).locator('img')).toHaveAttribute('src', /\/assets\/comic\/mascot-cheer\.webp$/)
 
@@ -123,6 +130,69 @@ test('below full marks shows only the encouraging Mascot, and the score toast st
   await expect(counter(page)).toContainText('2/9')
 })
 
+test('below full marks the check plays no clip: no เก่งมาก! under a ลองใหม่นะ toast', async ({ page }) => {
+  await open(page, 5)
+  await partialMarks(page)
+  const before = (await audioLog(page)).length
+  await check(page).click()
+  await expect(toast(page)).toContainText('ได้ 8/12 คะแนน ลองใหม่นะ')
+  await expect(reaction(page)).toHaveAttribute('data-pose', 'encourage')
+  // Past the whole reaction (2.5 s), nothing new has played.
+  await expect(reaction(page)).toHaveCount(0, { timeout: 4000 })
+  expect((await audioLog(page)).slice(before)).toEqual([])
+})
+
+test('full marks: the check plays เก่งมาก! once', async ({ page }) => {
+  await open(page, 5)
+  await fullMarks(page)
+  const before = (await audioLog(page)).length
+  await check(page).click()
+  await expect(toast(page)).toContainText('เก่งมาก! ได้ 12/12 คะแนน')
+  // It cuts off the last card's word, so only plays are counted.
+  const played = async () => (await audioLog(page)).slice(before).filter((entry) => entry.startsWith('play:'))
+  await expect.poll(played).toEqual([PRAISE])
+})
+
+test('full marks: the burst and Stars are gone within 1.6 s of the check, the Mascot and confetti stay', async ({ page }) => {
+  await open(page, 5)
+  await fullMarks(page)
+  // Browser-clock times: the check tap, and every frame whether the burst and Stars are in the page.
+  await page.evaluate(() => {
+    const w = window as unknown as { checkAt: number; frames: { t: number; burst: boolean; stars: boolean }[]; sampling: boolean }
+    w.frames = []
+    w.sampling = true
+    document.addEventListener('click', () => (w.checkAt ??= performance.now()), { capture: true })
+    const tick = (t: number) => {
+      w.frames.push({
+        t,
+        burst: !!document.querySelector('[data-testid="comic-burst"]'),
+        stars: !!document.querySelector('[data-testid="celebration-stars"]'),
+      })
+      if (w.sampling) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  })
+  await check(page).click()
+  await expect(burst(page)).toBeVisible()
+  await expect(burst(page)).toHaveCount(0, { timeout: 1600 })
+  await expect(page.getByTestId('celebration-stars')).toHaveCount(0)
+  // The Mascot cheer and confetti still run their full 2.5 s.
+  await expect(reaction(page)).toHaveAttribute('data-pose', 'cheer')
+  await expect(page.getByTestId('confetti')).toHaveCount(1)
+
+  const { checkAt, frames } = await page.evaluate(() => {
+    const w = window as unknown as { checkAt: number; frames: { t: number; burst: boolean; stars: boolean }[]; sampling: boolean }
+    w.sampling = false
+    return { checkAt: w.checkAt, frames: w.frames }
+  })
+  const after = frames.filter((f) => f.t >= checkAt)
+  const shownAt = after.findIndex((f) => f.burst && f.stars)
+  expect(shownAt, 'the burst and Stars showed').toBeGreaterThanOrEqual(0)
+  const gone = after.slice(shownAt).find((f) => !f.burst && !f.stars)
+  expect(gone, 'the burst and Stars went').toBeDefined()
+  expect(gone!.t - checkAt, 'ms from the check until the burst and Stars are gone').toBeLessThan(1600)
+})
+
 for (const viewport of [
   { width: 844, height: 390 },
   { width: 1920, height: 1080 },
@@ -144,7 +214,9 @@ for (const viewport of [
       await expect(reaction(page), 'the effect was still playing').toBeVisible()
       await expect(choice(page, 'เงา')).toHaveAttribute('aria-pressed', 'true')
       await expect.poll(async () => (await audioLog(page)).slice(before)).toContain('play:/assets/audio/vocabulary/ngao.mp3')
-      expect(await audioLog(page)).toContain(PRAISE)
+      // เก่งมาก! plays only at full marks.
+      if (marks === 'full') expect(await audioLog(page)).toContain(PRAISE)
+      else expect(await audioLog(page)).not.toContain(PRAISE)
 
       await expectUncovered(page, boxes, [...cards, check(page), restart(page)])
       await restart(page).click()
@@ -159,9 +231,16 @@ test.describe('with reduced motion', () => {
   test('full marks: no shake and no Star flight, and the results still show', async ({ page }) => {
     await open(page, 5)
     await fullMarks(page)
-    const samples = await sampleEffects(page, () => check(page).click(), 2200)
+    // The burst and Stars are gone after 1.2 s, so the burst is checked while it shows.
+    const samples = await sampleEffects(
+      page,
+      async () => {
+        await check(page).click()
+        await expect(burst(page).getByText('เก่งมาก!', { exact: true })).toBeVisible()
+      },
+      1400,
+    )
     await expect(celebration(page)).toContainText('ได้ 3 ดาว')
-    await expect(burst(page).getByText('เก่งมาก!', { exact: true })).toBeVisible()
     await expect(page.getByTestId('confetti')).toHaveCount(0)
     expect(samples.every((s) => s.shake === 0), 'no shake').toBe(true)
     const stars = samples.flatMap((s) => (s.stars ? [s.stars] : []))
