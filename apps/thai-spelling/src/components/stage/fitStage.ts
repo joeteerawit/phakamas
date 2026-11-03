@@ -2,7 +2,7 @@
 export const STAGE_WIDTH = 1920
 export const STAGE_HEIGHT = 1080
 
-/** Uniform scale and offset that fit the stage inside the window, centred (letterboxed). */
+/** Uniform scale and offset that fit the stage inside the window, centred; the scene covers the rest of the window. */
 export function fitStage(viewportWidth: number, viewportHeight: number) {
   const scale = Math.min(viewportWidth / STAGE_WIDTH, viewportHeight / STAGE_HEIGHT)
   return {

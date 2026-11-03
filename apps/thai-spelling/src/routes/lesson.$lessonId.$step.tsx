@@ -8,7 +8,7 @@ import { DEFAULT_LESSON_ID, getLesson, parseStepNumber } from '../lessons'
 import { useLessonSession } from '../session/lessonSession'
 
 /** Stage background per Step; unlisted Steps use the garden. */
-const stepScenes: Partial<Record<number, Scene>> = { 1: 'cover', 3: 'pond', 4: 'pond', 7: 'pond', 8: 'pond', 10: 'cover' }
+const stepScenes: Partial<Record<number, Scene>> = { 1: 'cover', 3: 'pond', 4: 'pond', 7: 'pond', 8: 'pond', 10: 'summary' }
 
 export const Route = createFileRoute('/lesson/$lessonId/$step')({
   beforeLoad: ({ params }) => {

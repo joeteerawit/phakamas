@@ -72,7 +72,7 @@ export function CoverStep({ lesson }: StepProps) {
       </motion.div>
 
       {/* Buttons sit in the window's corners, whatever its shape. */}
-      <div className="absolute" style={{ inset: `${-bleed.y}px ${-bleed.x}px` }}>
+      <div className="absolute" style={{ inset: bleed.inset }}>
         {/* Background music on/off (#20); the choice is saved with the Session store. */}
         <button
           type="button"

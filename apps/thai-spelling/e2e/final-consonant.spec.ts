@@ -11,7 +11,7 @@ test.describe('Step 4 final-consonant spotting', () => {
   test('shows set 1 on the pond with red final ง and spelling pills from the Lesson', async ({ page }) => {
     await open(page, 4)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('สังเกตตัวสะกด')
-    await expect(page.getByTestId('stage')).toHaveCSS('background-image', /pond\.webp/)
+    await expect(page.getByTestId('stage-scene')).toHaveCSS('background-image', /pond\.webp/)
     for (const word of ['ลิง', 'ช้าง', 'ดัง']) await expect(card(page, word)).toBeVisible()
     await expect(card(page, 'รัง')).toHaveCount(0)
     await expect(card(page, 'ช้าง').getByText('ง', { exact: true })).toHaveCSS('color', RED)

@@ -31,6 +31,32 @@ for (const viewport of [
   })
 }
 
+for (const viewport of [
+  { width: 844, height: 390 },
+  { width: 1024, height: 768 },
+  { width: 2560, height: 1080 },
+]) {
+  test(`every Step fills ${viewport.width}×${viewport.height}: no letterbox, buttons in the corners`, async ({ page }) => {
+    await page.setViewportSize(viewport)
+    const scale = Math.min(viewport.width / 1920, viewport.height / 1080)
+    for (let step = 2; step <= 10; step++) {
+      await page.goto(`/lesson/mae-kong/${step}`)
+      const scene = (await page.getByTestId('stage-scene').boundingBox())!
+      expect(scene.x, `Step ${step} scene`).toBeLessThanOrEqual(0.5)
+      expect(scene.y, `Step ${step} scene`).toBeLessThanOrEqual(0.5)
+      expect(scene.x + scene.width, `Step ${step} scene`).toBeGreaterThanOrEqual(viewport.width - 0.5)
+      expect(scene.y + scene.height, `Step ${step} scene`).toBeGreaterThanOrEqual(viewport.height - 0.5)
+
+      const home = (await page.getByRole('link', { name: 'กลับไปขั้นแรก' }).boundingBox())!
+      expect(viewport.width - home.x - home.width).toBeCloseTo(20 * scale, 0)
+      expect(home.y).toBeCloseTo(23 * scale, 0)
+      const back = (await page.getByRole('link', { name: 'ย้อนกลับ' }).boundingBox())!
+      expect(back.x).toBeCloseTo(29 * scale, 0)
+      expect(viewport.height - back.y - back.height).toBeCloseTo(13 * scale, 0)
+    }
+  })
+}
+
 test('chrome buttons are at least 44px on a 390px-tall landscape phone', async ({ page }) => {
   await page.setViewportSize({ width: 844, height: 390 })
   await page.goto('/lesson/mae-kong/5')

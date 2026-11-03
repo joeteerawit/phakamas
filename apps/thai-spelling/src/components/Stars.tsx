@@ -8,6 +8,7 @@ import { useLessonSession } from '../session/lessonSession'
 import { activityStars, lessonStars } from '../session/stars'
 import { MONKEY_SRC } from './Mascot'
 import { popIn } from './motion/PopIn'
+import { useStageBleed } from './stage/Stage'
 
 /** The Activity being celebrated; not persisted. */
 const useCelebration = create<{ activityId: ActivityId | null }>(() => ({ activityId: null }))
@@ -52,6 +53,7 @@ export function Celebration({ lesson }: { lesson: Lesson }) {
 
 function Burst({ stars, clip }: { stars: number; clip: AudioClip }) {
   const still = useReducedMotion()
+  const bleed = useStageBleed()
   const [flying, setFlying] = useState(false)
   useEffect(() => {
     playClip(clip)
@@ -66,17 +68,19 @@ function Burst({ stars, clip }: { stars: number; clip: AudioClip }) {
   return (
     <motion.div
       data-testid="celebration"
-      className="absolute inset-0 z-40 cursor-pointer bg-navy/15"
+      className="absolute inset-0 z-40 cursor-pointer"
       onClick={endCelebration}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
     >
+      {/* Tint and tap target reach the window's edges. */}
+      <div className="absolute bg-navy/15" style={{ inset: `${-bleed.y}px ${-bleed.x}px` }} />
       {!still && <Confetti />}
       <span className="sr-only">ได้ {stars} ดาว</span>
       <motion.div
         aria-hidden="true"
         className="absolute top-[330px] left-[460px] flex h-[300px] w-[1000px] items-center justify-center gap-[24px] text-[220px] leading-none drop-shadow-[0_10px_0_rgba(0,0,0,0.2)]"
-        animate={flying && !still ? { ...TO_COUNTER, scale: 0.15, opacity: 0 } : undefined}
+        animate={flying && !still ? { x: TO_COUNTER.x - bleed.x, y: TO_COUNTER.y - bleed.y, scale: 0.15, opacity: 0 } : undefined}
         transition={{ duration: 0.6, ease: 'easeIn' }}
       >
         {Array.from({ length: stars }, (_, i) => (

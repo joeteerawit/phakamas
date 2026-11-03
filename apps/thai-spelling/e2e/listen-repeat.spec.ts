@@ -102,7 +102,7 @@ test.describe('Step 3 listen and repeat', () => {
 
   test('sits on the pond scene with a cream word card', async ({ page }) => {
     await open(page, 3)
-    await expect(page.getByTestId('stage')).toHaveCSS('background-image', /pond\.webp/)
+    await expect(page.getByTestId('stage-scene')).toHaveCSS('background-image', /pond\.webp/)
     await expect(wordCard(page)).toHaveCSS('background-color', 'rgb(255, 233, 141)')
   })
 

@@ -7,6 +7,7 @@ Art for the comic-art experiment (#30). Files live in `public/assets/comic/`. St
 Decided by the owner on 2026-11-03: a plain background is not enough, it must interest children.
 
 - A scene has many objects and they move: animals, plants, sky.
+- Steps where students read or choose words stay calmer: fewer objects, moving more slowly (owner decision, 2026-11-03).
 - Prefer objects from the Lesson's own words, such as ช้าง and ผึ้ง for แม่กง.
 - Scene objects stay behind the sign, words and buttons, so nothing moving crosses what a student reads or taps.
 - Movement is gentle and loops. Under reduced motion the scene is still.

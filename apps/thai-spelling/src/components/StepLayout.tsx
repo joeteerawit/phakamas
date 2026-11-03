@@ -9,7 +9,7 @@ import { lessonActivities, useUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { cx, pressable as pressFeedback } from './clay/buttonClass'
 import { FeedbackToast, type Feedback } from './clay/FeedbackToast'
-import { Stage, type Scene } from './stage/Stage'
+import { Stage, useStageBleed, type Scene } from './stage/Stage'
 import { Celebration, endCelebration, StarCounter } from './Stars'
 
 /** Shared chrome exported from Canva (docs/canva-assets.md). */
@@ -62,53 +62,55 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
 
   return (
     <Stage scene={scene}>
-      {isFirst ? (
-        // The cover's visible heading is the Lesson title; the Step title stays the h1.
-        <h1 className="sr-only">{title}</h1>
-      ) : (
-        <div
-          className="absolute top-[29px] left-[47px] flex h-[115px] w-[382px] items-center justify-center bg-contain bg-center bg-no-repeat px-[24px]"
-          style={{ backgroundImage: `url(${CHROME}/title-sign.webp)` }}
-        >
-          <h1 className="truncate font-heading text-[38px] leading-[1.4] font-bold text-navy">{title}</h1>
-        </div>
-      )}
+      <WindowEdges>
+        {isFirst ? (
+          // The cover's visible heading is the Lesson title; the Step title stays the h1.
+          <h1 className="sr-only">{title}</h1>
+        ) : (
+          <div
+            className="absolute top-[29px] left-[47px] flex h-[115px] w-[382px] items-center justify-center bg-contain bg-center bg-no-repeat px-[24px]"
+            style={{ backgroundImage: `url(${CHROME}/title-sign.webp)` }}
+          >
+            <h1 className="truncate font-heading text-[38px] leading-[1.4] font-bold text-navy">{title}</h1>
+          </div>
+        )}
 
-      {(activity || isLast) && <StarCounter lesson={lesson} />}
+        {(activity || isLast) && <StarCounter lesson={lesson} />}
 
-      {/* Design page 1 has no Step badge; the cover keeps it for screen readers. */}
-      <p className={isFirst ? 'sr-only' : 'absolute top-[52px] left-1/2 -translate-x-1/2 rounded-full border-4 border-card bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold whitespace-nowrap text-navy'}>
-        ขั้น {stepNumber}/{totalSteps}
-      </p>
+        {/* Design page 1 has no Step badge; the cover keeps it for screen readers. */}
+        <p className={isFirst ? 'sr-only' : 'absolute top-[52px] left-1/2 -translate-x-1/2 rounded-full border-4 border-card bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold whitespace-nowrap text-navy'}>
+          ขั้น {stepNumber}/{totalSteps}
+        </p>
 
-      {/* The cover has its own music speaker. */}
-      {!isFirst && (
-        <button
-          type="button"
-          aria-label={musicOn ? 'ปิดเพลง' : 'เปิดเพลง'}
-          aria-pressed={musicOn}
-          onClick={toggleMusic}
-          className={`${pressable} z-10 top-[32px] left-[1620px] flex size-[122px] items-center justify-center rounded-full border-[6px] border-card bg-pill text-navy`}
-        >
-          {musicOn ? (
-            <Volume2 aria-hidden="true" className="size-16" strokeWidth={2.5} />
-          ) : (
-            <VolumeX aria-hidden="true" className="size-16" strokeWidth={2.5} />
-          )}
-        </button>
-      )}
+        {/* The cover has its own music speaker. */}
+        {!isFirst && (
+          <button
+            type="button"
+            aria-label={musicOn ? 'ปิดเพลง' : 'เปิดเพลง'}
+            aria-pressed={musicOn}
+            onClick={toggleMusic}
+            className={`${pressable} z-10 top-[32px] right-[178px] flex size-[122px] items-center justify-center rounded-full border-[6px] border-card bg-pill text-navy`}
+          >
+            {musicOn ? (
+              <Volume2 aria-hidden="true" className="size-16" strokeWidth={2.5} />
+            ) : (
+              <VolumeX aria-hidden="true" className="size-16" strokeWidth={2.5} />
+            )}
+          </button>
+        )}
 
-      {!isFirst && (
-        <Link
-          to="/lesson/$lessonId/$step"
-          params={stepParams(1)}
-          aria-label="กลับไปขั้นแรก"
-          className={`${pressable} top-[23px] left-[1765px] h-[140px] w-[135px]`}
-          onClick={resetSession}
-        >
-          <img src={`${CHROME}/home-button.webp`} alt="" draggable={false} className={chromeImage} />
-        </Link>
-      )}
+        {!isFirst && (
+          <Link
+            to="/lesson/$lessonId/$step"
+            params={stepParams(1)}
+            aria-label="กลับไปขั้นแรก"
+            className={`${pressable} top-[23px] right-[20px] h-[140px] w-[135px]`}
+            onClick={resetSession}
+          >
+            <img src={`${CHROME}/home-button.webp`} alt="" draggable={false} className={chromeImage} />
+          </Link>
+        )}
+      </WindowEdges>
 
       {/* Every Step marks its root data-full-stage and is laid out over the whole stage in design pixels (Step 6 portals onto the stage). */}
       <main className={`absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto has-[[data-full-stage]]:pointer-events-none has-[[data-full-stage]]:inset-0 ${isFirst ? 'has-[[data-full-stage]]:overflow-visible' : 'has-[[data-full-stage]]:overflow-hidden'}`}>
@@ -121,13 +123,13 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
         </AnimatePresence>
       </main>
 
-      <nav aria-label="เปลี่ยนขั้น">
+      <WindowEdges as="nav" label="เปลี่ยนขั้น">
         {!isFirst && (
           <Link
             to="/lesson/$lessonId/$step"
             params={stepParams(stepNumber - 1)}
             aria-label="ย้อนกลับ"
-            className={`${pressable} top-[904px] left-[29px] h-[163px] w-[158px]`}
+            className={`${pressable} bottom-[13px] left-[29px] h-[163px] w-[158px]`}
           >
             <img src={`${CHROME}/back-button.webp`} alt="" draggable={false} className={chromeImage} />
           </Link>
@@ -139,16 +141,26 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
             params={stepParams(isLast ? 1 : stepNumber + 1)}
             aria-label={isLast ? 'กลับหน้าแรก' : 'ถัดไป'}
             onClick={isLast ? undefined : leaveViaNext}
-            className={`${pressable} top-[915px] left-[1738px] h-[152px] w-[148px]`}
+            className={`${pressable} right-[34px] bottom-[13px] h-[152px] w-[148px]`}
           >
             <img src={`${CHROME}/next-button.webp`} alt="" draggable={false} className={chromeImage} />
           </Link>
         )}
-      </nav>
+      </WindowEdges>
 
       <Celebration lesson={lesson} />
       <FeedbackToast feedback={feedback} className="absolute inset-x-0 bottom-[48px] z-30 flex justify-center" />
     </Stage>
+  )
+}
+
+/** Stretches to the window's edges, so what it holds stays in the window's corners on any device. */
+function WindowEdges({ as: Tag = 'div', label, children }: { as?: 'div' | 'nav'; label?: string; children: ReactNode }) {
+  const { inset } = useStageBleed()
+  return (
+    <Tag aria-label={label} className="pointer-events-none absolute" style={{ inset }}>
+      {children}
+    </Tag>
   )
 }
 
