@@ -7,6 +7,7 @@ import { scoreFeedback, useClearFeedbackOnLeave } from '../activities/feedback'
 import { lessonActivity, useReportUncheckedWork } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { creamCard, cx } from './clay/buttonClass'
+import type { Feedback } from './clay/FeedbackToast'
 import { popIn } from './motion/PopIn'
 import { useStageScale } from './stage/Stage'
 import type { ActivityStepProps } from './stepProps'
@@ -52,6 +53,12 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
   const [selected, setSelected] = useState<string | null>(null)
   // Bumped on each check so the shake and sparkles replay.
   const [checks, setChecks] = useState(0)
+  // The layout shows the check toast where the instruction pill sits, so the pill steps aside meanwhile.
+  const [toastShown, setToastShown] = useState(false)
+  const say = (feedback: Feedback | null) => {
+    setToastShown(feedback !== null)
+    onFeedback(feedback)
+  }
   const recordActivityCheck = useLessonSession((state) => state.recordActivityCheck)
   const reduceMotion = useReducedMotion()
   const scale = useStageScale()
@@ -91,7 +98,7 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
     setResults((old) => old.map((result, i) => (next[i] === placed[i] ? result : null)))
     setPlaced(next)
     setSelected(null)
-    onFeedback(null)
+    say(null)
   }
   const put = (word: string, blank: number) => update(placed.map((w, i) => (i === blank ? word : w === word ? null : w)))
   const takeBack = (word: string) => update(placed.map((w) => (w === word ? null : w)))
@@ -108,7 +115,8 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
     setChecks((n) => n + 1)
     setSelected(null)
     recordActivityCheck(activity.id, score, activity.maxScore, placed)
-    onFeedback(scoreFeedback(score, activity.maxScore, 'กดลองอีกครั้งเพื่อแก้ช่องที่ผิด'))
+    // ลองอีกครั้ง names the button, so it never breaks across lines.
+    say(scoreFeedback(score, activity.maxScore, 'กดลองอีกครั้งเพื่อแก้ช่องที่ผิด', ['ลองอีกครั้ง']))
     celebrate(activity.id)
   }
   const retry = () => {
@@ -116,7 +124,7 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
     setPlaced(placed.map((w, i) => (results[i] === false ? null : w)))
     setResults(results.map((r) => (r === false ? null : r)))
     setSelected(null)
-    onFeedback(null)
+    say(null)
   }
   const clearAll = () => {
     setResults(pictures.map(() => null))
@@ -145,8 +153,13 @@ export function WordFillingStep({ lesson, onFeedback }: ActivityStepProps) {
 
   const content = (
     <div ref={root} className="contents">
-      {/* A yellow pill so the heading stays readable over drifting clouds; centred over the card row. */}
-      <p className="absolute top-[160px] left-1/2 -translate-x-1/2 rounded-full border-[5px] border-comic-ink bg-pill px-[40px] whitespace-nowrap font-heading text-[56px] leading-[1.4] font-bold text-navy shadow-comic">
+      {/* A yellow pill so the heading stays readable over drifting clouds; centred over the card row. Hidden under the check toast. */}
+      <p
+        className={cx(
+          toastShown && 'invisible',
+          'absolute top-[160px] left-1/2 -translate-x-1/2 rounded-full border-[5px] border-comic-ink bg-pill px-[40px] whitespace-nowrap font-heading text-[56px] leading-[1.4] font-bold text-navy shadow-comic',
+        )}
+      >
         {instruction}
       </p>
 

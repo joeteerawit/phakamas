@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Volume2, VolumeX } from 'lucide-react'
 import { AnimatePresence, motion, useIsPresent, useReducedMotion } from 'motion/react'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { stopAudio } from '../audio/audioManager'
 import { toggleMusic } from '../audio/music'
 import type { Lesson } from '../lessons'
@@ -9,6 +9,7 @@ import { lessonActivities, useUncheckedWork, type ActivityId } from '../session/
 import { useLessonSession } from '../session/lessonSession'
 import { cx, pressable as pressFeedback } from './clay/buttonClass'
 import { FeedbackToast, type Feedback } from './clay/FeedbackToast'
+import { PANEL_COVER_MS, PANEL_MS, PANEL_STEPS, PanelTransition } from './PanelTransition'
 import { Stage, useStageBleed, type Scene } from './stage/Stage'
 import { Celebration, endCelebration, StarCounter } from './Stars'
 
@@ -30,11 +31,18 @@ const chromeImage = 'pointer-events-none size-full select-none object-contain'
 const cornerButton = 'h-[150px] w-[146px] rounded-full'
 const pressable = cx(pressFeedback, 'absolute block')
 /**
- * The feedback toast sits bottom centre; its widest, in stage px, keeps it between each Activity's bottom
- * buttons: Step 5's ตรวจคำตอบ and เริ่มใหม่, Step 6's controls either side of the word bank. Step 8 has only
- * a centred เริ่มใหม่, so its one-line messages may use the room between Back and Next.
+ * Where each Activity's feedback toast sits, clear of every card, chip and control. Step 5: bottom centre,
+ * between ตรวจคำตอบ and เริ่มใหม่ and under the cards. Steps 6 and 8 fill their bottom row (word bank, เริ่มใหม่),
+ * so their toast sits on one line at the top (146–256), under the Step badge and above the cards (Step 6
+ * from 290) and buzzers (Step 8 from 264 at the top of a bounce), and left of the music button (1620).
+ * Step 6's instruction pill steps aside while it shows.
  */
-const TOAST_WIDTH: Record<ActivityId, number> = { wordSelection: 580, wordFilling: 732, rhymeMatching: 960 }
+const TOAST: Record<ActivityId, { placement: 'top' | 'bottom'; maxWidth: number }> = {
+  wordSelection: { placement: 'bottom', maxWidth: 580 },
+  wordFilling: { placement: 'top', maxWidth: 1280 },
+  rhymeMatching: { placement: 'top', maxWidth: 1280 },
+}
+const toastClass = { top: 'top-[146px]', bottom: 'bottom-[40px]' }
 
 /**
  * Shared Step layout (spec §1.3, MASTER.md "Canva garden"): every Step sits on the 1920×1080 stage
@@ -48,8 +56,10 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
   const title = lesson.steps[stepNumber - 1]?.title
   const stepParams = (step: number) => ({ lessonId: lesson.id, step: String(step) })
 
-  const { direction, moved } = useStepDirection(stepNumber)
   const reduceMotion = useReducedMotion()
+  const { direction, moved, panel, panelChange, stageScene } = useStepChange(stepNumber, scene, !!reduceMotion)
+  // Step 5's full marks shake the Step (#35).
+  const mainRef = useRef<HTMLElement>(null)
   const musicOn = useLessonSession((state) => state.musicOn)
   // AUD-004: leaving a Step stops its sound; the cover's intro (started by ▶) carries on into Step 2.
   useEffect(() => (isFirst ? undefined : stopAudio), [stepNumber, isFirst])
@@ -67,9 +77,10 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
   }
 
   const resetSession = useLessonSession((state) => state.resetSession)
+  const toast = activity ? TOAST[activity.id] : TOAST.wordSelection
 
   return (
-    <Stage scene={scene}>
+    <Stage scene={stageScene}>
       <WindowEdges>
         {isFirst ? (
           // The cover's visible heading is the Lesson title; the Step title stays the h1.
@@ -121,11 +132,12 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
       </WindowEdges>
 
       {/* Every Step marks its root data-full-stage and is laid out over the whole stage in design pixels (Step 6 portals onto the stage). */}
-      <main className={`absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto has-[[data-full-stage]]:pointer-events-none has-[[data-full-stage]]:inset-0 ${isFirst ? 'has-[[data-full-stage]]:overflow-visible' : 'has-[[data-full-stage]]:overflow-hidden'}`}>
+      <main ref={mainRef} className={`absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto has-[[data-full-stage]]:pointer-events-none has-[[data-full-stage]]:inset-0 ${isFirst ? 'has-[[data-full-stage]]:overflow-visible' : 'has-[[data-full-stage]]:overflow-hidden'}`}>
         {/* #18: the old Step slides out and the next slides in, in the travel direction; a fade with reduced motion. */}
+        {/* #36: into or out of Step 1 or 5 a comic panel sweeps over instead; the Steps swap under it. */}
         {/* No AnimatePresence initial={false}: it would also freeze every looping animation inside the first Step. */}
-        <AnimatePresence mode="wait" custom={{ direction, reduceMotion }}>
-          <StepSlide key={stepNumber} travel={{ direction, reduceMotion }} enter={moved}>
+        <AnimatePresence mode="wait" custom={{ direction, reduceMotion, panel: panelChange }}>
+          <StepSlide key={stepNumber} travel={{ direction, reduceMotion, panel: panelChange }} enter={moved}>
             {children}
           </StepSlide>
         </AnimatePresence>
@@ -157,12 +169,14 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
         )}
       </WindowEdges>
 
-      <Celebration lesson={lesson} />
+      <Celebration lesson={lesson} shakeTarget={mainRef} />
       <FeedbackToast
         feedback={feedback}
-        maxWidth={activity ? TOAST_WIDTH[activity.id] : TOAST_WIDTH.wordFilling}
-        className="absolute inset-x-0 bottom-[40px] z-30 flex justify-center"
+        placement={toast.placement}
+        maxWidth={toast.maxWidth}
+        className={`absolute inset-x-0 z-30 ${toastClass[toast.placement]}`}
       />
+      {panel && <PanelTransition key={panel.key} direction={panel.direction} />}
     </Stage>
   )
 }
@@ -177,15 +191,23 @@ function WindowEdges({ as: Tag = 'div', label, children }: { as?: 'div' | 'nav';
   )
 }
 
-type Travel = { direction: number; reduceMotion: boolean | null }
+type Travel = { direction: number; reduceMotion: boolean | null; panel: boolean }
 const SLIDE_PX = 240
+const SLIDE = { duration: 0.22, ease: 'easeOut' } as const
 const slide = {
-  enter: ({ direction, reduceMotion }: Travel) => (reduceMotion ? { opacity: 0 } : { opacity: 0, x: direction * SLIDE_PX }),
-  center: { opacity: 1, x: 0 },
-  exit: ({ direction, reduceMotion }: Travel) => (reduceMotion ? { opacity: 0 } : { opacity: 0, x: -direction * SLIDE_PX }),
+  enter: ({ direction, reduceMotion, panel }: Travel) =>
+    reduceMotion ? { opacity: 0 } : panel ? { opacity: 1, x: 0, scale: 1.04 } : { opacity: 0, x: direction * SLIDE_PX },
+  center: ({ panel }: Travel) => ({ opacity: 1, x: 0, scale: 1, transition: panel ? ({ duration: 0.4, ease: 'easeOut' } as const) : SLIDE }),
+  // A panel change keeps the old Step in place, settling back, until the panel covers it.
+  exit: ({ direction, reduceMotion, panel }: Travel) =>
+    reduceMotion
+      ? { opacity: 0, transition: SLIDE }
+      : panel
+        ? { opacity: 1, x: 0, scale: 0.97, transition: { duration: PANEL_COVER_MS / 1000, ease: 'easeIn' as const } }
+        : { opacity: 0, x: -direction * SLIDE_PX, transition: SLIDE },
 }
 
-/** One Step's content; inert while it slides out so nothing in it can be pressed twice. */
+/** One Step's content; inert while it leaves so nothing in it can be pressed twice. */
 function StepSlide({ travel, enter, children }: { travel: Travel; enter: boolean; children: ReactNode }) {
   const isPresent = useIsPresent()
   return (
@@ -198,22 +220,78 @@ function StepSlide({ travel, enter, children }: { travel: Travel; enter: boolean
       initial={enter ? 'enter' : false}
       animate="center"
       exit="exit"
-      transition={{ duration: 0.22, ease: 'easeOut' }}
+      transition={SLIDE}
     >
       {children}
     </motion.div>
   )
 }
 
-/** +1 when moving to a later Step, -1 when going back (drives the slide direction); `moved` once any Step change happened. */
-function useStepDirection(stepNumber: number) {
-  const [previousStep, setPreviousStep] = useState(stepNumber)
-  const [direction, setDirection] = useState(1)
-  const [moved, setMoved] = useState(false)
-  if (stepNumber !== previousStep) {
-    setDirection(stepNumber > previousStep ? 1 : -1)
-    setPreviousStep(stepNumber)
-    setMoved(true)
+type StepChange = {
+  step: number
+  /** The scene of `step`, as last passed in. */
+  scene: Scene
+  /** +1 when moving to a later Step, -1 when going back (drives the slide and panel direction). */
+  direction: number
+  /** Once any Step change happened. */
+  moved: boolean
+  /** Whether the latest change turns a panel. */
+  panelChange: boolean
+  /** The panel on screen, until its sweep ends; a new panel change replaces it. */
+  panel: { key: number; direction: number } | null
+  /** The scene kept on screen until the panel covers the window. */
+  held: Scene | null
+  count: number
+}
+
+/**
+ * Tracks Step changes. A change into or out of a panel Step (#36, not under reduced motion) shows the panel
+ * and keeps the old scene until the panel covers the window, so the new scene never pops in in plain view.
+ * Rapid changes restart the panel and keep whichever scene is on screen; both timers always run out.
+ */
+function useStepChange(stepNumber: number, scene: Scene, reduceMotion: boolean) {
+  const [change, setChange] = useState<StepChange>(() => ({
+    step: stepNumber,
+    scene,
+    direction: 1,
+    moved: false,
+    panelChange: false,
+    panel: null,
+    held: null,
+    count: 0,
+  }))
+  if (stepNumber !== change.step) {
+    const panelChange = !reduceMotion && (PANEL_STEPS.has(stepNumber) || PANEL_STEPS.has(change.step))
+    const direction = stepNumber > change.step ? 1 : -1
+    const count = change.count + 1
+    setChange({
+      step: stepNumber,
+      scene,
+      direction,
+      moved: true,
+      panelChange,
+      panel: panelChange ? { key: count, direction } : change.panel,
+      held: panelChange ? (change.held ?? change.scene) : change.held,
+      count,
+    })
   }
-  return { direction, moved }
+
+  const panelKey = change.panel?.key
+  useEffect(() => {
+    if (panelKey === undefined) return
+    const uncover = setTimeout(() => setChange((old) => ({ ...old, held: null })), PANEL_COVER_MS)
+    const done = setTimeout(() => setChange((old) => (old.panel?.key === panelKey ? { ...old, panel: null } : old)), PANEL_MS + 40)
+    return () => {
+      clearTimeout(uncover)
+      clearTimeout(done)
+    }
+  }, [panelKey])
+
+  return {
+    direction: change.direction,
+    moved: change.moved,
+    panelChange: change.panelChange,
+    panel: change.panel,
+    stageScene: change.held ?? scene,
+  }
 }

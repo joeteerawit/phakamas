@@ -15,12 +15,14 @@ test('completing each Activity celebrates and fills the Star counter', async ({ 
   // Step 5: 8 of 12 right (the 4 distractors left unselected, 4 แม่กง words missed) = 67 % → 2 Stars.
   for (const word of MAE_KONG.slice(0, 4)) await page.getByRole('button', { name: new RegExp(`^${word}(\\s|$)`) }).click()
   await check(page).click()
-  await expect(celebration(page)).toContainText('ได้ 2 ดาว')
-  await expect(celebration(page).locator('img')).toBeVisible()
+  // #35: below full marks Step 5 shows only the encouraging Mascot, not the Star celebration; the Stars still count.
+  await expect(page.getByTestId('mascot-reaction')).toHaveAttribute('data-pose', 'encourage')
+  await expect(page.getByTestId('mascot-reaction').locator('img')).toBeVisible()
+  await expect(celebration(page)).toHaveCount(0)
   await expect.poll(() => audioLog(page)).toContain('play:/assets/audio/feedback/keng-mak.mp3')
   await expect(counter(page)).toContainText('2/9')
-  await celebration(page).click()
-  await expect(celebration(page)).toHaveCount(0)
+  // It goes by itself after 2.5 s.
+  await expect(page.getByTestId('mascot-reaction')).toHaveCount(0, { timeout: 4000 })
 
   // Step 6: full marks → 3 Stars.
   await page.goto('/lesson/mae-kong/6')

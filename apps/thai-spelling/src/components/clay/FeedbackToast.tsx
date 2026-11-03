@@ -1,17 +1,25 @@
 import { Check, X } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { Mascot } from '../Mascot'
+import { Fragment } from 'react'
+import { MONKEY_CHEER_SRC, MONKEY_ENCOURAGE_SRC } from '../Mascot'
 import { cx } from './buttonClass'
 
 export type Feedback = {
   kind: 'correct' | 'wrong'
   message: string
+  /** Phrases in `message`, such as a button name, that must not break across lines. */
+  keepTogether?: readonly string[]
 }
 
 type FeedbackToastProps = {
   feedback: Feedback | null
   /** Widest the toast may grow, in stage px; longer messages wrap. */
   maxWidth: number
+  /**
+   * `bottom` rises into place; `top` only pops in its own box, so on the way in it never crosses what
+   * lies under it.
+   */
+  placement: 'top' | 'bottom'
   className?: string
 }
 
@@ -20,32 +28,47 @@ type FeedbackToastProps = {
  * readers announce each new message; right/wrong is never colour alone.
  * It sits on the scaled stage, so it is sized in stage px: 46px type is 16.6 CSS px on a 390px-tall phone.
  */
-export function FeedbackToast({ feedback, maxWidth, className }: FeedbackToastProps) {
+export function FeedbackToast({ feedback, maxWidth, placement, className }: FeedbackToastProps) {
   const reduceMotion = useReducedMotion()
+  const rise = placement === 'bottom'
 
   return (
-    <div role="status" aria-live="polite" className={cx('pointer-events-none', className)}>
+    // One grid cell: a leaving toast and its replacement overlap in place instead of pushing each other aside.
+    <div
+      role="status"
+      aria-live="polite"
+      className={cx('pointer-events-none grid justify-items-center', rise ? 'items-end' : 'items-start', className)}
+    >
       <AnimatePresence>
         {feedback && (
           <motion.div
             key={`${feedback.kind}:${feedback.message}`}
-            initial={reduceMotion ? false : { opacity: 0, y: 32, scale: 0.9 }}
+            initial={reduceMotion ? false : { opacity: 0, y: rise ? 32 : 0, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduceMotion ? { opacity: 0, transition: { duration: 0 } } : { opacity: 0, y: 16, transition: { duration: 0.15 } }}
+            exit={
+              reduceMotion
+                ? { opacity: 0, transition: { duration: 0 } }
+                : { opacity: 0, y: rise ? 16 : 0, transition: { duration: 0.15 } }
+            }
             transition={
               feedback.kind === 'correct'
-                ? { type: 'spring', duration: 0.3, bounce: 0.45 }
+                ? { type: 'spring', duration: 0.3, bounce: rise ? 0.45 : 0 }
                 : { duration: 0.2, ease: 'easeOut' }
             }
             style={{ maxWidth }}
             className={cx(
               // Ink outline and hard shadow; an inner ring in the result colour.
-              'flex items-center gap-[10px] rounded-[32px] border-[5px] border-comic-ink bg-cream py-[10px] ps-[12px] pe-[20px] shadow-comic ring-[5px] ring-inset',
+              'col-start-1 row-start-1 flex items-center gap-[10px] rounded-[32px] border-[5px] border-comic-ink bg-cream py-[10px] ps-[12px] pe-[20px] shadow-comic ring-[5px] ring-inset',
               feedback.kind === 'correct' ? 'ring-correct' : 'ring-wrong',
             )}
           >
-            {/* The 256px Mascot drawn at 80 stage px: 29 CSS px on a 390px-tall phone, 80 on a 1080p screen. */}
-            <Mascot size="sm" decorative className="size-[80px]! shrink-0" />
+            {/* The comic Mascot cheers a right answer and gives a thumbs up otherwise; 80 stage px tall (29 CSS px on a 390px-tall phone). */}
+            <img
+              src={feedback.kind === 'correct' ? MONKEY_CHEER_SRC : MONKEY_ENCOURAGE_SRC}
+              alt=""
+              draggable={false}
+              className="pointer-events-none h-[80px] w-[68px] shrink-0 object-contain select-none"
+            />
             <span
               aria-hidden="true"
               className={cx(
@@ -66,11 +89,28 @@ export function FeedbackToast({ feedback, maxWidth, className }: FeedbackToastPr
               )}
             >
               <span className="sr-only">{feedback.kind === 'correct' ? 'ถูกต้อง: ' : 'ยังไม่ถูก: '}</span>
-              {feedback.message}
+              <Message text={feedback.message} keepTogether={feedback.keepTogether} />
             </p>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
+  )
+}
+
+/** The message text, with each `keepTogether` phrase in a no-wrap span; the text itself is unchanged. */
+function Message({ text, keepTogether = [] }: { text: string; keepTogether?: readonly string[] }) {
+  const phrases = keepTogether.filter(Boolean)
+  if (phrases.length === 0) return text
+  const escaped = phrases.map((phrase) => phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+  const parts = text.split(new RegExp(`(${escaped.join('|')})`))
+  return parts.map((part, i) =>
+    phrases.includes(part) ? (
+      <span key={i} className="whitespace-nowrap">
+        {part}
+      </span>
+    ) : (
+      <Fragment key={i}>{part}</Fragment>
+    ),
   )
 }

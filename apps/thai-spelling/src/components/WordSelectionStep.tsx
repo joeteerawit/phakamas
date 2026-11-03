@@ -64,7 +64,8 @@ export function WordSelectionStep({ lesson, onFeedback }: ActivityStepProps) {
     setUnchecked(false)
     recordActivityCheck(activity.id, result.score, activity.maxScore, [...selected])
     onFeedback(scoreFeedback(result.score, activity.maxScore, 'ลองใหม่นะ'))
-    celebrate(activity.id)
+    // Full marks get the comic burst; below that only the Mascot's encouragement (#35).
+    celebrate(activity.id, result.score === activity.maxScore)
   }
 
   const restart = () => {
