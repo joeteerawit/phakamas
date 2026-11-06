@@ -28,8 +28,9 @@ test('a student goes through แม่กม from the cover, by the Map, to the 
   await expect(page).toHaveURL(/\/lesson\/mae-kom\/map$/)
   await page.getByRole('link', { name: /^ขั้น 2 / }).click()
   await expectStep(page, 2, 'ดูภาพเรียนรู้คำ')
+  // Window shopping: each window lights with its picture once tapped.
   for (const [i, word] of WORDS.entries()) {
-    await expect(wordButton(page, word)).toBeVisible()
+    await wordButton(page, word).click()
     await expect(wordButton(page, word).locator(`img[src="/assets/comic/word-${SLUGS[i]}.webp"]`)).toBeVisible()
   }
 

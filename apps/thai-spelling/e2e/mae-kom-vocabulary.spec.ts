@@ -1,8 +1,8 @@
 import { expect, type Page, test } from '@playwright/test'
 import { audioLog, endCurrent, open } from './audioStub.js'
 import { expectTapTarget } from './tapTarget.js'
-import { stageBox, waitUntilStill } from './stageBox.js'
-import { drifterPaths } from './windyScene.js'
+import { near, overlaps, stageBox, waitUntilStill } from './stageBox.js'
+import { expectNoDrifterCrosses, expectSceneFillsWithCornerButtons, expectSceneStill } from './windyScene.js'
 
 // src/lessons/mae-kom.ts: the six words in picture order.
 const WORDS = ['ร่ม', 'ลม', 'ส้ม', 'นม', 'ผม', 'ชาม']
@@ -11,34 +11,77 @@ const SLUGS = ['rom', 'lom', 'som', 'nom', 'phom', 'cham']
 const windows = (page: Page) => page.getByRole('list').getByRole('button')
 const shopWindow = (page: Page, word: string) => page.getByRole('button', { name: new RegExp(`^${word} `) })
 const scene = (page: Page) => page.getByTestId('stage-scene')
+const ahead = (page: Page) => page.getByRole('link', { name: 'ไปต่อ', exact: true })
 
-test('the six words are lit shop windows on two floors of a building row', async ({ page }) => {
+test('the six words are dark shop windows side by side along the shop street, each in its own shop', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 })
   await open(page, 2, {}, 'mae-kom')
   await expect(windows(page)).toHaveCount(6)
   await waitUntilStill(...(await windows(page).all()))
+  const shops = await Promise.all((await page.getByTestId('shop-row').locator('> div').all()).map((b) => stageBox(page, b)))
+  expect(shops).toHaveLength(6)
   const boxes = []
   for (const [i, word] of WORDS.entries()) {
-    await expect(windows(page).nth(i)).toHaveAccessibleName(new RegExp(`^${word} `))
-    await expect(windows(page).nth(i).locator(`img[src="/assets/comic/word-${SLUGS[i]}.webp"]`)).toHaveJSProperty('complete', true)
-    boxes.push(await stageBox(page, windows(page).nth(i)))
+    await expect(windows(page).nth(i)).toHaveAccessibleName(`${word} แตะฟังเสียง`)
+    // Dark: no light and no picture until it is tapped.
+    await expect(windows(page).nth(i)).not.toHaveAttribute('data-lit')
+    await expect(windows(page).nth(i).locator('img')).toHaveCount(0)
+    await expect(windows(page).nth(i).getByTestId('window-light')).toHaveCSS('opacity', '0')
+    const box = await stageBox(page, windows(page).nth(i))
+    const shop = shops[i]!
+    expect(box.left >= shop.left && box.right <= shop.right && box.top >= shop.top && box.bottom <= shop.bottom, word).toBe(true)
+    boxes.push(box)
   }
-  // Upstairs ร่ม ลม ส้ม, downstairs นม ผม ชาม, in three columns centred on x = 960.
-  for (let i = 0; i < 3; i++) {
+  // One row, left to right in word order.
+  for (let i = 1; i < 6; i++) {
     expect(Math.round(boxes[i]!.top)).toBe(Math.round(boxes[0]!.top))
-    expect(Math.round(boxes[i + 3]!.top)).toBe(Math.round(boxes[3]!.top))
-    expect(boxes[i + 3]!.top).toBeGreaterThan(boxes[i]!.bottom)
-    expect(Math.round(boxes[i + 3]!.left)).toBe(Math.round(boxes[i]!.left))
+    expect(boxes[i]!.left).toBeGreaterThan(boxes[i - 1]!.right)
   }
-  expect((boxes[0]!.left + boxes[2]!.right) / 2).toBeCloseTo(960, 0)
+  await expect(page.getByTestId('street-barrier')).toBeVisible()
+  await expect(ahead(page)).toHaveCount(0)
+  await expect(page.getByRole('status')).toHaveText('แตะหน้าต่างร้านให้ไฟติด (0/6)')
+})
 
-  // Each window sits inside one of the buildings.
-  const buildings = await Promise.all((await page.getByTestId('building-row').locator('> div').all()).map((b) => stageBox(page, b)))
-  expect(buildings).toHaveLength(3)
-  for (const [i, box] of boxes.entries()) {
-    const building = buildings[i % 3]!
-    expect(box.left >= building.left && box.right <= building.right && box.top >= building.top && box.bottom <= building.bottom, WORDS[i]).toBe(true)
+test('tapping a shop lights its window, shows its picture and plays its word, and น้องส้ม walks to it', async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 })
+  await open(page, 2, {}, 'mae-kom')
+  await waitUntilStill(...(await windows(page).all()))
+  const her = page.getByTestId('shop-mascot')
+  await expect(her.locator('img')).toHaveAttribute('src', /mascot-som-greet\.webp$/)
+  for (const i of [2, 0, 5]) {
+    await shopWindow(page, WORDS[i]!).click()
+    await expect.poll(() => audioLog(page)).toContain(`play:/assets/audio/vocabulary/${SLUGS[i]}.mp3`)
+    await expect(windows(page).nth(i)).toHaveAttribute('data-lit', 'true')
+    await expect(windows(page).nth(i).locator(`img[src="/assets/comic/word-${SLUGS[i]}.webp"]`)).toHaveJSProperty('complete', true)
+    await expect(windows(page).nth(i).getByTestId('window-light')).toHaveCSS('opacity', '1')
+    // She stands on the street outside that shop, below its window.
+    await waitUntilStill(her)
+    const at = await stageBox(page, her)
+    const window = await stageBox(page, windows(page).nth(i))
+    near(at.cx, window.cx, `under ${WORDS[i]}`)
+    expect(at.top).toBeGreaterThan(window.bottom)
   }
+  await expect(page.getByRole('status')).toHaveText('แตะหน้าต่างร้านให้ไฟติด (3/6)')
+  await expect(windows(page).nth(1)).not.toHaveAttribute('data-lit')
+})
+
+test('the street ahead opens only once all six shops are lit, and ไปต่อ leads on to the next stop', async ({ page }) => {
+  await open(page, 2, {}, 'mae-kom')
+  for (const [i, word] of WORDS.entries()) {
+    await expect(ahead(page), `before ${word}`).toHaveCount(0)
+    await expect(page.getByTestId('street-barrier')).toBeVisible()
+    await shopWindow(page, word).click()
+    // Tapping a lit window again plays it again but lights nothing new.
+    if (i === 2) await shopWindow(page, WORDS[0]!).click()
+    await endCurrent(page)
+  }
+  await expect(page.getByRole('status')).toHaveText('ไฟติดครบ 6 ร้านแล้ว ไปต่อกันเลย')
+  await expect(page.getByTestId('street-barrier')).toHaveCount(0)
+  await ahead(page).click()
+  await expect(page).toHaveURL(/\/lesson\/mae-kom\/3$/)
+  // It counts as finishing the Step, as ถัดไป does: the Map shows it done.
+  await page.getByRole('link', { name: 'กลับไปแผนที่' }).click()
+  await expect(page.getByRole('link', { name: /^ขั้น 2 / })).toHaveAttribute('data-done', 'true')
 })
 
 test('tapping a window plays its word as on แม่กง, and tapping another stops the first', async ({ page }) => {
@@ -81,41 +124,52 @@ for (const viewport of [
 ]) {
   test(`Step 2 at ${viewport.width}×${viewport.height}: the Scene fills the window, buttons in the corners, nothing moving crosses a window`, async ({ page }) => {
     await page.setViewportSize(viewport)
-    await page.goto('/lesson/mae-kom/2')
+    await open(page, 2, {}, 'mae-kom')
     await waitUntilStill(...(await windows(page).all()))
+    await expectSceneFillsWithCornerButtons(page, viewport)
 
-    const fill = (await scene(page).boundingBox())!
-    expect(fill.x).toBeLessThanOrEqual(0.5)
-    expect(fill.y).toBeLessThanOrEqual(0.5)
-    expect(fill.x + fill.width).toBeGreaterThanOrEqual(viewport.width - 0.5)
-    expect(fill.y + fill.height).toBeGreaterThanOrEqual(viewport.height - 0.5)
-
-    const scale = Math.min(viewport.width / 1920, viewport.height / 1080)
-    const home = (await page.getByRole('link', { name: 'กลับไปแผนที่' }).boundingBox())!
-    expect(viewport.width - home.x - home.width).toBeCloseTo(20 * scale, 0)
-    expect(home.y).toBeCloseTo(23 * scale, 0)
-    const back = (await page.getByRole('link', { name: 'ย้อนกลับ' }).boundingBox())!
-    expect(back.x).toBeCloseTo(29 * scale, 0)
-    expect(viewport.height - back.y - back.height).toBeCloseTo(13 * scale, 0)
-    const next = (await page.getByRole('link', { name: 'ถัดไป' }).boundingBox())!
-    expect(viewport.width - next.x - next.width).toBeCloseTo(34 * scale, 0)
-    expect(viewport.height - next.y - next.height).toBeCloseTo(13 * scale, 0)
-
+    for (const word of WORDS) {
+      await shopWindow(page, word).click()
+      await endCurrent(page)
+    }
+    await expect(ahead(page)).toBeVisible()
     if (viewport.height === 390) {
       for (const word of WORDS) await expectTapTarget(shopWindow(page, word))
-      for (const name of ['กลับไปแผนที่', 'ย้อนกลับ', 'ถัดไป']) await expectTapTarget(page.getByRole('link', { name }))
+      for (const target of [ahead(page), ...['กลับไปแผนที่', 'ย้อนกลับ', 'ถัดไป'].map((name) => page.getByRole('link', { name }))]) await expectTapTarget(target)
     }
+    await expectNoDrifterCrosses(page, [windows(page), ahead(page), page.getByRole('status')])
 
-    const cards = await Promise.all(WORDS.map(async (word) => (await shopWindow(page, word).boundingBox())!))
-    const paths = await drifterPaths(page)
-    expect(paths.length).toBeGreaterThan(0)
-    const crossing = paths.filter((r) => cards.some((c) => r.x < c.x + c.width && c.x < r.right && r.y < c.y + c.height && c.y < r.bottom))
-    expect(crossing, 'a leaf or snowflake crosses a window').toEqual([])
+    // ไปต่อ and น้องส้ม (outside the last shop) keep clear of the windows and the corner buttons.
+    await waitUntilStill(page.getByTestId('shop-mascot'))
+    const corners = await Promise.all(['ย้อนกลับ', 'ถัดไป'].map((name) => stageBox(page, page.getByRole('link', { name }))))
+    const cards = await Promise.all(WORDS.map((word) => stageBox(page, shopWindow(page, word))))
+    for (const box of [await stageBox(page, ahead(page)), await stageBox(page, page.getByTestId('shop-mascot'))]) {
+      for (const other of [...corners, ...cards]) expect(overlaps(box, other)).toBe(false)
+    }
+    expect(overlaps(await stageBox(page, ahead(page)), await stageBox(page, page.getByTestId('shop-mascot')))).toBe(false)
   })
 }
 
-test('the windy Scene drifts slowly; under reduced motion it is still', async ({ page }) => {
-  await page.goto('/lesson/mae-kom/2')
+test('keyboard and screen reader: each shop window is a named button, Enter lights it, and the street ahead is announced', async ({ page }) => {
+  await open(page, 2, {}, 'mae-kom')
+  await expect(page.getByTestId('shop-row')).toHaveAttribute('aria-hidden', 'true')
+  await expect(page.getByTestId('shop-mascot')).toHaveAttribute('aria-hidden', 'true')
+  for (const word of WORDS) {
+    await shopWindow(page, word).focus()
+    expect(parseFloat(await shopWindow(page, word).evaluate((el) => getComputedStyle(el).outlineWidth))).toBeGreaterThan(0)
+    await page.keyboard.press('Enter')
+    await expect(shopWindow(page, word)).toHaveAttribute('data-lit', 'true')
+    await endCurrent(page)
+    await expect(shopWindow(page, word)).toHaveAccessibleName(`${word} ฟังแล้ว`)
+  }
+  await expect(page.getByRole('status')).toHaveText('ไฟติดครบ 6 ร้านแล้ว ไปต่อกันเลย')
+  await ahead(page).focus()
+  await page.keyboard.press('Enter')
+  await expect(page).toHaveURL(/\/lesson\/mae-kom\/3$/)
+})
+
+test('the windy Scene drifts slowly; under reduced motion it is still, and so is the Game', async ({ page }) => {
+  await open(page, 2, {}, 'mae-kom')
   const drifters = scene(page).getByTestId('scene-drifter')
   // A few: five leaves and eight snowflakes.
   await expect(drifters).toHaveCount(13)
@@ -124,7 +178,18 @@ test('the windy Scene drifts slowly; under reduced motion it is still', async ({
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.reload()
   await windows(page).first().waitFor()
-  for (const drifter of await drifters.all()) await expect(drifter).toBeHidden()
-  const moving = await scene(page).evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === 'running').length)
+  await expectSceneStill(page)
+  // She is outside each shop at once, the window lights without fading and the barrier simply goes.
+  await expect(page.getByTestId('step-content')).toHaveCSS('opacity', '1')
+  for (const [i, word] of WORDS.entries()) {
+    await shopWindow(page, word).click()
+    await endCurrent(page)
+    const at = await stageBox(page, page.getByTestId('shop-mascot'))
+    near(at.cx, (await stageBox(page, windows(page).nth(i))).cx, `at ${word} at once`)
+    await expect(windows(page).nth(i).getByTestId('window-light')).toHaveCSS('transition-duration', '0s')
+  }
+  await expect(page.getByTestId('street-barrier')).toHaveCount(0)
+  await expect(ahead(page)).toBeVisible()
+  const moving = await page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length)
   expect(moving).toBe(0)
 })
