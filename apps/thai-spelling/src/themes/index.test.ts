@@ -27,12 +27,20 @@ describe('Theme fallback', () => {
     expect(getTheme(maeKong.theme)).toBe(maeKongTheme)
   })
 
-  it("แม่กม's Theme has no Steps yet, so every Step is แม่กง's", () => {
+  it("แม่กม's Theme lays out its own cover on the snowy street; its other Steps are still แม่กง's", () => {
     const theme = getTheme(maeKom.theme)
     expect(theme.id).toBe('mae-kom')
-    for (const step of stepNumbers) {
+    expect(stepLayout(theme, 1)).not.toBe(maeKongTheme.steps[1]?.layout)
+    expect(stepScene(theme, 1)).toBe('kom-cover')
+    for (const step of stepNumbers.slice(1)) {
       expect(stepLayout(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.layout)
       expect(stepScene(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.scene)
     }
+  })
+
+  it("แม่กม's Mascot is น้องส้ม with her own poses, floating on the cover", () => {
+    const { poses } = getTheme(maeKom.theme).mascot
+    for (const src of Object.values(poses)) expect(src).toMatch(/\/mascot-som-/)
+    expect(poses.cover).toBe('/assets/comic/mascot-som-float.webp')
   })
 })

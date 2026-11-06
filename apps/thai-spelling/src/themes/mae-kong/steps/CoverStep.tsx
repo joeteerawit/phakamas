@@ -1,20 +1,14 @@
-import { Link } from '@tanstack/react-router'
-import { RotateCcw } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
-import { playClip } from '../../../audio/audioManager'
-import { toggleMusic } from '../../../audio/music'
-import { useLessonSession } from '../../../session/lessonSession'
 import { CoverDecor } from '../scenes/CoverDecor'
-import { cx, pressable as pressFeedback } from '../../../ui/clay/buttonClass'
-import { useStageBleed } from '../../../ui/stage/Stage'
+import { useCover } from '../../../steps/cover/useCover'
 import type { StepProps } from '../../../steps/stepProps'
-import { useRestartLesson } from '../../../session/useRestartLesson'
+import { CoverButtons } from '../../../ui/CoverButtons'
+import { useMascot } from '../../../ui/mascotContext'
 
 /** Cover layers split from the design's cover image (docs/canva-assets.md, #19). */
 const COVER = '/assets/comic'
 
 const layer = 'pointer-events-none absolute select-none'
-const pressable = cx(pressFeedback, 'absolute block')
 
 const loop = { repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' } as const
 
@@ -24,12 +18,8 @@ const loop = { repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' } as co
  */
 export function CoverStep({ lesson }: StepProps) {
   const still = useReducedMotion()
-  const bleed = useStageBleed()
-  const restart = useRestartLesson(lesson.id)
-  const resumeStep = useLessonSession(({ session }) =>
-    session?.lessonId === lesson.id && session.currentStep > 1 ? session.currentStep : null,
-  )
-  const musicOn = useLessonSession((state) => state.musicOn)
+  const cover = useCover(lesson)
+  const { poses } = useMascot()
 
   return (
     <section data-full-stage className="pointer-events-none absolute inset-0">
@@ -68,63 +58,10 @@ export function CoverStep({ lesson }: StepProps) {
         transition={{ duration: 1.5, ...loop }}
       >
         <div className={`${layer} bottom-[719px] left-[147px] h-[800px] w-[49px] bg-[url(/assets/comic/mascot-vine.webp)] bg-size-[49px_17px] bg-bottom`} />
-        <img src={`${COVER}/mascot-swing.webp`} alt="" draggable={false} className={`${layer} inset-0 size-full`} />
+        <img src={poses.cover} alt="" draggable={false} className={`${layer} inset-0 size-full`} />
       </motion.div>
 
-      {/* Buttons sit in the window's corners, whatever its shape. */}
-      <div className="absolute" style={{ inset: bleed.inset }}>
-        {/* Background music on/off (#20); the choice is saved with the Session store. */}
-        <button
-          type="button"
-          aria-label={musicOn ? 'ปิดเพลง' : 'เปิดเพลง'}
-          aria-pressed={musicOn}
-          onClick={toggleMusic}
-          className={`${pressable} bottom-[32px] left-[40px] h-[139px] w-[135px] rounded-full`}
-        >
-          <img
-            src={`${COVER}/speaker-button.webp`}
-            alt=""
-            draggable={false}
-            className={`pointer-events-none size-full object-contain transition-[filter] ${musicOn ? '' : 'opacity-70 grayscale'}`}
-          />
-          {!musicOn && (
-            <span
-              data-testid="music-off"
-              aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 left-1/2 h-[14px] w-[150px] -translate-1/2 -rotate-45 rounded-full border-4 border-card bg-final"
-            />
-          )}
-        </button>
-
-        {resumeStep && (
-          <button
-            type="button"
-            onClick={restart}
-            className={`${pressable} right-[248px] bottom-[32px] flex h-[136px] items-center gap-[16px] rounded-full border-[6px] border-card bg-pill px-[44px] font-heading text-[52px] font-bold text-navy`}
-          >
-            <RotateCcw aria-hidden="true" className="size-[56px]" strokeWidth={2.5} />
-            เริ่มใหม่
-          </button>
-        )}
-
-        <Link
-          to="/lesson/$lessonId/$step"
-          params={{ lessonId: lesson.id, step: String(resumeStep ?? 2) }}
-          // The cover speaker is the music toggle, so the teacher intro plays on the Session's first ▶ instead.
-          onClick={resumeStep ? undefined : () => playClip(lesson.intro)}
-          className={`${pressable} right-[32px] bottom-[24px] size-[187px] rounded-full`}
-        >
-          <span className="sr-only">{resumeStep ? `เรียนต่อ (ขั้น ${resumeStep})` : 'เริ่มเรียน'}</span>
-          <motion.img
-            src={`${COVER}/play-button.webp`}
-            alt=""
-            draggable={false}
-            className="pointer-events-none size-full object-contain"
-            animate={still ? undefined : { scale: [1, 1.08] }}
-            transition={{ duration: 0.8, ...loop }}
-          />
-        </Link>
-      </div>
+      <CoverButtons cover={cover} />
     </section>
   )
 }

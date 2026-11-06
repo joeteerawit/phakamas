@@ -36,6 +36,7 @@ export const maeKongTheme: Theme = {
       greet: '/assets/comic/mascot-greet.webp',
       cheer: '/assets/comic/mascot-cheer.webp',
       encourage: '/assets/comic/mascot-encourage.webp',
+      cover: '/assets/comic/mascot-swing.webp',
     },
   },
 }

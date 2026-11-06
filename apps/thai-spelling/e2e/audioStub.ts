@@ -86,9 +86,9 @@ function stubAudio(opts: StubOptions) {
   })
 }
 
-export async function open(page: Page, step: number, opts: Partial<StubOptions> = {}) {
+export async function open(page: Page, step: number, opts: Partial<StubOptions> = {}, lessonId = 'mae-kong') {
   await page.addInitScript(stubAudio, { mp3: 'ok', thaiVoice: true, ...opts } as StubOptions)
-  await page.goto(`/lesson/mae-kong/${step}`)
+  await page.goto(`/lesson/${lessonId}/${step}`)
 }
 
 export const audioLog = (page: Page) => page.evaluate(() => (window as unknown as { __audio: AudioStub }).__audio.log)

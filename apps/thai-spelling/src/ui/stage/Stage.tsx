@@ -1,11 +1,12 @@
 import { Smartphone } from 'lucide-react'
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from 'react'
+import { SnowyStreet } from '../../themes/mae-kom/scenes/SnowyStreet'
 import { useMascot } from '../mascotContext'
 import { Ambient } from './Ambient'
 import { ClickFeedback } from './ClickFeedback'
 import { fitStage, isPortrait, STAGE_HEIGHT, STAGE_WIDTH } from './fitStage'
 
-export type Scene = 'garden' | 'pond' | 'summary' | 'step5' | 'cover'
+export type Scene = 'garden' | 'pond' | 'summary' | 'step5' | 'cover' | 'kom-cover'
 
 const sceneSrc: Record<Exclude<Scene, 'cover'>, string> = {
   garden: '/assets/canva/backgrounds/garden.webp',
@@ -13,6 +14,14 @@ const sceneSrc: Record<Exclude<Scene, 'cover'>, string> = {
   summary: '/assets/canva/backgrounds/cover.webp',
   // Calm comic flower garden (docs/comic-art.md).
   step5: '/assets/comic/step5-scene.webp',
+  // แม่กม (docs/mae-kom-spec.md): busy snowy shop street.
+  'kom-cover': '/assets/comic/kom-scene-cover.webp',
+}
+
+/** What moves in a Scene: แม่กม's Scenes have their own objects, the rest share the garden's. */
+function SceneMotion({ scene }: { scene: Exclude<Scene, 'cover'> }) {
+  if (scene === 'kom-cover') return <SnowyStreet />
+  return <Ambient scene={scene} />
 }
 
 const StageScale = createContext(1)
@@ -72,7 +81,7 @@ export function Stage({ scene = 'garden', children }: { scene?: Scene; children:
             className="absolute inset-0 bg-cover"
             style={{ transform: `scale(${bleed.scale})`, backgroundImage: `url(${sceneSrc[scene]})` }}
           >
-            <Ambient scene={scene} />
+            <SceneMotion scene={scene} />
           </div>
         )}
         <StageScale.Provider value={scale}>
