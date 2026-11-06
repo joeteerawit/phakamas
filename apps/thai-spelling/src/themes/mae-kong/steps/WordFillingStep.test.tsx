@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { maeKong } from '../lessons/mae-kong'
-import { Stage } from './stage/Stage'
+import { maeKong } from '../../../lessons/mae-kong'
+import { Stage } from '../../../ui/stage/Stage'
 import { WordFillingStep } from './WordFillingStep'
 
 function renderStep() {

@@ -1,10 +1,10 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useState } from 'react'
-import { clipDurationMs, playClip, useClipStatus } from '../audio/audioManager'
-import type { SpottingWord } from '../lessons'
-import { creamCard, cx, pressable } from './clay/buttonClass'
-import { SpeakerButton } from './SpeakerButton'
-import type { StepProps } from './stepProps'
+import { clipDurationMs, playClip, useClipStatus } from '../../../audio/audioManager'
+import type { SpottingWord } from '../../../lessons'
+import { creamCard, cx, pressable } from '../../../ui/clay/buttonClass'
+import { SpeakerButton } from '../../../ui/SpeakerButton'
+import type { StepProps } from '../../../steps/stepProps'
 
 /** Per-part highlight time until the clip's length is known (speech fallback, metadata still loading). */
 const PART_MS = 500

@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, Mic, Play, RotateCcw, Square, Star } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useState } from 'react'
-import { playClip, stopAudio, useAudio, useClipStatus, type AudioStatus } from '../audio/audioManager'
+import { playClip, stopAudio, useAudio, useClipStatus, type AudioStatus } from '../../../audio/audioManager'
 import {
   discardRecording,
   MAX_RECORDING_MS,
@@ -9,12 +9,12 @@ import {
   startRecording,
   stopRecording,
   useRecorder,
-} from '../audio/recorder'
-import { creamCard, cx, pressable } from './clay/buttonClass'
-import { Mascot } from './Mascot'
-import { RecorderMessages } from './RecorderMessages'
-import { SpeakerButton } from './SpeakerButton'
-import type { StepProps } from './stepProps'
+} from '../../../audio/recorder'
+import { creamCard, cx, pressable } from '../../../ui/clay/buttonClass'
+import { Mascot } from '../../../ui/Mascot'
+import { RecorderMessages } from '../../../ui/RecorderMessages'
+import { SpeakerButton } from '../../../ui/SpeakerButton'
+import type { StepProps } from '../../../steps/stepProps'
 
 const statusText: Partial<Record<AudioStatus, string>> = {
   loading: 'กำลังโหลด',

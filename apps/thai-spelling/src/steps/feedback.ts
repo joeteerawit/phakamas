@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import type { Feedback } from '../components/clay/FeedbackToast'
+import type { Feedback } from '../ui/clay/FeedbackToast'
 
 /**
  * The ตรวจคำตอบ toast: full marks earn praise, otherwise the score plus `retryHint`. `keepTogether` names

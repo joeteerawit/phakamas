@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
-import { useStageBleed } from './stage/Stage'
+import { useStageBleed } from '../../../ui/stage/Stage'
 
 const COMIC = '/assets/comic'
 const layer = 'pointer-events-none absolute select-none'

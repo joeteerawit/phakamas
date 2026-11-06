@@ -1,9 +1,9 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import type { Feedback } from '../components/clay/FeedbackToast'
-import { StepContent } from '../components/StepContent'
-import { StepLayout } from '../components/StepLayout'
-import type { Scene } from '../components/stage/Stage'
+import type { Feedback } from '../ui/clay/FeedbackToast'
+import { StepContent } from '../themes/StepContent'
+import { StepLayout } from '../ui/StepLayout'
+import type { Scene } from '../ui/stage/Stage'
 import { DEFAULT_LESSON_ID, getLesson, parseStepNumber } from '../lessons'
 import { useLessonSession } from '../session/lessonSession'
 

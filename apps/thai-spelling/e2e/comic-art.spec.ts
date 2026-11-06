@@ -4,7 +4,7 @@ import { join } from 'node:path'
 
 const DIR = 'public/assets/comic'
 const files = readdirSync(DIR)
-const source = ['src/components/CoverStep.tsx', 'src/components/CoverDecor.tsx'].map((path) => readFileSync(path, 'utf8')).join()
+const source = ['src/themes/mae-kong/steps/CoverStep.tsx', 'src/themes/mae-kong/scenes/CoverDecor.tsx'].map((path) => readFileSync(path, 'utf8')).join()
 const doc = readFileSync('docs/comic-art.md', 'utf8')
 
 test('the cover uses only comic art files that exist', () => {

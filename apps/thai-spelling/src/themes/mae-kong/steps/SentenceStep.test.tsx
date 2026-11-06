@@ -1,11 +1,11 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { stopAudio, useAudio } from '../audio/audioManager'
-import { maeKong } from '../lessons/mae-kong'
+import { stopAudio, useAudio } from '../../../audio/audioManager'
+import { maeKong } from '../../../lessons/mae-kong'
 import { SentenceStep } from './SentenceStep'
 
-vi.mock('../audio/audioManager', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('../audio/audioManager')>()),
+vi.mock('../../../audio/audioManager', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../../audio/audioManager')>()),
   playClip: vi.fn(),
 }))
 

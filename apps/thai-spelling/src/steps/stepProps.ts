@@ -1,5 +1,5 @@
 import type { Lesson } from '../lessons'
-import type { Feedback } from './clay/FeedbackToast'
+import type { Feedback } from '../ui/clay/FeedbackToast'
 
 /** Props of every Activity Step; it reports feedback for the layout's toast. */
 export type ActivityStepProps = {

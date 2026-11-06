@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
-import { useLessonSession } from '../session/lessonSession'
+import { useLessonSession } from './lessonSession'
 
 /** Clears the Session and starts the Lesson again from Step 2. */
 export function useRestartLesson(lessonId: string) {

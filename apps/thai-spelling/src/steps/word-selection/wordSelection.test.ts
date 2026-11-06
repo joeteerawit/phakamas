@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { maeKong } from '../lessons/mae-kong'
+import { maeKong } from '../../lessons/mae-kong'
 import { checkWordSelection } from './wordSelection'
 
 const { choices } = maeKong.wordSelection

@@ -1,11 +1,11 @@
 import { motion, useAnimate, useReducedMotion } from 'motion/react'
 import { useState } from 'react'
-import { playClip, useClipStatus, type AudioStatus } from '../audio/audioManager'
-import type { VocabularyWord } from '../lessons'
-import { creamCard, cx } from './clay/buttonClass'
-import { popIn } from './motion/PopIn'
-import { SpeakerButton } from './SpeakerButton'
-import type { StepProps } from './stepProps'
+import { playClip, useClipStatus, type AudioStatus } from '../../../audio/audioManager'
+import type { VocabularyWord } from '../../../lessons'
+import { creamCard, cx } from '../../../ui/clay/buttonClass'
+import { popIn } from '../../../ui/motion/PopIn'
+import { SpeakerButton } from '../../../ui/SpeakerButton'
+import type { StepProps } from '../../../steps/stepProps'
 
 /** Card lefts in stage pixels: design DAHZj0Nxyxs page 2's spacing, moved 33px left so the row (104–1816) is centred on x = 960. */
 const cardLefts = [104, 396, 687, 978, 1269, 1561]

@@ -1,14 +1,14 @@
 import { Check, RotateCcw, Star, X } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useState } from 'react'
-import { playClip } from '../audio/audioManager'
-import { celebrate } from './Stars'
-import { useClearFeedbackOnLeave } from '../activities/feedback'
-import { lessonActivity, useReportUncheckedWork, useUncheckedWork } from '../session/activities'
-import { useLessonSession } from '../session/lessonSession'
-import { creamCard, cx, pressable } from './clay/buttonClass'
-import type { Feedback } from './clay/FeedbackToast'
-import type { ActivityStepProps } from './stepProps'
+import { playClip } from '../../../audio/audioManager'
+import { celebrate } from '../../../ui/Stars'
+import { useClearFeedbackOnLeave } from '../../../steps/feedback'
+import { lessonActivity, useReportUncheckedWork, useUncheckedWork } from '../../../session/activities'
+import { useLessonSession } from '../../../session/lessonSession'
+import { creamCard, cx, pressable } from '../../../ui/clay/buttonClass'
+import type { Feedback } from '../../../ui/clay/FeedbackToast'
+import type { ActivityStepProps } from '../../../steps/stepProps'
 
 const WRONG_FLASH_MS = 700
 const TOAST_MS = 2500
