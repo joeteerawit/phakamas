@@ -2,6 +2,7 @@ import { expect, type Page, test } from '@playwright/test'
 import { audioLog, endCurrent, open } from './audioStub.js'
 import { expectTapTarget } from './tapTarget.js'
 import { stageBox, waitUntilStill } from './stageBox.js'
+import { drifterPaths } from './windyScene.js'
 
 // src/lessons/mae-kom.ts: the six words in picture order.
 const WORDS = ['ร่ม', 'ลม', 'ส้ม', 'นม', 'ผม', 'ชาม']
@@ -10,35 +11,6 @@ const SLUGS = ['rom', 'lom', 'som', 'nom', 'phom', 'cham']
 const windows = (page: Page) => page.getByRole('list').getByRole('button')
 const shopWindow = (page: Page, word: string) => page.getByRole('button', { name: new RegExp(`^${word} `) })
 const scene = (page: Page) => page.getByTestId('stage-scene')
-
-/**
- * Every rect each drifter covers on screen: animations are paused and seeked through 12 points of each fall,
- * with the sway at both ends, so the whole path is checked, not just a moment of it.
- */
-const drifterPaths = (page: Page) =>
-  page.evaluate(() => {
-    const motion = document.querySelector('[data-testid="scene-motion"]')!
-    const animations = motion.getAnimations({ subtree: true }) as CSSAnimation[]
-    for (const a of animations) a.pause()
-    const at = (name: string, phase: number) => {
-      for (const a of animations.filter((x) => x.animationName === name)) {
-        a.currentTime = phase * Number(a.effect!.getComputedTiming().duration)
-      }
-    }
-    const rects: { x: number; y: number; right: number; bottom: number }[] = []
-    for (let k = 0; k <= 12; k++) {
-      at('drift-fall', k / 12)
-      for (const sway of [0, 0.999]) {
-        at('leaf-sway', sway)
-        for (const drifter of motion.querySelectorAll('[data-testid="scene-drifter"] > *')) {
-          const r = drifter.getBoundingClientRect()
-          rects.push({ x: r.x, y: r.y, right: r.right, bottom: r.bottom })
-        }
-      }
-    }
-    for (const a of animations) a.play()
-    return rects
-  })
 
 test('the six words are lit shop windows on two floors of a building row', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 1080 })

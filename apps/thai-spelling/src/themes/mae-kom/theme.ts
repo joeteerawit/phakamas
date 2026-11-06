@@ -1,6 +1,7 @@
 import { activitySteps } from '../../session/activities'
 import type { Theme } from '../types'
 import { CoverStep } from './steps/CoverStep'
+import { ListenRepeatStep } from './steps/ListenRepeatStep'
 import { VocabularyStep } from './steps/VocabularyStep'
 
 /** แม่กม's snowy-city Theme (docs/mae-kom-spec.md). Parts of a Step it leaves out use แม่กง's layout and Scene. */
@@ -9,7 +10,7 @@ export const maeKomTheme: Theme = {
   steps: {
     1: { layout: CoverStep, scene: 'kom-cover' },
     2: { layout: VocabularyStep, scene: 'kom-windy' },
-    3: { scene: 'kom-windy' },
+    3: { layout: ListenRepeatStep, scene: 'kom-windy' },
     4: { scene: 'kom-windy' },
     [activitySteps.wordSelection]: { scene: 'kom-windy' },
     [activitySteps.wordFilling]: { scene: 'kom-windy' },

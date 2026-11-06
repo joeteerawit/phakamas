@@ -1,26 +1,12 @@
-import { ChevronLeft, ChevronRight, Mic, Play, RotateCcw, Square, Star } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Play, RotateCcw, Star } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { useEffect, useState } from 'react'
-import { playClip, stopAudio, useAudio, useClipStatus, type AudioStatus } from '../../../audio/audioManager'
-import {
-  discardRecording,
-  MAX_RECORDING_MS,
-  playRecording,
-  startRecording,
-  stopRecording,
-  useRecorder,
-} from '../../../audio/recorder'
+import { useListenRepeat, useListenRepeatRecorder } from '../../../steps/listen-repeat/useListenRepeat'
 import { creamCard, cx, pressable } from '../../../ui/clay/buttonClass'
 import { Mascot } from '../../../ui/Mascot'
+import { RecordBuzzer } from '../../../ui/RecordBuzzer'
 import { RecorderMessages } from '../../../ui/RecorderMessages'
 import { SpeakerButton } from '../../../ui/SpeakerButton'
 import type { StepProps } from '../../../steps/stepProps'
-
-const statusText: Partial<Record<AudioStatus, string>> = {
-  loading: 'กำลังโหลด',
-  playing: 'กำลังเล่น',
-  error: 'เล่นเสียงไม่ได้ ลองอีกครั้ง',
-}
 
 // Every target here is ≥ 122 stage px: 44 CSS px on a 390px-tall landscape phone. Ink on orange for contrast.
 const roundOrange = `${pressable} flex size-[130px] items-center justify-center rounded-full border-[6px] border-comic-ink bg-orange text-comic-ink shadow-comic`
@@ -36,46 +22,9 @@ const bigButton = 'h-[242px] w-[280px]'
  * Hearing every word earns a star. Positions are stage pixels over the whole stage (data-full-stage).
  */
 export function ListenRepeatStep({ lesson }: StepProps) {
-  const words = lesson.listenAndRepeat
+  const { words, index, direction, current, complete, yourTurn, playing, listenLabel, goTo, listen, ...step } = useListenRepeat(lesson)
   const reduceMotion = useReducedMotion()
-  const [index, setIndex] = useState(0)
-  // 0 = first card (pops in); ±1 = slide from the next/previous side.
-  const [direction, setDirection] = useState(0)
-  const [heard, setHeard] = useState<ReadonlySet<string>>(() => new Set())
-  const [endedId, setEndedId] = useState<string | null>(null)
-  const current = words[index] ?? words[0]!
-  const status = useClipStatus(current.audio.id)
-  const complete = words.every((item) => heard.has(item.audio.id))
-
-  // A clip ended on its own (playing → idle, same clip); stopAudio clears clipId instead.
-  useEffect(
-    () =>
-      useAudio.subscribe((next, prev) => {
-        if (prev.status !== 'playing' || next.status !== 'idle' || !next.clipId || next.clipId !== prev.clipId) return
-        const id = next.clipId
-        setHeard((old) => new Set(old).add(id))
-        setEndedId(id)
-      }),
-    [],
-  )
-  useEffect(() => discardRecording, [])
-
-  const goTo = (i: number) => {
-    stopAudio()
-    discardRecording()
-    setEndedId(null)
-    setDirection(i >= index ? 1 : -1)
-    setIndex(i)
-  }
-  // Teacher audio never plays into a recording (as on Steps 7 and 9).
-  const listen = () => {
-    stopRecording()
-    playClip(current.audio)
-  }
-  const yourTurn = endedId === current.audio.id && status === 'idle'
-  const playing = status === 'playing'
   const slide = reduceMotion ? 0 : 240
-  const listenLabel = heard.has(current.audio.id) ? 'ฟังอีกครั้ง' : 'ฟังเสียง'
 
   return (
     <section data-full-stage className="relative size-full font-heading text-navy">
@@ -101,7 +50,7 @@ export function ListenRepeatStep({ lesson }: StepProps) {
           <img src={current.image} alt="" width={300} height={300} draggable={false} className="size-[300px] object-contain" />
           <h2 className="text-[110px] leading-[1.4] font-bold">{current.word}</h2>
           {/* Out of the flow, so the picture and word stay centred; it sits below the word's glyphs. */}
-          <p className="absolute inset-x-0 bottom-[10px] text-center text-[30px] leading-[1.3] font-semibold">{statusText[status]}</p>
+          <p className="absolute inset-x-0 bottom-[10px] text-center text-[30px] leading-[1.3] font-semibold">{step.statusText}</p>
         </motion.div>
       </AnimatePresence>
 
@@ -143,7 +92,7 @@ export function ListenRepeatStep({ lesson }: StepProps) {
             <li key={item.audio.id}>
               <button
                 type="button"
-                aria-label={heard.has(item.audio.id) ? `${item.word} (ฟังแล้ว)` : item.word}
+                aria-label={step.heard(item) ? `${item.word} (ฟังแล้ว)` : item.word}
                 aria-current={i === index ? 'step' : undefined}
                 onClick={() => goTo(i)}
                 className={`${pressable} flex size-[124px] justify-center pt-[16px]`}
@@ -154,7 +103,7 @@ export function ListenRepeatStep({ lesson }: StepProps) {
                     className={cx(
                       'block rounded-full border-[5px] border-comic-ink transition-all duration-200 motion-reduce:transition-none',
                       i === index ? 'size-[48px] bg-navy' : 'size-[32px]',
-                      i !== index && (heard.has(item.audio.id) ? 'bg-primary' : 'bg-cream'),
+                      i !== index && (step.heard(item) ? 'bg-primary' : 'bg-cream'),
                     )}
                   />
                 </span>
@@ -222,45 +171,18 @@ export function ListenRepeatStep({ lesson }: StepProps) {
 
 /** Red comic buzzer to record, the remaining time, and an orange play-back button. */
 function Recorder() {
-  const status = useRecorder((state) => state.status)
-  const reduceMotion = useReducedMotion()
-  const recording = status === 'recording'
-  const secondsLeft = useSecondsLeft(recording)
+  const { status, recording, secondsLeft, toggle, playBack } = useListenRepeatRecorder()
 
   return (
     <div className={cx(sideColumn, 'left-[1380px]')}>
-      <button
-        type="button"
-        aria-label={recording ? 'หยุดบันทึก' : 'ลองอ่านเอง'}
-        disabled={status === 'requesting'}
-        onClick={recording ? stopRecording : () => void startRecording()}
-        className={cx(pressable, 'relative', bigButton)}
-      >
-        {recording && (
-          <motion.span
-            aria-hidden="true"
-            className="absolute inset-x-[20px] top-[10px] bottom-[60px] rounded-full bg-final blur-[30px]"
-            initial={{ opacity: 0.5, scale: 1 }}
-            animate={reduceMotion ? { opacity: 0.6 } : { opacity: [0.4, 0.9, 0.4], scale: [1, 1.15, 1] }}
-            transition={reduceMotion ? { duration: 0 } : { duration: 1, repeat: Infinity }}
-          />
-        )}
-        <img src="/assets/comic/ui-buzzer.webp" alt="" draggable={false} className="relative size-full object-contain" />
-        <span className="absolute inset-x-0 top-[40px] flex justify-center text-card drop-shadow-[4px_5px_0_var(--color-comic-ink)]">
-          {recording ? (
-            <Square aria-hidden="true" className="size-[80px] fill-card" strokeWidth={3} />
-          ) : (
-            <Mic aria-hidden="true" className="size-[90px]" strokeWidth={3} />
-          )}
-        </span>
-      </button>
+      <RecordBuzzer recording={recording} disabled={status === 'requesting'} onClick={toggle} />
 
       <p className={inkPill}>
         {recording ? <span data-testid="record-time">{secondsLeft} วินาที</span> : 'กดแล้วอ่านตาม'}
       </p>
 
       {status === 'ready' && (
-        <button type="button" aria-label="ฟังเสียงตัวเอง" onClick={playRecording} className={roundOrange}>
+        <button type="button" aria-label="ฟังเสียงตัวเอง" onClick={playBack} className={roundOrange}>
           <Play aria-hidden="true" className="size-[70px] fill-card" strokeWidth={3} />
         </button>
       )}
@@ -270,19 +192,4 @@ function Recorder() {
       </div>
     </div>
   )
-}
-
-/** Whole seconds left of MAX_RECORDING_MS while recording. */
-function useSecondsLeft(recording: boolean) {
-  const [elapsed, setElapsed] = useState(0)
-  useEffect(() => {
-    if (!recording) return
-    const start = Date.now()
-    const id = setInterval(() => setElapsed(Date.now() - start), 250)
-    return () => {
-      clearInterval(id)
-      setElapsed(0)
-    }
-  }, [recording])
-  return Math.max(0, Math.ceil((MAX_RECORDING_MS - elapsed) / 1000))
 }
