@@ -97,6 +97,8 @@ export type Lesson = {
   /** Id of the Lesson's Theme in src/themes. */
   theme: string
   title: string
+  /** The final-consonant group (มาตรา) as students read it, e.g. แม่กง. */
+  finalGroup: string
   subtitle: string
   /** Subject and grade line on the cover. */
   gradeLine: string

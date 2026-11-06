@@ -1,51 +1,22 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { useEffect, useState } from 'react'
-import { clipDurationMs, playClip, useClipStatus } from '../../../audio/audioManager'
 import type { SpottingWord } from '../../../lessons'
+import { spottingPicture, useSpellingPlaying, useSpotting } from '../../../steps/spotting/useSpotting'
 import { creamCard, cx, pressable } from '../../../ui/clay/buttonClass'
 import { SpeakerButton } from '../../../ui/SpeakerButton'
 import type { StepProps } from '../../../steps/stepProps'
 
-/** Per-part highlight time until the clip's length is known (speech fallback, metadata still loading). */
-const PART_MS = 500
 const CARD_LEFTS = [251, 744, 1237]
-const picture = (word: SpottingWord) => `/assets/comic/word-${word.audio.id.split('/').pop()}.webp`
 
 /**
  * Step 4 (design DAHZj0Nxyxs pages 3–4): one set of three words at a time on the pond. Tapping a card plays
  * the word, sweeps its spelling pill part by part and makes the red final ง glow.
  */
 export function SpottingStep({ lesson }: StepProps) {
-  const { explanation, sets } = lesson.spotting
+  const { sets, setIndex, direction, words, explaining, explain, showSet, play, activePart } = useSpotting(lesson)
   const reduceMotion = useReducedMotion()
-  const explaining = useClipStatus(explanation.id) === 'playing'
-  const [setIndex, setSetIndex] = useState(0)
-  const [direction, setDirection] = useState(1)
-  const [sweep, setSweep] = useState<{ word: SpottingWord; part: number } | null>(null)
-
-  useEffect(() => {
-    if (!sweep) return
-    const next = sweep.part + 1
-    const parts = sweep.word.spelling.length
-    // Spread the parts over the clip once its length is known (read again on each part).
-    const clip = clipDurationMs()
-    const partMs = clip > 0 ? clip / parts : PART_MS
-    const timer = setTimeout(() => setSweep(next < parts ? { ...sweep, part: next } : null), partMs)
-    return () => clearTimeout(timer)
-  }, [sweep])
-
-  const showSet = (index: number) => {
-    setDirection(index > setIndex ? 1 : -1)
-    setSetIndex(index)
-    setSweep(null)
-  }
-  const play = (word: SpottingWord) => {
-    playClip(word.spellingAudio)
-    setSweep({ word, part: 0 })
-  }
 
   return (
-    <section data-full-stage aria-label="คำในมาตราแม่กง" className="relative size-full">
+    <section data-full-stage aria-label={`คำในมาตรา${lesson.finalGroup}`} className="relative size-full">
       {/* Set buttons left of the Step pill (844–1076, centre 960) and the explanation speaker right of it, both 48px away and level with it. */}
       <div role="group" aria-label="เลือกชุดคำ" className="absolute top-[27px] right-[1124px] flex gap-[24px]">
         {sets.map((_, i) => (
@@ -66,7 +37,7 @@ export function SpottingStep({ lesson }: StepProps) {
         ))}
       </div>
       <div className="absolute top-[27px] left-[1124px] size-[124px]">
-        <SpeakerButton label="ฟังคำอธิบาย" onClick={() => playClip(explanation)} playing={explaining} className="inset-0 size-full" />
+        <SpeakerButton label="ฟังคำอธิบาย" onClick={explain} playing={explaining} className="inset-0 size-full" />
       </div>
 
       <AnimatePresence mode="wait" initial={false}>
@@ -78,12 +49,12 @@ export function SpottingStep({ lesson }: StepProps) {
           exit={reduceMotion ? { opacity: 0, transition: { duration: 0 } } : { x: direction * -240, opacity: 0 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
         >
-          {sets[setIndex]?.map((word, i) => (
+          {words.map((word, i) => (
             <li key={word.audio.id}>
               <SpottingCard
                 word={word}
                 left={CARD_LEFTS[i] ?? 0}
-                activePart={sweep?.word === word ? sweep.part : null}
+                activePart={activePart(word)}
                 onPlay={() => play(word)}
               />
             </li>
@@ -104,7 +75,7 @@ type SpottingCardProps = {
 
 function SpottingCard({ word, left, activePart, onPlay }: SpottingCardProps) {
   const reduceMotion = useReducedMotion()
-  const playing = useClipStatus(word.spellingAudio.id) === 'playing'
+  const playing = useSpellingPlaying(word)
   const glowing = activePart !== null
   const text = word.audio.text
 
@@ -120,7 +91,7 @@ function SpottingCard({ word, left, activePart, onPlay }: SpottingCardProps) {
         className={cx(pressable, creamCard, 'absolute top-[165px] h-[639px] w-[432px]')}
       >
         <img
-          src={picture(word)}
+          src={spottingPicture(word)}
           alt=""
           draggable={false}
           className="absolute top-[40px] left-[40px] h-[380px] w-[352px] object-contain"

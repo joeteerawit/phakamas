@@ -27,11 +27,11 @@ describe('Theme fallback', () => {
     expect(getTheme(maeKong.theme)).toBe(maeKongTheme)
   })
 
-  it("แม่กม's Theme lays out its own Steps 1 to 3; the rest are still แม่กง's", () => {
+  it("แม่กม's Theme lays out its own Steps 1 to 4; the rest are still แม่กง's", () => {
     const theme = getTheme(maeKom.theme)
     expect(theme.id).toBe('mae-kom')
     for (const step of stepNumbers) {
-      const own = step <= 3
+      const own = step <= 4
       expect(stepLayout(theme, step) === maeKongTheme.steps[step]?.layout, `Step ${step}`).toBe(!own)
     }
   })

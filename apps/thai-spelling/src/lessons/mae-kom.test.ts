@@ -42,6 +42,7 @@ describe('mae-kom lesson data (docs/mae-kom-spec.md)', () => {
     expect(maeKom.id).toBe('mae-kom')
     expect(maeKom.theme).toBe('mae-kom')
     expect(maeKom.title).toBe('คำแม่กมชมเมืองหิมะ')
+    expect(maeKom.finalGroup).toBe('แม่กม')
     expect(maeKom.subtitle).toBe('แม่ กม (ม)')
     expect(maeKom.gradeLine).toBe('วิชาภาษาไทย ชั้นประถมศึกษาปีที่ ๒')
   })

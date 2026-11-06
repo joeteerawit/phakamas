@@ -50,6 +50,7 @@ export const maeKom = {
   id: 'mae-kom',
   theme: 'mae-kom',
   title: 'คำแม่กมชมเมืองหิมะ',
+  finalGroup: 'แม่กม',
   subtitle: 'แม่ กม (ม)',
   gradeLine: 'วิชาภาษาไทย ชั้นประถมศึกษาปีที่ ๒',
   steps: [

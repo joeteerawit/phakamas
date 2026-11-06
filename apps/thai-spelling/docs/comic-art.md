@@ -13,7 +13,7 @@ Decided by the owner on 2026-11-03: a plain background is not enough, it must in
 - Movement is gentle and loops. Under reduced motion the scene is still.
 - The scene fills the window on every device, with no letterbox. The sign stays centred and buttons stay in the window's corners.
 - Cards have a slowly moving colourful ring, and every tap gets a boing and a burst (still under reduced motion).
-- แม่กม's cover Scene draws its moving objects over `kom-scene-cover.webp`: CSS snow and gusts, plus the `word-rom.webp` umbrella blown across the sky and the `word-som.webp` orange rolling down the street (#46). Its windy Scene only has a few CSS leaves and snowflakes falling down the window's sides, clear of the cards, and Step 2's building row is drawn in CSS (#47). Step 3 draws `kom-billboard.webp` at its own size with the word on its screen, and the record buzzer on `kom-phone-booth.webp` (#48).
+- แม่กม's cover Scene draws its moving objects over `kom-scene-cover.webp`: CSS snow and gusts, plus the `word-rom.webp` umbrella blown across the sky and the `word-som.webp` orange rolling down the street (#46). Its windy Scene only has a few CSS leaves and snowflakes falling down the window's sides, clear of the cards, and Step 2's building row is drawn in CSS (#47). Step 3 draws `kom-billboard.webp` at its own size with the word on its screen, and the record buzzer on `kom-phone-booth.webp` (#48). Step 4's words sit in the blank panels of three `kom-bus-stop.webp` signs, whose poles run on past the stage's bottom (#49).
 
 ## Shared style text
 
