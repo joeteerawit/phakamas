@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { allLessons } from '../src/lessons/index.ts'
 
 const DIR = 'public/assets/comic'
 const files = readdirSync(DIR)
@@ -17,10 +18,11 @@ test('every comic art file is recorded in the art doc, so none is an orphan', ()
   expect(files.filter((name) => !doc.includes(`\`${name}\``))).toEqual([])
 })
 
-test('comic art is all WebP and stays within the 3 MB budget', () => {
+// Each Lesson brings its own Theme art, so the budget grows with the Lessons.
+test('comic art is all WebP and stays within 3 MB per Lesson', () => {
   expect(files.filter((name) => !name.endsWith('.webp'))).toEqual([])
   const bytes = files.reduce((total, name) => total + statSync(join(DIR, name)).size, 0)
-  expect(bytes).toBeLessThanOrEqual(3 * 1024 * 1024)
+  expect(bytes).toBeLessThanOrEqual(allLessons.length * 3 * 1024 * 1024)
 })
 
 for (const viewport of [
