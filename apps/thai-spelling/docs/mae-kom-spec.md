@@ -40,19 +40,38 @@ The palette is blue, purple and snow white. The rules in `comic-art.md` hold: ob
 | Snowy city at night | 10 | Building lights switch on, one for each Star earned |
 | Comic panels | 7 | No Scene; the four panels fill the window |
 
-## Step layouts
+## Map
 
-Buttons stay in the window corners on every Step.
+The Map is a snowy city map, following `game-concept.md`. The cover's ▶ opens it. A winding street joins the eight stops (Steps 2–9) and ends at น้องส้ม's home (Step 10). Every stop is open. An arrow marks the recommended next stop, a done stop shows a lit window, and Activity stops show their Stars. น้องส้ม walks along the street to the chosen stop. Under reduced motion she appears there directly.
 
-| Step | Layout |
+## Games
+
+Decided with the owner on 2026-11-06. No Game has a timer, and every one has a still version under reduced motion.
+
+| Step | Stop | Game |
+|---|---|---|
+| 1 | Cover | The snowy-street cover (#46); ▶ opens the Map |
+| 2 | Shop street | **Window shopping:** น้องส้ม walks past the shops. Tapping a shop lights its window, shows the picture and plays the word. When all six are lit, the street ahead opens |
+| 3 | Billboard | **Billboard karaoke:** the word shows on the billboard and the student records at the phone booth. Each word recorded lights one bulb around the screen; six bulbs set off fireworks on the screen |
+| 4 | Bus stop | **Find the ม for the bus:** a bus stops showing one word. The student taps the final consonant (the ม). Then the bus leaves and the next one arrives. A wrong tap leaves the bus where it is and plays a hint |
+| 5 | Umbrella square (Activity) | **Catch the umbrellas:** twelve picture umbrellas drift down slowly and loop until each one is decided. Tap to catch the แม่กม ones; let the others drift by. One umbrella = one Decision, scored out of 12 as before. Under reduced motion the umbrellas stand in rows |
+| 6 | Apartment block (Activity) | **Sled delivery:** words ride on the sled. Drag (or tap, then tap) each word to the window with the matching picture; a delivered window lights up |
+| 7 | Comic cinema | **4-panel comic:** read along with highlighting, then tap each highlighted แม่กม word in a panel to collect it |
+| 8 | Lamp street (Activity) | **Light the street:** tap two lamps whose words rhyme; a string of lights joins them |
+| 9 | Post office | **Send a postcard:** read the sentence on the postcard, record it, then drop the postcard into the post box |
+| 10 | Home (summary) | The city at night; one building light switches on for each Star |
+
+## UI Kit
+
+แม่กม's own controls. None may look like แม่กง's clay buttons, comic cards or comic-panel transition.
+
+| Part | แม่กม |
 |---|---|
-| 1 | A shop sign hung between buildings, with น้องส้ม floating on the wind |
-| 2 | Six cards as lit shop windows, two floors of a building row |
-| 3 | The word on a billboard screen; the microphone in a phone booth below |
-| 4 | Words on three bus-stop signs, the ม red like a traffic light |
-| 5 | Twelve cards as umbrellas held by a crowd; a tap opens the umbrella |
-| 6 | Pictures in apartment windows; the Word Bank on a snow sled |
-| 7 | 4-panel comic |
-| 8 | The buzzers are four street lamps; a locked pair is joined by a string of lights |
-| 9 | Sentences on postcards pinned to a mailbox wall |
-| 10 | Building lights, one for each Star |
+| Buttons | Rounded ice blocks with a snow cap, in pale blue and white with ink outlines |
+| Home / Back / Next | Home is a small house with a snowy roof; Back and Next are arrow-shaped street direction signs |
+| Speaker | A red vintage radio |
+| Cards | Frosted window frames |
+| Feedback | A speech bubble from น้องส้ม, who peeks in at the screen edge |
+| Stars display | Snowflake-stars on a shop banner |
+| Step change | A snow flurry wipes across the screen |
+| Tap | A soft bell jingle and a puff of snow |

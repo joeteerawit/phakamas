@@ -13,8 +13,16 @@ One of the ordered stages of a Lesson (แม่กง has 10).
 _Avoid_: Page, หน้า, screen
 
 **Activity** (กิจกรรม):
-A Step that produces a score: word selection, word filling, rhyme matching.
-_Avoid_: Game, quiz, exercise
+A Step that produces a score: word selection, word filling, rhyme matching. Every Lesson scores its Activities the same way, whatever its Games look like.
+_Avoid_: quiz, exercise
+
+**Map** (แผนที่):
+A Lesson's journey: one stop per Step, set in the Lesson's Theme, which the student travels through with the Mascot.
+_Avoid_: Menu, level select
+
+**Game** (เกม):
+How one Step is played in one Lesson, invented for that Lesson's words and setting; two Lessons never share a Game for the same Step.
+_Avoid_: Mini-game, layout, skin
 
 **Session**:
 One student's run through a Lesson in one browser; a browser holds at most one Session.
@@ -37,7 +45,7 @@ The one character that guides the student through every Step of a Lesson; each L
 _Avoid_: Character, owl, teacher avatar
 
 **Theme** (ธีม):
-The look of one Lesson: its Scenes, Mascot, colours and how each Step is laid out. No two Lessons share a Theme.
+The world of one Lesson: its setting, Scenes, Mascot, colours, Map and Games. No two Lessons share a Theme.
 _Avoid_: Skin, style
 
 **Word Catalog** (คลังคำ):

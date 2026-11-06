@@ -1,0 +1,7 @@
+# Each Lesson is its own game; only learning goals, Stars and the Session are shared
+
+Supersedes ADR-0001. The owner played แม่กม with new art on แม่กง's mechanics and found it "just the same as แม่กง". So every Lesson keeps the same ten learning stages (Steps), but each Lesson plays them as a journey of its own: a Map with one stop per Step, and each stop is a Game invented for that Lesson's words and setting. We keep across Lessons only what teachers and students need to stay comparable: the Steps' learning goals, Stars (the same three Activities score the same way), the Session and resume, audio, and the accessibility rules (phone landscape, large tap targets, screen reader and keyboard, a still alternative under reduced motion, no timer a child can lose to). Games stay in React with `motion`; PixiJS only for a Game that needs many moving objects at once.
+
+The owner then added that a child must feel they are playing a different game, so the difference reaches the controls too: each Theme brings its own UI Kit (buttons, the Home/Back/Next controls, the speaker, cards, feedback, the Stars display and the change between Steps). `src/ui/` keeps only behaviour and accessibility that every Kit wraps: tap targets, focus, the Stage, audio wiring.
+
+**Consequences**: a Lesson costs about eight new Games, not a reskin. Shared behaviour hooks in `src/steps/` stay where a Game genuinely reuses them, but nothing forces a Game into another Lesson's mechanic.
