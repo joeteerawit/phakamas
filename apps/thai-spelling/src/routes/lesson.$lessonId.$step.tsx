@@ -1,14 +1,12 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import type { Feedback } from '../ui/clay/FeedbackToast'
+import { getTheme, stepScene } from '../themes'
 import { StepContent } from '../themes/StepContent'
+import { MascotContext } from '../ui/mascotContext'
 import { StepLayout } from '../ui/StepLayout'
-import type { Scene } from '../ui/stage/Stage'
 import { DEFAULT_LESSON_ID, getLesson, parseStepNumber } from '../lessons'
 import { useLessonSession } from '../session/lessonSession'
-
-/** Stage background per Step; unlisted Steps use the garden. */
-const stepScenes: Partial<Record<number, Scene>> = { 1: 'cover', 3: 'pond', 4: 'pond', 5: 'step5', 7: 'pond', 8: 'pond', 10: 'summary' }
 
 export const Route = createFileRoute('/lesson/$lessonId/$step')({
   beforeLoad: ({ params }) => {
@@ -31,9 +29,12 @@ function StepPage() {
   const visitStep = useLessonSession((state) => state.visitStep)
   useEffect(() => visitStep(lesson.id, stepNumber), [visitStep, lesson.id, stepNumber])
   const [feedback, setFeedback] = useState<Feedback | null>(null)
+  const theme = getTheme(lesson.theme)
   return (
-    <StepLayout lesson={lesson} stepNumber={stepNumber} feedback={feedback} scene={stepScenes[stepNumber]}>
-      <StepContent lesson={lesson} stepNumber={stepNumber} onFeedback={setFeedback} />
-    </StepLayout>
+    <MascotContext.Provider value={theme.mascot}>
+      <StepLayout lesson={lesson} stepNumber={stepNumber} feedback={feedback} scene={stepScene(theme, stepNumber)}>
+        <StepContent lesson={lesson} theme={theme} stepNumber={stepNumber} onFeedback={setFeedback} />
+      </StepLayout>
+    </MascotContext.Provider>
   )
 }

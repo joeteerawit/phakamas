@@ -1,7 +1,7 @@
 import { Check, X } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Fragment } from 'react'
-import { MONKEY_CHEER_SRC, MONKEY_ENCOURAGE_SRC } from '../Mascot'
+import { useMascot } from '../mascotContext'
 import { cx } from './buttonClass'
 
 export type Feedback = {
@@ -30,6 +30,7 @@ type FeedbackToastProps = {
  */
 export function FeedbackToast({ feedback, maxWidth, placement, className }: FeedbackToastProps) {
   const reduceMotion = useReducedMotion()
+  const { poses } = useMascot()
   const rise = placement === 'bottom'
 
   return (
@@ -64,7 +65,7 @@ export function FeedbackToast({ feedback, maxWidth, placement, className }: Feed
           >
             {/* The comic Mascot cheers a right answer and gives a thumbs up otherwise; 80 stage px tall (29 CSS px on a 390px-tall phone). */}
             <img
-              src={feedback.kind === 'correct' ? MONKEY_CHEER_SRC : MONKEY_ENCOURAGE_SRC}
+              src={feedback.kind === 'correct' ? poses.cheer : poses.encourage}
               alt=""
               draggable={false}
               className="pointer-events-none h-[80px] w-[68px] shrink-0 object-contain select-none"

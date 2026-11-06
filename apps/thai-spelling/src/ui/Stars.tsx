@@ -6,7 +6,7 @@ import type { AudioClip, Lesson } from '../lessons'
 import type { ActivityId } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { activityStars, lessonStars } from '../session/stars'
-import { MONKEY_CHEER_SRC, MONKEY_ENCOURAGE_SRC } from './Mascot'
+import { useMascot } from './mascotContext'
 import { popIn } from './motion/PopIn'
 import { useStageBleed } from './stage/Stage'
 
@@ -191,6 +191,7 @@ function ComicBurst() {
  */
 function ReactionMascot({ pose }: { pose: 'cheer' | 'encourage' }) {
   const still = useReducedMotion()
+  const { poses } = useMascot()
   return (
     <motion.div
       data-testid="mascot-reaction"
@@ -205,7 +206,7 @@ function ReactionMascot({ pose }: { pose: 'cheer' | 'encourage' }) {
         <JumpingMascot className="inset-0 size-full" />
       ) : (
         <motion.img
-          src={MONKEY_ENCOURAGE_SRC}
+          src={poses.encourage}
           alt=""
           draggable={false}
           className="pointer-events-none absolute inset-0 size-full origin-bottom object-contain select-none"
@@ -266,9 +267,10 @@ function Burst({ stars, clip }: { stars: number; clip: AudioClip }) {
 /** The cheering Mascot hopping in place; still under reduced motion. */
 export function JumpingMascot({ className }: { className: string }) {
   const still = useReducedMotion()
+  const { poses } = useMascot()
   return (
     <motion.img
-      src={MONKEY_CHEER_SRC}
+      src={poses.cheer}
       alt=""
       draggable={false}
       className={`pointer-events-none absolute select-none object-contain ${className}`}

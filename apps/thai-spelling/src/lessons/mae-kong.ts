@@ -48,6 +48,7 @@ const wordSelection = {
 /** แม่กง (ง). Content follows the Canva design DAHZj0Nxyxs. */
 export const maeKong = {
   id: 'mae-kong',
+  theme: 'mae-kong',
   title: 'คำคล้องจองพาเพลิน',
   subtitle: 'แม่ กง (ง)',
   gradeLine: 'วิชาภาษาไทย ชั้นประถมศึกษาปีที่ ๒',

@@ -1,12 +1,5 @@
 import { cx } from './clay/buttonClass'
-
-export const MASCOT_NAME = 'น้องลิง'
-/** The comic Mascot greeting (docs/comic-art.md). */
-export const MONKEY_SRC = '/assets/comic/mascot-greet.webp'
-/** The comic Mascot jumping for joy, for celebrations and right answers. */
-export const MONKEY_CHEER_SRC = '/assets/comic/mascot-cheer.webp'
-/** The comic Mascot giving a thumbs up, for answers that are not right yet. */
-export const MONKEY_ENCOURAGE_SRC = '/assets/comic/mascot-encourage.webp'
+import { useMascot } from './mascotContext'
 
 type MascotSize = 'sm' | 'md' | 'lg'
 
@@ -23,12 +16,13 @@ type MascotProps = {
   className?: string
 }
 
-/** น้องลิง, the Mascot that guides the student through every Step, greeting. */
+/** The Lesson's Mascot, which guides the student through every Step, greeting. */
 export function Mascot({ size = 'md', decorative = false, className }: MascotProps) {
+  const { name, poses } = useMascot()
   return (
     <img
-      src={MONKEY_SRC}
-      alt={decorative ? '' : MASCOT_NAME}
+      src={poses.greet}
+      alt={decorative ? '' : name}
       width={514}
       height={600}
       draggable={false}

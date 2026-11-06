@@ -92,6 +92,8 @@ export type Sentence = {
 /** A complete Lesson for one final-consonant group (มาตราตัวสะกด). */
 export type Lesson = {
   id: string
+  /** Id of the Lesson's Theme in src/themes. */
+  theme: string
   title: string
   subtitle: string
   /** Subject and grade line on the cover. */

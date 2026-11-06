@@ -1,6 +1,6 @@
 import { Smartphone } from 'lucide-react'
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from 'react'
-import { MONKEY_SRC } from '../Mascot'
+import { useMascot } from '../mascotContext'
 import { Ambient } from './Ambient'
 import { ClickFeedback } from './ClickFeedback'
 import { fitStage, isPortrait, STAGE_HEIGHT, STAGE_WIDTH } from './fitStage'
@@ -86,6 +86,7 @@ export function Stage({ scene = 'garden', children }: { scene?: Scene; children:
 }
 
 function RotateOverlay() {
+  const { poses } = useMascot()
   return (
     <div
       role="dialog"
@@ -99,7 +100,7 @@ function RotateOverlay() {
         className="size-24 animate-rotate-phone text-card motion-reduce:animate-none"
         strokeWidth={2}
       />
-      <img src={MONKEY_SRC} alt="" draggable={false} className="pointer-events-none h-40 w-auto object-contain select-none" />
+      <img src={poses.greet} alt="" draggable={false} className="pointer-events-none h-40 w-auto object-contain select-none" />
       <p
         id="rotate-message"
         className="rounded-full border-4 border-comic-ink bg-pill px-(--space-md) py-(--space-sm) shadow-comic font-heading text-body-lg font-bold whitespace-nowrap text-navy"

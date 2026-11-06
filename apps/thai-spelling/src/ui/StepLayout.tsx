@@ -21,7 +21,7 @@ type StepLayoutProps = {
   stepNumber: number
   /** Activity feedback shown in the toast; placeholder Steps pass none. */
   feedback?: Feedback | null
-  /** Stage background, from the route's per-Step scene map. */
+  /** Stage background, from the Lesson's Theme. */
   scene?: Scene
   children: ReactNode
 }
