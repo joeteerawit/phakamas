@@ -91,7 +91,7 @@ for (const viewport of [
     expect(fill.y + fill.height).toBeGreaterThanOrEqual(viewport.height - 0.5)
 
     const scale = Math.min(viewport.width / 1920, viewport.height / 1080)
-    const home = (await page.getByRole('link', { name: 'กลับไปขั้นแรก' }).boundingBox())!
+    const home = (await page.getByRole('link', { name: 'กลับไปแผนที่' }).boundingBox())!
     expect(viewport.width - home.x - home.width).toBeCloseTo(20 * scale, 0)
     expect(home.y).toBeCloseTo(23 * scale, 0)
     const back = (await page.getByRole('link', { name: 'ย้อนกลับ' }).boundingBox())!
@@ -103,7 +103,7 @@ for (const viewport of [
 
     if (viewport.height === 390) {
       for (const word of WORDS) await expectTapTarget(shopWindow(page, word))
-      for (const name of ['กลับไปขั้นแรก', 'ย้อนกลับ', 'ถัดไป']) await expectTapTarget(page.getByRole('link', { name }))
+      for (const name of ['กลับไปแผนที่', 'ย้อนกลับ', 'ถัดไป']) await expectTapTarget(page.getByRole('link', { name }))
     }
 
     const cards = await Promise.all(WORDS.map(async (word) => (await shopWindow(page, word).boundingBox())!))

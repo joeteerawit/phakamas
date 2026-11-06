@@ -1,6 +1,7 @@
 import { activitySteps } from '../../session/activities'
 import type { Theme } from '../types'
 import { maeKomKit } from './kit'
+import { CityMap } from './map/CityMap'
 import { CoverStep } from './steps/CoverStep'
 import { ListenRepeatStep } from './steps/ListenRepeatStep'
 import { SpottingStep } from './steps/SpottingStep'
@@ -19,6 +20,7 @@ export const maeKomTheme: Theme = {
     [activitySteps.rhymeMatching]: { scene: 'kom-windy' },
     9: { scene: 'kom-windy' },
   },
+  map: CityMap,
   // น้องส้ม (docs/comic-art.md).
   mascot: {
     name: 'น้องส้ม',

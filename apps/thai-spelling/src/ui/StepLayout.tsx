@@ -19,6 +19,8 @@ type StepLayoutProps = {
   feedback?: Feedback | null
   /** Stage background, from the Lesson's Theme. */
   scene?: Scene
+  /** The Lesson has a Map: Home goes back to it and keeps the Session. */
+  map?: boolean
   children: ReactNode
 }
 
@@ -44,7 +46,7 @@ const toastClass = { top: 'top-[146px]', bottom: 'bottom-[40px]' }
  * with the title sign, Home, music, Back and Next from the Canva design. Positions are stage pixels
  * copied from design DAHZj0Nxyxs page 2; how each looks comes from the Theme's UI Kit.
  */
-export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garden', children }: StepLayoutProps) {
+export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garden', map = false, children }: StepLayoutProps) {
   const totalSteps = lesson.steps.length
   const isFirst = stepNumber === 1
   const isLast = stepNumber === totalSteps
@@ -62,7 +64,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
   useEffect(() => endCelebration, [stepNumber])
 
   // Spec §4: ถัดไป completes a plain Step; on an Activity it saves partial work or, untouched, marks it skipped.
-  // Back never does either; Home clears the Session.
+  // Back never does either; Home clears the Session, or goes back to the Lesson's Map and keeps it.
   const activity = lessonActivities(lesson).find((a) => a.step === stepNumber)
   const leaveViaNext = () => {
     const { completeStep, savePartialActivity, skipActivity } = useLessonSession.getState()
@@ -107,17 +109,27 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
           </button>
         )}
 
-        {!isFirst && (
-          <Link
-            to="/lesson/$lessonId/$step"
-            params={stepParams(1)}
-            aria-label="กลับไปขั้นแรก"
-            className={cx(pressable, 'top-[23px] right-[20px]', cornerButton, kit.home.className)}
-            onClick={resetSession}
-          >
-            <kit.home.Art />
-          </Link>
-        )}
+        {!isFirst &&
+          (map ? (
+            <Link
+              to="/lesson/$lessonId/map"
+              params={{ lessonId: lesson.id }}
+              aria-label="กลับไปแผนที่"
+              className={cx(pressable, 'top-[23px] right-[20px]', cornerButton, kit.home.className)}
+            >
+              <kit.home.Art />
+            </Link>
+          ) : (
+            <Link
+              to="/lesson/$lessonId/$step"
+              params={stepParams(1)}
+              aria-label="กลับไปขั้นแรก"
+              className={cx(pressable, 'top-[23px] right-[20px]', cornerButton, kit.home.className)}
+              onClick={resetSession}
+            >
+              <kit.home.Art />
+            </Link>
+          ))}
       </WindowEdges>
 
       {/* Every Step marks its root data-full-stage and is laid out over the whole stage in design pixels (Step 6 portals onto the stage). */}

@@ -33,7 +33,7 @@ const onTop = (target: Locator) =>
     return !!hit && el.contains(hit)
   })
 
-test('the แม่กม cover: snowy street Scene, title on the shop sign, น้องส้ม floating, ▶ instead of Next', async ({ page }) => {
+test('the แม่กม cover: snowy street Scene, title on the shop sign, น้องส้ม floating, ▶ to the Map instead of Next', async ({ page }) => {
   await open(page, 1, {}, 'mae-kom')
   await expect(scene(page)).toHaveCSS('background-image', /comic\/kom-scene-cover\.webp/)
   await expect(sign(page).locator('img')).toHaveAttribute('src', /comic\/kom-shop-sign\.webp$/)
@@ -44,7 +44,7 @@ test('the แม่กม cover: snowy street Scene, title on the shop sign, น
   await expect(page.getByRole('link', { name: 'ถัดไป' })).toHaveCount(0)
 
   await playLink(page).click()
-  await expect(page).toHaveURL(/\/lesson\/mae-kom\/2$/)
+  await expect(page).toHaveURL(/\/lesson\/mae-kom\/map$/)
   await expect.poll(() => audioLog(page)).toEqual(['play:/assets/audio/explanations/mae-kom-intro.mp3'])
 })
 
@@ -64,9 +64,10 @@ test('น้องส้ม replaces น้องลิง on แม่กม St
 test('the แม่กม Theme uses only comic art files that exist', () => {
   const files = readdirSync('public/assets/comic')
   const dir = 'src/themes/mae-kom'
-  const sources = ['theme.ts', ...readdirSync(`${dir}/steps`).map((f) => `steps/${f}`), ...readdirSync(`${dir}/scenes`).map((f) => `scenes/${f}`)]
+  const sources = ['theme.ts', ...['steps', 'scenes', 'map'].flatMap((sub) => readdirSync(`${dir}/${sub}`).map((f) => `${sub}/${f}`))]
   const used = [...sources.map((f) => readFileSync(`${dir}/${f}`, 'utf8')).join().matchAll(/[\w-]+\.webp/g)].map(([name]) => name)
   expect(used).toContain('mascot-som-float.webp')
+  expect(used).toContain('kom-map.webp')
   expect(used.filter((name) => !files.includes(name))).toEqual([])
 })
 

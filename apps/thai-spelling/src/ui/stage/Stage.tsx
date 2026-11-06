@@ -7,7 +7,7 @@ import { Ambient } from './Ambient'
 import { ClickFeedback } from './ClickFeedback'
 import { fitStage, isPortrait, STAGE_HEIGHT, STAGE_WIDTH } from './fitStage'
 
-export type Scene = 'garden' | 'pond' | 'summary' | 'step5' | 'cover' | 'kom-cover' | 'kom-windy'
+export type Scene = 'garden' | 'pond' | 'summary' | 'step5' | 'cover' | 'kom-cover' | 'kom-windy' | 'kom-map'
 
 const sceneSrc: Record<Exclude<Scene, 'cover'>, string> = {
   garden: '/assets/canva/backgrounds/garden.webp',
@@ -15,15 +15,18 @@ const sceneSrc: Record<Exclude<Scene, 'cover'>, string> = {
   summary: '/assets/canva/backgrounds/cover.webp',
   // Calm comic flower garden (docs/comic-art.md).
   step5: '/assets/comic/step5-scene.webp',
-  // แม่กม (docs/mae-kom-spec.md): busy snowy shop street; calm windy street.
+  // แม่กม (docs/mae-kom-spec.md): busy snowy shop street; calm windy street; the snowy-city Map.
   'kom-cover': '/assets/comic/kom-scene-cover.webp',
   'kom-windy': '/assets/comic/kom-scene-windy.webp',
+  'kom-map': '/assets/comic/kom-map.webp',
 }
 
 /** What moves in a Scene: แม่กม's Scenes have their own objects, the rest share the garden's. */
 function SceneMotion({ scene }: { scene: Exclude<Scene, 'cover'> }) {
   if (scene === 'kom-cover') return <SnowyStreet />
   if (scene === 'kom-windy') return <WindyStreet />
+  // On the Map only น้องส้ม and the arrow move, drawn by the Map itself.
+  if (scene === 'kom-map') return null
   return <Ambient scene={scene} />
 }
 

@@ -18,13 +18,15 @@ async function expectStep(page: Page, step: number, title: string) {
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(title)
 }
 
-test('a student goes through แม่กม from the cover to the summary with all 9 Stars', async ({ page }) => {
+test('a student goes through แม่กม from the cover, by the Map, to the summary with all 9 Stars', async ({ page }) => {
   await page.goto('/lesson/mae-kom/1')
   await expectStep(page, 1, 'หน้าปก')
   await expect(page.getByText('คำแม่กมชมเมืองหิมะ')).toBeVisible()
   await expect(page.getByText('แม่ กม (ม)')).toBeVisible()
 
   await page.getByRole('link', { name: 'เริ่มเรียน' }).click()
+  await expect(page).toHaveURL(/\/lesson\/mae-kom\/map$/)
+  await page.getByRole('link', { name: /^ขั้น 2 / }).click()
   await expectStep(page, 2, 'ดูภาพเรียนรู้คำ')
   for (const [i, word] of WORDS.entries()) {
     await expect(wordButton(page, word)).toBeVisible()

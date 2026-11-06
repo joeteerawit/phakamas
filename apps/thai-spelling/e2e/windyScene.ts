@@ -56,7 +56,7 @@ export async function expectSceneFillsWithCornerButtons(page: Page, viewport: { 
   expect(fill.y + fill.height).toBeGreaterThanOrEqual(viewport.height - 0.5)
 
   const scale = Math.min(viewport.width / 1920, viewport.height / 1080)
-  const home = (await page.getByRole('link', { name: 'กลับไปขั้นแรก' }).boundingBox())!
+  const home = (await page.getByRole('link', { name: 'กลับไปแผนที่' }).boundingBox())!
   expect(viewport.width - home.x - home.width).toBeCloseTo(20 * scale, 0)
   expect(home.y).toBeCloseTo(23 * scale, 0)
   const back = (await page.getByRole('link', { name: 'ย้อนกลับ' }).boundingBox())!

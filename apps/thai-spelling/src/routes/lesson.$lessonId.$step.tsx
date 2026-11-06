@@ -34,7 +34,7 @@ function StepPage() {
   return (
     <MascotContext.Provider value={theme.mascot}>
       <KitContext.Provider value={theme.kit}>
-        <StepLayout lesson={lesson} stepNumber={stepNumber} feedback={feedback} scene={stepScene(theme, stepNumber)}>
+        <StepLayout lesson={lesson} stepNumber={stepNumber} feedback={feedback} scene={stepScene(theme, stepNumber)} map={!!theme.map}>
           <StepContent lesson={lesson} theme={theme} stepNumber={stepNumber} onFeedback={setFeedback} />
         </StepLayout>
       </KitContext.Provider>

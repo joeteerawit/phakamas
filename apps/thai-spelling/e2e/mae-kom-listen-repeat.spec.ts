@@ -149,7 +149,7 @@ for (const viewport of [
     const controls = () => [wordCard(page), step.getByRole('button'), page.getByTestId('listen-label'), page.getByText('กดแล้วอ่านตาม'), progress(page)]
     if (viewport.height === 390) {
       for (const target of await step.getByRole('button').all()) await expectTapTarget(target)
-      for (const name of ['กลับไปขั้นแรก', 'ย้อนกลับ', 'ถัดไป']) await expectTapTarget(page.getByRole('link', { name }))
+      for (const name of ['กลับไปแผนที่', 'ย้อนกลับ', 'ถัดไป']) await expectTapTarget(page.getByRole('link', { name }))
     }
     await expectNoDrifterCrosses(page, controls())
 

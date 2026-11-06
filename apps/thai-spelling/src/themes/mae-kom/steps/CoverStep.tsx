@@ -61,7 +61,7 @@ export function CoverStep({ lesson }: StepProps) {
 
 /**
  * The cover's controls from the Kit, in the window's corners whatever its shape, at แม่กง's cover offsets: the music
- * ice block, เริ่มใหม่, and the ▶ as a street sign pointing on, which sways gently; still under reduced motion.
+ * ice block, เริ่มใหม่, and the ▶ as a street sign pointing on to the Map, which sways gently; still under reduced motion.
  */
 function CornerButtons({ cover }: { cover: Cover }) {
   const still = useReducedMotion()
@@ -91,9 +91,10 @@ function CornerButtons({ cover }: { cover: Cover }) {
         </Button>
       )}
 
+      {/* ▶ opens the Map, where the arrow marks the stop to go on with. */}
       <Link
-        to="/lesson/$lessonId/$step"
-        params={{ lessonId, step: String(resumeStep ?? 2) }}
+        to="/lesson/$lessonId/map"
+        params={{ lessonId }}
         onClick={start}
         className={cx(pressable, 'absolute right-[32px] bottom-[24px] block size-[187px]', next.className)}
       >

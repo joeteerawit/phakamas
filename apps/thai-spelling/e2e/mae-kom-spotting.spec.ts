@@ -114,7 +114,7 @@ for (const viewport of [
     const step = page.getByRole('main')
     if (viewport.height === 390) {
       for (const target of await step.getByRole('button').all()) await expectTapTarget(target)
-      for (const name of ['กลับไปขั้นแรก', 'ย้อนกลับ', 'ถัดไป']) await expectTapTarget(page.getByRole('link', { name }))
+      for (const name of ['กลับไปแผนที่', 'ย้อนกลับ', 'ถัดไป']) await expectTapTarget(page.getByRole('link', { name }))
     }
     await expectNoDrifterCrosses(page, [step.getByRole('button'), step.locator('[data-testid^="spelling-"]')])
     // A two-line spelling splits evenly, never leaving a lone part on the second line.

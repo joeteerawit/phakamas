@@ -10,7 +10,7 @@ const link = (page: Page, name: string) => page.getByRole('link', { name, exact:
 const music = (page: Page) => page.getByRole('button', { name: /^(ปิดเพลง|เปิดเพลง)$/ })
 const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true })
 const burst = (page: Page) => page.getByTestId('click-burst')
-const corners = (page: Page) => [link(page, 'กลับไปขั้นแรก'), link(page, 'ย้อนกลับ'), link(page, 'ถัดไป'), music(page)]
+const corners = (page: Page) => [link(page, 'กลับไปแผนที่'), link(page, 'ย้อนกลับ'), link(page, 'ถัดไป'), music(page)]
 const running = (page: Page) => page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length)
 
 /** Counts the oscillators the page starts: each bell jingle is six. */
@@ -60,7 +60,7 @@ test('Steps 1–4 use only the แม่กม Kit: no แม่กง art, comi
 test('Home is a snowy house, Back and Next street direction signs, the title a street-name sign', async ({ page }) => {
   for (const step of [2, 5, 7, 10]) {
     await page.goto(`/lesson/mae-kom/${step}`)
-    await expect(link(page, 'กลับไปขั้นแรก').locator('[data-art="house"]'), `Step ${step}`).toBeVisible()
+    await expect(link(page, 'กลับไปแผนที่').locator('[data-art="house"]'), `Step ${step}`).toBeVisible()
     for (const name of ['ย้อนกลับ', step === 10 ? 'กลับหน้าแรก' : 'ถัดไป']) {
       await expect(link(page, name).locator('[data-art="street-sign"]'), `Step ${step} ${name}`).toBeVisible()
       await expect(link(page, name).locator('img'), `Step ${step} ${name}`).toHaveCount(0)
@@ -119,12 +119,8 @@ test("แม่กง's tap is unchanged: a boing and a comic star, no bell", as
 })
 
 test('a snow flurry wipes across the window between Steps, never the comic panel', async ({ page }) => {
-  await page.goto('/lesson/mae-kom/1')
-  await link(page, 'เริ่มเรียน').click()
-  await expect(page.getByTestId('step-flurry')).toBeVisible()
-  await expect(page.getByTestId('panel-transition')).toHaveCount(0)
-  await expect(page.getByTestId('step-flurry')).toHaveCount(0)
-  await expect(page).toHaveURL(/\/lesson\/mae-kom\/2$/)
+  // The cover's ▶ opens the Map, which has its own walk (mae-kom-map.spec.ts); Steps change with the flurry.
+  await page.goto('/lesson/mae-kom/2')
 
   for (const [name, step] of [
     ['ถัดไป', 3],
