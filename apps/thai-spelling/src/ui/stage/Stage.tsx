@@ -1,12 +1,13 @@
 import { Smartphone } from 'lucide-react'
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from 'react'
 import { SnowyStreet } from '../../themes/mae-kom/scenes/SnowyStreet'
+import { WindyStreet } from '../../themes/mae-kom/scenes/WindyStreet'
 import { useMascot } from '../mascotContext'
 import { Ambient } from './Ambient'
 import { ClickFeedback } from './ClickFeedback'
 import { fitStage, isPortrait, STAGE_HEIGHT, STAGE_WIDTH } from './fitStage'
 
-export type Scene = 'garden' | 'pond' | 'summary' | 'step5' | 'cover' | 'kom-cover'
+export type Scene = 'garden' | 'pond' | 'summary' | 'step5' | 'cover' | 'kom-cover' | 'kom-windy'
 
 const sceneSrc: Record<Exclude<Scene, 'cover'>, string> = {
   garden: '/assets/canva/backgrounds/garden.webp',
@@ -14,13 +15,15 @@ const sceneSrc: Record<Exclude<Scene, 'cover'>, string> = {
   summary: '/assets/canva/backgrounds/cover.webp',
   // Calm comic flower garden (docs/comic-art.md).
   step5: '/assets/comic/step5-scene.webp',
-  // แม่กม (docs/mae-kom-spec.md): busy snowy shop street.
+  // แม่กม (docs/mae-kom-spec.md): busy snowy shop street; calm windy street.
   'kom-cover': '/assets/comic/kom-scene-cover.webp',
+  'kom-windy': '/assets/comic/kom-scene-windy.webp',
 }
 
 /** What moves in a Scene: แม่กม's Scenes have their own objects, the rest share the garden's. */
 function SceneMotion({ scene }: { scene: Exclude<Scene, 'cover'> }) {
   if (scene === 'kom-cover') return <SnowyStreet />
+  if (scene === 'kom-windy') return <WindyStreet />
   return <Ambient scene={scene} />
 }
 

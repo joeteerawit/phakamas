@@ -196,6 +196,17 @@
     50% { opacity: 0.8; }
     60%, 100% { transform: translateX(-500px); opacity: 0; }
   }
+  /* แม่กม windy street (Steps 2–6, 8, 9): a few leaves and snowflakes fall slowly down the window's sides, swaying. */
+  --animate-drift-fall: drift-fall 22s linear infinite;
+  @keyframes drift-fall {
+    from { transform: translateY(-80px); }
+    to { transform: translateY(1160px); }
+  }
+  --animate-leaf-sway: leaf-sway 3.6s ease-in-out infinite alternate;
+  @keyframes leaf-sway {
+    from { transform: translateX(-40px) rotate(-30deg); }
+    to { transform: translateX(40px) rotate(25deg); }
+  }
   --animate-lamp-glow: lamp-glow 2.4s ease-in-out infinite alternate;
   @keyframes lamp-glow {
     from { opacity: 0.5; transform: scale(0.92); }

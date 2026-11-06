@@ -1,11 +1,20 @@
+import { activitySteps } from '../../session/activities'
 import type { Theme } from '../types'
 import { CoverStep } from './steps/CoverStep'
+import { VocabularyStep } from './steps/VocabularyStep'
 
-/** แม่กม's snowy-city Theme (docs/mae-kom-spec.md). Steps it leaves out use แม่กง's layout and Scene. */
+/** แม่กม's snowy-city Theme (docs/mae-kom-spec.md). Parts of a Step it leaves out use แม่กง's layout and Scene. */
 export const maeKomTheme: Theme = {
   id: 'mae-kom',
   steps: {
     1: { layout: CoverStep, scene: 'kom-cover' },
+    2: { layout: VocabularyStep, scene: 'kom-windy' },
+    3: { scene: 'kom-windy' },
+    4: { scene: 'kom-windy' },
+    [activitySteps.wordSelection]: { scene: 'kom-windy' },
+    [activitySteps.wordFilling]: { scene: 'kom-windy' },
+    [activitySteps.rhymeMatching]: { scene: 'kom-windy' },
+    9: { scene: 'kom-windy' },
   },
   // น้องส้ม (docs/comic-art.md).
   mascot: {
