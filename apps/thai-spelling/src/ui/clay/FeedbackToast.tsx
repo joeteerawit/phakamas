@@ -1,7 +1,6 @@
-import { Check, X } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Fragment } from 'react'
-import { useMascot } from '../mascotContext'
+import { useKit } from '../kit'
 import { cx } from './buttonClass'
 
 export type Feedback = {
@@ -24,78 +23,57 @@ type FeedbackToastProps = {
 }
 
 /**
- * Mascot + message + ✓/✗ icon. The live region stays mounted so screen
+ * The Kit's feedback bubble: Mascot + message + ✓/✗ icon. The live region stays mounted so screen
  * readers announce each new message; right/wrong is never colour alone.
  * It sits on the scaled stage, so it is sized in stage px: 46px type is 16.6 CSS px on a 390px-tall phone.
  */
 export function FeedbackToast({ feedback, maxWidth, placement, className }: FeedbackToastProps) {
   const reduceMotion = useReducedMotion()
-  const { poses } = useMascot()
+  const { feedback: bubble } = useKit()
   const rise = placement === 'bottom'
 
   return (
-    // One grid cell: a leaving toast and its replacement overlap in place instead of pushing each other aside.
-    <div
-      role="status"
-      aria-live="polite"
-      className={cx('pointer-events-none grid justify-items-center', rise ? 'items-end' : 'items-start', className)}
-    >
-      <AnimatePresence>
-        {feedback && (
-          <motion.div
-            key={`${feedback.kind}:${feedback.message}`}
-            initial={reduceMotion ? false : { opacity: 0, y: rise ? 32 : 0, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={
-              reduceMotion
-                ? { opacity: 0, transition: { duration: 0 } }
-                : { opacity: 0, y: rise ? 16 : 0, transition: { duration: 0.15 } }
-            }
-            transition={
-              feedback.kind === 'correct'
-                ? { type: 'spring', duration: 0.3, bounce: rise ? 0.45 : 0 }
-                : { duration: 0.2, ease: 'easeOut' }
-            }
-            style={{ maxWidth }}
-            className={cx(
-              // Ink outline and hard shadow; an inner ring in the result colour.
-              'col-start-1 row-start-1 flex items-center gap-[10px] rounded-[32px] border-[5px] border-comic-ink bg-cream py-[10px] ps-[12px] pe-[20px] shadow-comic ring-[5px] ring-inset',
-              feedback.kind === 'correct' ? 'ring-correct' : 'ring-wrong',
-            )}
-          >
-            {/* The comic Mascot cheers a right answer and gives a thumbs up otherwise; 80 stage px tall (29 CSS px on a 390px-tall phone). */}
-            <img
-              src={feedback.kind === 'correct' ? poses.cheer : poses.encourage}
-              alt=""
-              draggable={false}
-              className="pointer-events-none h-[80px] w-[68px] shrink-0 object-contain select-none"
-            />
-            <span
-              aria-hidden="true"
-              className={cx(
-                'flex size-[56px] shrink-0 items-center justify-center rounded-full border-4 border-comic-ink text-on-primary',
-                feedback.kind === 'correct' ? 'bg-correct' : 'bg-wrong',
-              )}
+    <>
+      {/* One grid cell: a leaving toast and its replacement overlap in place instead of pushing each other aside. */}
+      <div
+        role="status"
+        aria-live="polite"
+        className={cx('pointer-events-none grid justify-items-center', rise ? 'items-end' : 'items-start', className)}
+      >
+        <AnimatePresence>
+          {feedback && (
+            <motion.div
+              key={`${feedback.kind}:${feedback.message}`}
+              initial={reduceMotion ? false : { opacity: 0, y: rise ? 32 : 0, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={
+                reduceMotion
+                  ? { opacity: 0, transition: { duration: 0 } }
+                  : { opacity: 0, y: rise ? 16 : 0, transition: { duration: 0.15 } }
+              }
+              transition={
+                feedback.kind === 'correct'
+                  ? { type: 'spring', duration: 0.3, bounce: rise ? 0.45 : 0 }
+                  : { duration: 0.2, ease: 'easeOut' }
+              }
+              style={{ maxWidth }}
+              className={cx('col-start-1 row-start-1', bubble.className(feedback.kind))}
             >
-              {feedback.kind === 'correct' ? (
-                <Check className="size-[34px]" strokeWidth={3.5} />
-              ) : (
-                <X className="size-[34px]" strokeWidth={3.5} />
-              )}
-            </span>
-            <p
-              className={cx(
-                'min-w-0 font-heading text-[46px] leading-[1.35] font-bold text-balance',
-                feedback.kind === 'correct' ? 'text-correct' : 'text-wrong',
-              )}
-            >
-              <span className="sr-only">{feedback.kind === 'correct' ? 'ถูกต้อง: ' : 'ยังไม่ถูก: '}</span>
-              <Message text={feedback.message} keepTogether={feedback.keepTogether} />
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+              <bubble.Content
+                feedback={feedback}
+                text={
+                  <>
+                    <span className="sr-only">{feedback.kind === 'correct' ? 'ถูกต้อง: ' : 'ยังไม่ถูก: '}</span>
+                    <Message text={feedback.message} keepTogether={feedback.keepTogether} />
+                  </>
+                }
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+      {bubble.Aside && <AnimatePresence>{feedback && <bubble.Aside key={feedback.kind} feedback={feedback} placement={placement} />}</AnimatePresence>}
+    </>
   )
 }
 

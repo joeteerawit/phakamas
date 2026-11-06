@@ -4,7 +4,7 @@ import { maeKong } from '../lessons/mae-kong'
 import { getTheme, stepLayout, stepScene, type Theme } from '.'
 import { maeKongTheme } from './mae-kong/theme'
 
-const bare: Theme = { id: 'bare', steps: {}, mascot: maeKongTheme.mascot }
+const bare: Theme = { id: 'bare', steps: {}, mascot: maeKongTheme.mascot, kit: maeKongTheme.kit }
 const stepNumbers = maeKong.steps.map((_, i) => i + 1)
 
 describe('Theme fallback', () => {

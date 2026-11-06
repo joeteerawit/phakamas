@@ -6,6 +6,8 @@ import type { AudioClip, Lesson } from '../lessons'
 import type { ActivityId } from '../session/activities'
 import { useLessonSession } from '../session/lessonSession'
 import { activityStars, lessonStars } from '../session/stars'
+import { cx } from './clay/buttonClass'
+import { useKit } from './kit'
 import { useMascot } from './mascotContext'
 import { popIn } from './motion/PopIn'
 import { useStageBleed } from './stage/Stage'
@@ -26,17 +28,17 @@ const FLY_AT_MS = 1500
 // Stage-pixel offset from the big Stars' centre (960, 480) to the Star counter's centre (550, 86).
 const TO_COUNTER = { x: -410, y: -394 }
 
-/** The stage chrome's Star counter: a small wooden pill (MASTER.md wood) in ink, next to the title sign. */
+/** The stage chrome's Star counter, next to the title sign, in the Kit's Stars display. */
 export function StarCounter({ lesson }: { lesson: Lesson }) {
+  const { Star, starCounter } = useKit()
   const results = useLessonSession((state) => state.session?.activities)
   const { total, max } = lessonStars(lesson, results)
   return (
-    <p
-      data-testid="star-counter"
-      className="absolute top-[46px] left-[455px] flex h-[80px] items-center gap-[8px] rounded-full border-[5px] border-comic-ink bg-wood px-[24px] font-heading text-[40px] font-bold text-on-wood shadow-comic"
-    >
+    <p data-testid="star-counter" className={cx('absolute top-[46px] left-[455px] flex h-[80px]', starCounter)}>
       <span className="sr-only">ดาวที่ได้</span>
-      <span aria-hidden="true">⭐</span>
+      <span aria-hidden="true">
+        <Star />
+      </span>
       {total}/{max}
     </p>
   )
@@ -95,6 +97,7 @@ function CheckFeedback({
 }) {
   const still = useReducedMotion()
   const bleed = useStageBleed()
+  const { Star } = useKit()
   const [flying, setFlying] = useState(false)
   const [burstShown, setBurstShown] = useState(true)
   const [starsShown, setStarsShown] = useState(true)
@@ -142,7 +145,7 @@ function CheckFeedback({
             >
               {Array.from({ length: stars }, (_, i) => (
                 <motion.span key={i} {...popIn(i + 1, !!still)}>
-                  ⭐
+                  <Star />
                 </motion.span>
               ))}
             </motion.div>
@@ -221,6 +224,7 @@ function ReactionMascot({ pose }: { pose: 'cheer' | 'encourage' }) {
 function Burst({ stars, clip }: { stars: number; clip: AudioClip }) {
   const still = useReducedMotion()
   const bleed = useStageBleed()
+  const { Star } = useKit()
   const [flying, setFlying] = useState(false)
   useEffect(() => {
     playClip(clip)
@@ -255,7 +259,7 @@ function Burst({ stars, clip }: { stars: number; clip: AudioClip }) {
             key={i}
             {...popIn(i, !!still)}
           >
-            ⭐
+            <Star />
           </motion.span>
         ))}
       </motion.div>

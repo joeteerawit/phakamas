@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { useStageBleed } from './stage/Stage'
+import { useStageBleed } from '../../../ui/stage/Stage'
 
 /** Steps whose entry or exit turns a comic panel instead of sliding (#36): the comic-art cover and Step 5. */
 export const PANEL_STEPS: ReadonlySet<number> = new Set([1, 5])

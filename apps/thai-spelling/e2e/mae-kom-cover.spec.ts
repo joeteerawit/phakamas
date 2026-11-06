@@ -54,7 +54,8 @@ test('น้องส้ม replaces น้องลิง on แม่กม St
     await page.getByRole('button', { name: new RegExp(`^${word}(\\s|$)`) }).click()
   }
   await page.getByRole('button', { name: 'ตรวจคำตอบ' }).click()
-  await expect(page.getByRole('status').locator('img')).toHaveAttribute('src', /\/assets\/comic\/mascot-som-cheer\.webp$/)
+  // น้องส้ม peeks in beside her feedback bubble (the UI Kit, #63).
+  await expect(page.getByTestId('feedback-mascot').locator('img')).toHaveAttribute('src', /\/assets\/comic\/mascot-som-cheer\.webp$/)
 
   await page.setViewportSize({ width: 390, height: 844 })
   await expect(page.getByRole('dialog').locator('img')).toHaveAttribute('src', /\/assets\/comic\/mascot-som-greet\.webp$/)
@@ -130,7 +131,7 @@ test('reduced motion: the แม่กม cover is still', async ({ page }) => {
   await page.goto(COVER)
   await page.getByRole('heading', { level: 2 }).waitFor()
   expect(await running(page)).toBe(0)
-  for (const target of [mascot(page), sign(page), playLink(page).locator('img')]) {
+  for (const target of [mascot(page), sign(page), playLink(page).getByTestId('start-sign')]) {
     const before = await transformOf(target)
     await page.waitForTimeout(300)
     expect(await transformOf(target)).toBe(before)

@@ -48,6 +48,10 @@ _Avoid_: Character, owl, teacher avatar
 The world of one Lesson: its setting, Scenes, Mascot, colours, Map and Games. No two Lessons share a Theme.
 _Avoid_: Skin, style
 
+**UI Kit**:
+A Theme's own controls: buttons, Home/Back/Next, the speaker, cards, the feedback bubble, the Stars display, the change between Steps and the tap feedback. Behaviour and accessibility are shared; the look is not.
+_Avoid_: Skin, component library
+
 **Word Catalog** (คลังคำ):
 Every word the site knows, each with its picture, sound, spelling and final-consonant group, shared by all Lessons; a Session draws its Lesson's words from it at random.
 _Avoid_: Word Bank (that is the box of words to drag on the word-filling Step), dictionary, db

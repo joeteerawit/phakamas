@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import type { Feedback } from '../ui/clay/FeedbackToast'
 import { getTheme, stepScene } from '../themes'
 import { StepContent } from '../themes/StepContent'
+import { KitContext } from '../ui/kit'
 import { MascotContext } from '../ui/mascotContext'
 import { StepLayout } from '../ui/StepLayout'
 import { DEFAULT_LESSON_ID, getLesson, parseStepNumber } from '../lessons'
@@ -32,9 +33,11 @@ function StepPage() {
   const theme = getTheme(lesson.theme)
   return (
     <MascotContext.Provider value={theme.mascot}>
-      <StepLayout lesson={lesson} stepNumber={stepNumber} feedback={feedback} scene={stepScene(theme, stepNumber)}>
-        <StepContent lesson={lesson} theme={theme} stepNumber={stepNumber} onFeedback={setFeedback} />
-      </StepLayout>
+      <KitContext.Provider value={theme.kit}>
+        <StepLayout lesson={lesson} stepNumber={stepNumber} feedback={feedback} scene={stepScene(theme, stepNumber)}>
+          <StepContent lesson={lesson} theme={theme} stepNumber={stepNumber} onFeedback={setFeedback} />
+        </StepLayout>
+      </KitContext.Provider>
     </MascotContext.Provider>
   )
 }

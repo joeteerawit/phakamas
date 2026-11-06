@@ -64,6 +64,13 @@
   --color-cream-light: #fff6b3;
   /* Step 5 card marked wrong (always with a ✗ badge). */
   --color-wrong-tint: #ffc9c2;
+  /* แม่กม UI Kit (docs/mae-kom-spec.md): ice, snow and a blue street-sign enamel; navy text on ice 12:1, white on sign blue 8:1. */
+  --color-frost: #f4fbff;
+  --color-ice: #dcf1ff;
+  --color-ice-deep: #a6d6f5;
+  --color-sign-blue: #1f4fbf;
+  /* The shop banner of the Stars display: white text 7.6:1. */
+  --color-banner: #5b3cc4;
 
   --font-sans: 'Anuphan', ui-sans-serif, system-ui, sans-serif;
   --font-heading: 'Mali', 'Anuphan', ui-sans-serif, system-ui, sans-serif;
@@ -298,6 +305,130 @@
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
+  }
+}
+
+/*
+ * แม่กม's button (docs/mae-kom-spec.md UI Kit): a rounded ice block in pale blue and white with an ink outline and a
+ * snow cap, which sinks when pressed. aria-pressed="true" turns it deep blue. Reduced motion: no sinking motion.
+ */
+@utility ice-block {
+  border: 5px solid var(--color-comic-ink);
+  border-radius: 30px;
+  background: linear-gradient(160deg, var(--color-frost) 0 30%, var(--color-ice) 55%, var(--color-ice-deep));
+  color: var(--color-navy);
+  box-shadow:
+    inset 6px 6px 0 rgb(255 255 255 / 0.9),
+    inset -6px -8px 0 rgb(31 79 191 / 0.18),
+    0 8px 0 var(--color-comic-ink);
+  transition:
+    translate 150ms ease-out,
+    box-shadow 150ms ease-out;
+
+  /* The snow cap: a soft white pillow over the top edge, with two drips. */
+  &::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 10%;
+    width: 80%;
+    height: 30px;
+    border: 5px solid var(--color-comic-ink);
+    border-radius: 999px 999px 22px 22px;
+    background:
+      radial-gradient(circle at 22% 100%, var(--color-card) 9px, transparent 10px),
+      radial-gradient(circle at 70% 100%, var(--color-card) 7px, transparent 8px),
+      var(--color-card);
+    pointer-events: none;
+  }
+
+  &[aria-pressed='true'] {
+    background: linear-gradient(160deg, var(--color-ice-deep), var(--color-sign-blue) 70%);
+    color: var(--color-card);
+  }
+
+  &:active:not(:disabled) {
+    translate: 0 6px;
+    box-shadow:
+      inset 6px 6px 0 rgb(255 255 255 / 0.9),
+      inset -6px -8px 0 rgb(31 79 191 / 0.18),
+      0 2px 0 var(--color-comic-ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+/*
+ * แม่กม's card: a frosted window frame. A white frame between two ink lines, frost in its corners (an ::after
+ * over the picture, so the card must be positioned; the lower corners stay small, clear of words), and a cold
+ * glow while it is selected or playing.
+ */
+@utility frost-card {
+  border: 12px solid var(--color-card);
+  border-radius: 20px;
+  background-color: var(--color-frost);
+  box-shadow:
+    0 0 0 5px var(--color-comic-ink),
+    inset 0 0 0 4px var(--color-comic-ink),
+    0 10px 0 5px rgb(24 0 173 / 0.3);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    background:
+      radial-gradient(circle at 0 0, rgb(255 255 255 / 0.95) 0 22px, rgb(255 255 255 / 0.5) 34px, transparent 52px),
+      radial-gradient(circle at 100% 0, rgb(255 255 255 / 0.9) 0 16px, transparent 38px),
+      radial-gradient(circle at 0 100%, rgb(255 255 255 / 0.8) 0 8px, transparent 24px),
+      radial-gradient(circle at 100% 100%, rgb(255 255 255 / 0.9) 0 10px, transparent 26px);
+    pointer-events: none;
+  }
+
+  &[data-highlight] {
+    box-shadow:
+      0 0 0 5px var(--color-comic-ink),
+      inset 0 0 0 4px var(--color-comic-ink),
+      0 0 0 16px var(--color-ice-deep),
+      0 0 44px 20px rgb(255 255 255 / 0.95);
+  }
+}
+
+/* แม่กม's labels and badges: snow-white with an ink outline and a pale ice edge, so they never look like a button. */
+@utility frost-label {
+  border: 5px solid var(--color-comic-ink);
+  border-radius: 26px;
+  background-color: var(--color-card);
+  box-shadow: inset 0 -6px 0 var(--color-ice);
+}
+
+/* แม่กม's Star counter: a purple shop banner hung from an ink rod, with a fringe of snow along its bottom. */
+@utility shop-banner {
+  border: 5px solid var(--color-comic-ink);
+  border-radius: 6px 6px 14px 14px;
+  background-color: var(--color-banner);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -14px;
+    left: -18px;
+    right: -18px;
+    height: 12px;
+    border-radius: 999px;
+    background-color: var(--color-comic-ink);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    bottom: -17px;
+    height: 16px;
+    background: radial-gradient(circle at 12px 0, var(--color-card) 9px, var(--color-comic-ink) 9px 12px, transparent 12px) 0 0 / 24px 16px repeat-x;
   }
 }
 

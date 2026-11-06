@@ -2,7 +2,8 @@ import { motion, useReducedMotion } from 'motion/react'
 import type { VocabularyWord } from '../../../lessons'
 import { useVocabulary, useVocabularyCard } from '../../../steps/vocabulary/useVocabulary'
 import type { StepProps } from '../../../steps/stepProps'
-import { creamCard, cx } from '../../../ui/clay/buttonClass'
+import { cx } from '../../../ui/clay/buttonClass'
+import { useKit } from '../../../ui/kit'
 import { popIn } from '../../../ui/motion/PopIn'
 import { SpeakerButton } from '../../../ui/SpeakerButton'
 
@@ -18,7 +19,8 @@ const floorTops = [306, 710]
 
 /**
  * แม่กม Step 2 (docs/mae-kom-spec.md): the six picture cards as lit shop windows on two floors of a building row,
- * drawn in CSS in the comic style. Tapping a window plays its word; it glows while it plays.
+ * drawn in CSS in the comic style, each in the Kit's frosted window frame. Tapping a window plays its word; it
+ * glows while it plays.
  */
 export function VocabularyStep({ lesson }: StepProps) {
   const vocabulary = useVocabulary()
@@ -26,7 +28,7 @@ export function VocabularyStep({ lesson }: StepProps) {
 
   return (
     <section data-full-stage className="relative size-full">
-      <p className="absolute top-[166px] left-[960px] flex -translate-x-1/2 h-[71px] items-center rounded-full border-[5px] border-comic-ink bg-pill px-[28px] font-heading text-[38px] font-bold whitespace-nowrap text-navy shadow-comic">
+      <p className="frost-label absolute top-[166px] left-[960px] flex -translate-x-1/2 h-[71px] items-center px-[28px] font-heading text-[38px] font-bold whitespace-nowrap text-navy">
         คลิกที่ภาพเพื่อฟังเสียง
       </p>
 
@@ -70,6 +72,7 @@ type ShopWindowProps = { item: VocabularyWord; visited: boolean; onPlay: () => v
 
 function ShopWindow({ item, visited, onPlay }: ShopWindowProps) {
   const { status, statusText } = useVocabularyCard(item, visited)
+  const { card } = useKit()
 
   return (
     <button
@@ -78,7 +81,7 @@ function ShopWindow({ item, visited, onPlay }: ShopWindowProps) {
       data-highlight={status === 'playing' || undefined}
       className={cx(
         'pointer-events-auto relative block size-full cursor-pointer overflow-hidden select-none',
-        creamCard,
+        card,
         'focus-visible:outline-8 focus-visible:outline-offset-4 focus-visible:outline-ring',
       )}
     >

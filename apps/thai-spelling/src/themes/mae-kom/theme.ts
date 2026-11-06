@@ -1,5 +1,6 @@
 import { activitySteps } from '../../session/activities'
 import type { Theme } from '../types'
+import { maeKomKit } from './kit'
 import { CoverStep } from './steps/CoverStep'
 import { ListenRepeatStep } from './steps/ListenRepeatStep'
 import { SpottingStep } from './steps/SpottingStep'
@@ -28,4 +29,5 @@ export const maeKomTheme: Theme = {
       cover: '/assets/comic/mascot-som-float.webp',
     },
   },
+  kit: maeKomKit,
 }

@@ -3,6 +3,7 @@ import type { SpottingWord } from '../../../lessons'
 import { spottingPicture, useSpellingPlaying, useSpotting } from '../../../steps/spotting/useSpotting'
 import type { StepProps } from '../../../steps/stepProps'
 import { cx, pressable } from '../../../ui/clay/buttonClass'
+import { useKit } from '../../../ui/kit'
 import { SpeakerButton } from '../../../ui/SpeakerButton'
 
 // Stage pixels. kom-bus-stop.webp (425×1200) drawn 400 wide from y = 200, its pole running on past the stage's
@@ -20,26 +21,22 @@ const PANEL = { left: 30, top: 56, width: 339, height: 346 }
 export function SpottingStep({ lesson }: StepProps) {
   const { sets, setIndex, direction, words, explaining, explain, showSet, play, activePart } = useSpotting(lesson)
   const reduceMotion = useReducedMotion()
+  const { Button } = useKit()
 
   return (
     <section data-full-stage aria-label={`คำในมาตรา${lesson.finalGroup}`} className="relative size-full">
-      {/* As on แม่กง: set buttons left of the Step pill and the explanation speaker right of it, level with it. */}
+      {/* As on แม่กง: set buttons left of the Step badge and the explanation speaker right of it, level with it; the chosen set's ice block is pressed in. */}
       <div role="group" aria-label="เลือกชุดคำ" className="absolute top-[27px] right-[1124px] flex gap-[24px]">
         {sets.map((_, i) => (
-          <button
+          <Button
             key={i}
-            type="button"
             aria-label={`ชุดคำที่ ${i + 1}`}
             aria-pressed={i === setIndex}
             onClick={() => showSet(i)}
-            className={cx(
-              pressable,
-              'flex size-[124px] items-center justify-center rounded-full border-[6px] border-comic-ink font-heading text-[56px] font-bold shadow-comic',
-              i === setIndex ? 'bg-navy text-card' : 'bg-pill text-navy',
-            )}
+            className="relative flex size-[124px] items-center justify-center font-heading text-[56px] font-bold"
           >
             {i + 1}
-          </button>
+          </Button>
         ))}
       </div>
       <div className="absolute top-[27px] left-[1124px] size-[124px]">
@@ -135,7 +132,7 @@ function BusStopSign({ word, left, activePart, onPlay }: BusStopSignProps) {
       <p
         data-testid={`spelling-${text}`}
         style={{ left }}
-        className="absolute top-[630px] flex min-h-[110px] w-[400px] items-center justify-center rounded-[44px] border-[5px] border-comic-ink bg-cream px-[28px] py-[8px] text-center shadow-comic font-heading text-[44px] leading-[1.4] font-bold text-balance text-foreground"
+        className="frost-label absolute top-[630px] flex min-h-[110px] w-[400px] items-center justify-center px-[28px] py-[8px] text-center font-heading text-[44px] leading-[1.4] font-bold text-balance text-foreground"
       >
         {/* Inline parts, so a spelling that needs two lines splits evenly. */}
         <span>
@@ -145,7 +142,7 @@ function BusStopSign({ word, left, activePart, onPlay }: BusStopSignProps) {
                 data-active={i === activePart || undefined}
                 className={cx(
                   'rounded-[12px] px-[2px] transition-colors duration-150 motion-reduce:transition-none',
-                  i === activePart && 'bg-pill text-navy',
+                  i === activePart && 'bg-ice-deep text-navy',
                 )}
               >
                 {part}

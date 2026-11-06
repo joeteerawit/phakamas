@@ -1,5 +1,6 @@
 import { activitySteps } from '../../session/activities'
 import type { Theme } from '../types'
+import { maeKongKit } from './kit'
 import { CoverStep } from './steps/CoverStep'
 import { ListenRepeatStep } from './steps/ListenRepeatStep'
 import { RhymeMatchingStep } from './steps/RhymeMatchingStep'
@@ -39,4 +40,5 @@ export const maeKongTheme: Theme = {
       cover: '/assets/comic/mascot-swing.webp',
     },
   },
+  kit: maeKongKit,
 }

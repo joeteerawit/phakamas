@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router'
-import { Volume2, VolumeX } from 'lucide-react'
 import { AnimatePresence, motion, useIsPresent, useReducedMotion } from 'motion/react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { stopAudio } from '../audio/audioManager'
@@ -9,12 +8,9 @@ import { lessonActivities, useUncheckedWork, type ActivityId } from '../session/
 import { useLessonSession } from '../session/lessonSession'
 import { cx, pressable as pressFeedback } from './clay/buttonClass'
 import { FeedbackToast, type Feedback } from './clay/FeedbackToast'
-import { PANEL_COVER_MS, PANEL_MS, PANEL_STEPS, PanelTransition } from './PanelTransition'
+import { useKit, type UiKit } from './kit'
 import { Stage, useStageBleed, type Scene } from './stage/Stage'
 import { Celebration, endCelebration, StarCounter } from './Stars'
-
-/** Shared comic chrome (docs/comic-art.md). */
-const COMIC = '/assets/comic'
 
 type StepLayoutProps = {
   lesson: Lesson
@@ -26,9 +22,8 @@ type StepLayoutProps = {
   children: ReactNode
 }
 
-const chromeImage = 'pointer-events-none size-full select-none object-contain'
-// Home, Back and Next share one size; each keeps its window-corner offset. Round, so the focus ring follows the art.
-const cornerButton = 'h-[150px] w-[146px] rounded-full'
+// Home, Back and Next share one size; each keeps its window-corner offset. The Kit gives each its shape and art.
+const cornerButton = 'h-[150px] w-[146px]'
 const pressable = cx(pressFeedback, 'absolute block')
 /**
  * Where each Activity's feedback toast sits, clear of every card, chip and control. Step 5: bottom centre,
@@ -47,7 +42,7 @@ const toastClass = { top: 'top-[146px]', bottom: 'bottom-[40px]' }
 /**
  * Shared Step layout (spec §1.3, MASTER.md "Canva garden"): every Step sits on the 1920×1080 stage
  * with the title sign, Home, music, Back and Next from the Canva design. Positions are stage pixels
- * copied from design DAHZj0Nxyxs page 2.
+ * copied from design DAHZj0Nxyxs page 2; how each looks comes from the Theme's UI Kit.
  */
 export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garden', children }: StepLayoutProps) {
   const totalSteps = lesson.steps.length
@@ -56,8 +51,9 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
   const title = lesson.steps[stepNumber - 1]?.title
   const stepParams = (step: number) => ({ lessonId: lesson.id, step: String(step) })
 
+  const kit = useKit()
   const reduceMotion = useReducedMotion()
-  const { direction, moved, panel, panelChange, stageScene } = useStepChange(stepNumber, scene, !!reduceMotion)
+  const { direction, moved, panel, panelChange, stageScene } = useStepChange(stepNumber, scene, !!reduceMotion, kit.stepChange)
   // Step 5's full marks shake the Step (#35).
   const mainRef = useRef<HTMLElement>(null)
   const musicOn = useLessonSession((state) => state.musicOn)
@@ -86,18 +82,15 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
           // The cover's visible heading is the Lesson title; the Step title stays the h1.
           <h1 className="sr-only">{title}</h1>
         ) : (
-          <div
-            className="absolute top-[29px] left-[47px] flex h-[115px] w-[382px] items-center justify-center bg-contain bg-center bg-no-repeat px-[24px]"
-            style={{ backgroundImage: `url(${COMIC}/ui-plank.webp)` }}
-          >
-            <h1 className="truncate font-heading text-[38px] leading-[1.4] font-bold text-navy">{title}</h1>
-          </div>
+          <kit.TitleSign>
+            <h1 className="truncate">{title}</h1>
+          </kit.TitleSign>
         )}
 
         {(activity || isLast) && <StarCounter lesson={lesson} />}
 
         {/* Design page 1 has no Step badge; the cover keeps it for screen readers. */}
-        <p className={isFirst ? 'sr-only' : 'absolute top-[52px] left-1/2 -translate-x-1/2 rounded-full border-[5px] border-comic-ink bg-pill px-[32px] font-heading text-[40px] leading-[1.6] font-bold whitespace-nowrap text-navy shadow-comic'}>
+        <p className={isFirst ? 'sr-only' : cx('absolute top-[52px] left-1/2 -translate-x-1/2', kit.stepBadge)}>
           ขั้น {stepNumber}/{totalSteps}
         </p>
 
@@ -108,13 +101,9 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
             aria-label={musicOn ? 'ปิดเพลง' : 'เปิดเพลง'}
             aria-pressed={musicOn}
             onClick={toggleMusic}
-            className={`${pressable} z-10 top-[32px] right-[178px] flex size-[122px] items-center justify-center rounded-full border-[6px] border-comic-ink bg-pill text-navy shadow-comic`}
+            className={cx(pressable, 'z-10 top-[32px] right-[178px] size-[122px]', kit.music.className)}
           >
-            {musicOn ? (
-              <Volume2 aria-hidden="true" className="size-16" strokeWidth={2.5} />
-            ) : (
-              <VolumeX aria-hidden="true" className="size-16" strokeWidth={2.5} />
-            )}
+            <kit.music.Art on={musicOn} />
           </button>
         )}
 
@@ -123,10 +112,10 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
             to="/lesson/$lessonId/$step"
             params={stepParams(1)}
             aria-label="กลับไปขั้นแรก"
-            className={`${pressable} top-[23px] right-[20px] ${cornerButton}`}
+            className={cx(pressable, 'top-[23px] right-[20px]', cornerButton, kit.home.className)}
             onClick={resetSession}
           >
-            <img src={`${COMIC}/ui-home.webp`} alt="" draggable={false} className={chromeImage} />
+            <kit.home.Art />
           </Link>
         )}
       </WindowEdges>
@@ -134,10 +123,10 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
       {/* Every Step marks its root data-full-stage and is laid out over the whole stage in design pixels (Step 6 portals onto the stage). */}
       <main ref={mainRef} className={`absolute inset-x-[200px] top-[180px] bottom-[24px] flex flex-col overflow-x-clip overflow-y-auto has-[[data-full-stage]]:pointer-events-none has-[[data-full-stage]]:inset-0 ${isFirst ? 'has-[[data-full-stage]]:overflow-visible' : 'has-[[data-full-stage]]:overflow-hidden'}`}>
         {/* #18: the old Step slides out and the next slides in, in the travel direction; a fade with reduced motion. */}
-        {/* #36: into or out of Step 1 or 5 a comic panel sweeps over instead; the Steps swap under it. */}
+        {/* When the Kit's Step change covers the window (แม่กง #36: into or out of Step 1 or 5), the Steps swap under it. */}
         {/* No AnimatePresence initial={false}: it would also freeze every looping animation inside the first Step. */}
-        <AnimatePresence mode="wait" custom={{ direction, reduceMotion, panel: panelChange }}>
-          <StepSlide key={stepNumber} travel={{ direction, reduceMotion, panel: panelChange }} enter={moved}>
+        <AnimatePresence mode="wait" custom={{ direction, reduceMotion, panel: panelChange, coverMs: kit.stepChange.coverMs }}>
+          <StepSlide key={stepNumber} travel={{ direction, reduceMotion, panel: panelChange, coverMs: kit.stepChange.coverMs }} enter={moved}>
             {children}
           </StepSlide>
         </AnimatePresence>
@@ -149,10 +138,9 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
             to="/lesson/$lessonId/$step"
             params={stepParams(stepNumber - 1)}
             aria-label="ย้อนกลับ"
-            className={`${pressable} bottom-[13px] left-[29px] ${cornerButton}`}
+            className={cx(pressable, 'bottom-[13px] left-[29px]', cornerButton, kit.back.className)}
           >
-            {/* The ▶ button mirrored. */}
-            <img src={`${COMIC}/play-button.webp`} alt="" draggable={false} className={`${chromeImage} -scale-x-100`} />
+            <kit.back.Art />
           </Link>
         )}
         {/* The cover's own ▶ replaces Next. */}
@@ -162,9 +150,9 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
             params={stepParams(isLast ? 1 : stepNumber + 1)}
             aria-label={isLast ? 'กลับหน้าแรก' : 'ถัดไป'}
             onClick={isLast ? undefined : leaveViaNext}
-            className={`${pressable} right-[34px] bottom-[13px] ${cornerButton}`}
+            className={cx(pressable, 'right-[34px] bottom-[13px]', cornerButton, kit.next.className)}
           >
-            <img src={`${COMIC}/play-button.webp`} alt="" draggable={false} className={chromeImage} />
+            <kit.next.Art />
           </Link>
         )}
       </WindowEdges>
@@ -176,7 +164,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
         maxWidth={toast.maxWidth}
         className={`absolute inset-x-0 z-30 ${toastClass[toast.placement]}`}
       />
-      {panel && <PanelTransition key={panel.key} direction={panel.direction} />}
+      {panel && <kit.stepChange.Cover key={panel.key} direction={panel.direction} />}
     </Stage>
   )
 }
@@ -191,7 +179,7 @@ function WindowEdges({ as: Tag = 'div', label, children }: { as?: 'div' | 'nav';
   )
 }
 
-type Travel = { direction: number; reduceMotion: boolean | null; panel: boolean }
+type Travel = { direction: number; reduceMotion: boolean | null; panel: boolean; coverMs: number }
 const SLIDE_PX = 240
 const SLIDE = { duration: 0.22, ease: 'easeOut' } as const
 const slide = {
@@ -199,11 +187,11 @@ const slide = {
     reduceMotion ? { opacity: 0 } : panel ? { opacity: 1, x: 0, scale: 1.04 } : { opacity: 0, x: direction * SLIDE_PX },
   center: ({ panel }: Travel) => ({ opacity: 1, x: 0, scale: 1, transition: panel ? ({ duration: 0.4, ease: 'easeOut' } as const) : SLIDE }),
   // A panel change keeps the old Step in place, settling back, until the panel covers it.
-  exit: ({ direction, reduceMotion, panel }: Travel) =>
+  exit: ({ direction, reduceMotion, panel, coverMs }: Travel) =>
     reduceMotion
       ? { opacity: 0, transition: SLIDE }
       : panel
-        ? { opacity: 1, x: 0, scale: 0.97, transition: { duration: PANEL_COVER_MS / 1000, ease: 'easeIn' as const } }
+        ? { opacity: 1, x: 0, scale: 0.97, transition: { duration: coverMs / 1000, ease: 'easeIn' as const } }
         : { opacity: 0, x: -direction * SLIDE_PX, transition: SLIDE },
 }
 
@@ -245,11 +233,11 @@ type StepChange = {
 }
 
 /**
- * Tracks Step changes. A change into or out of a panel Step (#36, not under reduced motion) shows the panel
+ * Tracks Step changes. A change the Kit covers (not under reduced motion) shows its cover, the panel,
  * and keeps the old scene until the panel covers the window, so the new scene never pops in in plain view.
  * Rapid changes restart the panel and keep whichever scene is on screen; both timers always run out.
  */
-function useStepChange(stepNumber: number, scene: Scene, reduceMotion: boolean) {
+function useStepChange(stepNumber: number, scene: Scene, reduceMotion: boolean, { covers, coverMs, ms }: UiKit['stepChange']) {
   const [change, setChange] = useState<StepChange>(() => ({
     step: stepNumber,
     scene,
@@ -261,7 +249,7 @@ function useStepChange(stepNumber: number, scene: Scene, reduceMotion: boolean) 
     count: 0,
   }))
   if (stepNumber !== change.step) {
-    const panelChange = !reduceMotion && (PANEL_STEPS.has(stepNumber) || PANEL_STEPS.has(change.step))
+    const panelChange = !reduceMotion && covers(change.step, stepNumber)
     const direction = stepNumber > change.step ? 1 : -1
     const count = change.count + 1
     setChange({
@@ -279,13 +267,13 @@ function useStepChange(stepNumber: number, scene: Scene, reduceMotion: boolean) 
   const panelKey = change.panel?.key
   useEffect(() => {
     if (panelKey === undefined) return
-    const uncover = setTimeout(() => setChange((old) => ({ ...old, held: null })), PANEL_COVER_MS)
-    const done = setTimeout(() => setChange((old) => (old.panel?.key === panelKey ? { ...old, panel: null } : old)), PANEL_MS + 40)
+    const uncover = setTimeout(() => setChange((old) => ({ ...old, held: null })), coverMs)
+    const done = setTimeout(() => setChange((old) => (old.panel?.key === panelKey ? { ...old, panel: null } : old)), ms + 40)
     return () => {
       clearTimeout(uncover)
       clearTimeout(done)
     }
-  }, [panelKey])
+  }, [panelKey, coverMs, ms])
 
   return {
     direction: change.direction,
