@@ -1,5 +1,6 @@
-import { maeKong } from './mae-kong'
-import type { Lesson } from './types'
+import { maeKom } from './mae-kom.ts'
+import { maeKong } from './mae-kong.ts'
+import type { Lesson } from './types.ts'
 
 export type {
   AudioClip,
@@ -12,13 +13,17 @@ export type {
   WordChoice,
   WordFilling,
   WordSelectionActivity,
-} from './types'
+} from './types.ts'
 
 const lessons: Readonly<Record<string, Lesson>> = {
   [maeKong.id]: maeKong,
+  [maeKom.id]: maeKom,
 }
 
-/** Where `/` and invalid lesson URLs land until there is a second Lesson. */
+/** Every registered Lesson; scripts/gen-audio.sh reads its clips from these. */
+export const allLessons: readonly Lesson[] = Object.values(lessons)
+
+/** Where `/` and invalid lesson URLs land until there is a Lesson picker (#43). */
 export const DEFAULT_LESSON_ID = maeKong.id
 
 export function getLesson(lessonId: string): Lesson | undefined {

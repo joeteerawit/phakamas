@@ -30,7 +30,7 @@ describe('mae-kong lesson data (Canva design DAHZj0Nxyxs)', () => {
   it('is the default Lesson and can be looked up by id', () => {
     expect(DEFAULT_LESSON_ID).toBe('mae-kong')
     expect(getLesson('mae-kong')).toBe(maeKong)
-    expect(getLesson('mae-kom')).toBeUndefined()
+    expect(getLesson('no-such-lesson')).toBeUndefined()
     expect(getLesson('constructor')).toBeUndefined()
   })
 

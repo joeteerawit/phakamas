@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { maeKom } from '../lessons/mae-kom'
 import { maeKong } from '../lessons/mae-kong'
 import { getTheme, stepLayout, stepScene, type Theme } from '.'
 import { maeKongTheme } from './mae-kong/theme'
@@ -24,5 +25,14 @@ describe('Theme fallback', () => {
 
   it("แม่กง's Lesson names the แม่กง Theme", () => {
     expect(getTheme(maeKong.theme)).toBe(maeKongTheme)
+  })
+
+  it("แม่กม's Theme has no Steps yet, so every Step is แม่กง's", () => {
+    const theme = getTheme(maeKom.theme)
+    expect(theme.id).toBe('mae-kom')
+    for (const step of stepNumbers) {
+      expect(stepLayout(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.layout)
+      expect(stepScene(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.scene)
+    }
   })
 })

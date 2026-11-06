@@ -1,3 +1,4 @@
+import { maeKomTheme } from './mae-kom/theme'
 import { maeKongTheme } from './mae-kong/theme'
 import type { Theme } from './types'
 
@@ -5,6 +6,7 @@ export type { Theme, ThemeStep } from './types'
 
 const themes: Readonly<Record<string, Theme>> = {
   [maeKongTheme.id]: maeKongTheme,
+  [maeKomTheme.id]: maeKomTheme,
 }
 
 /** The Theme a Lesson names; every Lesson's Theme is registered here. */

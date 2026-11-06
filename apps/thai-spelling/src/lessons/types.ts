@@ -79,6 +79,8 @@ export type RhymeMatching = {
 /** A line of the Step 7 rhyme; `rhymeWords` are the words in it the UI highlights. */
 export type RhymeLine = AudioClip & {
   rhymeWords: readonly string[]
+  /** The comic panel picture drawn for this line, for a Theme that shows Step 7 as a comic; แม่กง has none. */
+  panel?: string
 }
 
 /** A sentence on Step 9, illustrated by several pictures side by side. */

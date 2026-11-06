@@ -1,11 +1,13 @@
 #!/bin/sh
-# Regenerate the placeholder mp3 for every AudioClip in the Lesson data with a Thai neural voice
+# Generate the placeholder mp3 for every AudioClip of every registered Lesson with a Thai neural voice
 # (edge-tts, Premwadee), read slowly and clearly. Spelling clips centre each part (ลอ, อิ, งอ, ลิง)
 # in an equal 1.2 s slot, so the UI can highlight part i at i * duration / parts.
+# Clips that already have an mp3 are kept (Lessons share word clips); FORCE=1 regenerates them all.
 # shortcut: edge-tts calls Microsoft's online service and its terms for this use are unclear,
 # replace with teacher recordings before launch (AUD-001).
-# Usage (from apps/thai-spelling, needs edge-tts on PATH, node >= 23 and ffmpeg): sh scripts/gen-audio.sh
+# Usage (from apps/thai-spelling, needs edge-tts on PATH, node >= 23 and ffmpeg): [FORCE=1] sh scripts/gen-audio.sh
 set -eu
+command -v edge-tts >/dev/null || { echo "edge-tts is not on PATH" >&2; exit 1; }
 OUT=public/assets/audio
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
@@ -24,15 +26,18 @@ speak() {
 TRIM='silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,adelay=150:all=1'
 
 # id|text|spelling (spelling = ลอ-อิ-งอ-ลิง for spelling clips, empty otherwise), read from the
-# Lesson data (node >= 23 strips the TS types itself).
+# Lesson data, once per id (node >= 23 strips the TS types itself).
 CLIPS=$(node --input-type=module -e "
-import { maeKong } from './src/lessons/mae-kong.ts'
+import { allLessons } from './src/lessons/index.ts'
 import { audioClips } from './src/lessons/audio-clips.ts'
-const spelling = new Map(maeKong.spotting.sets.flat().map((w) => [w.spellingAudio.id, w.spelling.join('-')]))
-for (const c of audioClips(maeKong)) console.log([c.id, c.text, spelling.get(c.id) ?? ''].join('|'))
+const words = allLessons.flatMap((lesson) => lesson.spotting.sets.flat())
+const spelling = new Map(words.map((w) => [w.spellingAudio.id, w.spelling.join('-')]))
+const clips = new Map(allLessons.flatMap(audioClips).map((c) => [c.id, c]))
+for (const c of clips.values()) console.log([c.id, c.text, spelling.get(c.id) ?? ''].join('|'))
 ")
 
 echo "$CLIPS" | while IFS='|' read -r id text spelling; do
+  [ -n "${FORCE:-}" ] || [ ! -f "$OUT/$id.mp3" ] || continue
   mkdir -p "$OUT/$(dirname "$id")"
   if [ -n "$spelling" ]; then
     list="$TMP/list.txt"

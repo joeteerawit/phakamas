@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { allLessons } from './index'
+import { maeKom } from './mae-kom'
 import { maeKong } from './mae-kong'
 
 // Keys look like /public/assets/comic/word-ling.webp.
@@ -14,10 +16,11 @@ function imagePaths(value: unknown): string[] {
 describe('Lesson images', () => {
   it('finds the image paths in the Lesson data', () => {
     expect(imagePaths(maeKong)).toContain('/assets/comic/word-ling.webp')
+    expect(imagePaths(maeKom)).toContain('/assets/comic/word-rom.webp')
   })
 
   it('has a file on disk for every image the Lesson references', () => {
-    const missing = [...new Set(imagePaths(maeKong))].filter((path) => !files.includes(`/public${path}`))
+    const missing = [...new Set(allLessons.flatMap(imagePaths))].filter((path) => !files.includes(`/public${path}`))
     expect(missing).toEqual([])
   })
 })
