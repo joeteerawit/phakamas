@@ -8,14 +8,12 @@ import { RhymeMatchingStep } from './steps/RhymeMatchingStep'
 import { RhymeStep } from './steps/RhymeStep'
 import { SentenceStep } from './steps/SentenceStep'
 import { SpottingStep } from './steps/SpottingStep'
+import { SummaryStep } from './steps/SummaryStep'
 import { VocabularyStep } from './steps/VocabularyStep'
 import { WordFillingStep } from './steps/WordFillingStep'
 import { WordSelectionStep } from './steps/WordSelectionStep'
 
-/**
- * แม่กบ's rainy-pond Theme (docs/mae-kop-spec.md): its cover, a Scene for every Step, its Map and its UI Kit. A Step whose
- * layout it leaves out still plays แม่กง's Game until its own Game lands (#62).
- */
+/** แม่กบ's rainy-pond Theme (docs/mae-kop-spec.md): its own Game and Scene for every Step, its Map, Mascot and UI Kit. */
 export const maeKopTheme: Theme = {
   id: 'mae-kop',
   steps: {
@@ -29,7 +27,7 @@ export const maeKopTheme: Theme = {
     7: { layout: RhymeStep, scene: 'kop-gutter' },
     [activitySteps.rhymeMatching]: { layout: RhymeMatchingStep, scene: 'kop-drizzle' },
     9: { layout: SentenceStep, scene: 'kop-drizzle' },
-    10: { scene: 'kop-rainbow' },
+    10: { layout: SummaryStep, scene: 'kop-rainbow' },
   },
   map: PondMap,
   // น้องกบ: SVG stand-ins exported to webp (scripts/placeholder-art.mjs) until the art ticket (#69) lands.

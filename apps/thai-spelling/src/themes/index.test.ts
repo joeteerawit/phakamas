@@ -61,11 +61,11 @@ describe('Theme fallback', () => {
     expect(stepScene(theme, 10)).toBe('kop-rainbow')
   })
 
-  it("แม่กบ's Theme lays out its own Games; the Steps not built yet are still แม่กง's", () => {
+  it("แม่กบ's Theme lays out its own Game for every Step, none of them แม่กง's or แม่กม's", () => {
     const theme = getTheme(maeKop.theme)
-    const own = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     for (const step of stepNumbers) {
-      expect(stepLayout(theme, step) === maeKongTheme.steps[step]?.layout, `Step ${step}`).toBe(!own.includes(step))
+      expect(theme.steps[step]?.layout, `Step ${step}`).toBeDefined()
+      expect(stepLayout(theme, step), `Step ${step}`).not.toBe(maeKongTheme.steps[step]?.layout)
       expect(stepLayout(theme, step), `Step ${step}`).not.toBe(getTheme(maeKom.theme).steps[step]?.layout)
     }
   })
