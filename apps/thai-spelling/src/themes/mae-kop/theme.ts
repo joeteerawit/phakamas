@@ -4,6 +4,7 @@ import { maeKopKit } from './kit'
 import { PondMap } from './map/PondMap'
 import { CoverStep } from './steps/CoverStep'
 import { ListenRepeatStep } from './steps/ListenRepeatStep'
+import { RhymeStep } from './steps/RhymeStep'
 import { SpottingStep } from './steps/SpottingStep'
 import { VocabularyStep } from './steps/VocabularyStep'
 import { WordFillingStep } from './steps/WordFillingStep'
@@ -23,7 +24,7 @@ export const maeKopTheme: Theme = {
     [activitySteps.wordSelection]: { layout: WordSelectionStep, scene: 'kop-drizzle' },
     [activitySteps.wordFilling]: { layout: WordFillingStep, scene: 'kop-drizzle' },
     // Step 7's comic has no Scene: its panels fill the window over a plain gutter.
-    7: { scene: 'kop-gutter' },
+    7: { layout: RhymeStep, scene: 'kop-gutter' },
     [activitySteps.rhymeMatching]: { scene: 'kop-drizzle' },
     9: { scene: 'kop-drizzle' },
     10: { scene: 'kop-rainbow' },
