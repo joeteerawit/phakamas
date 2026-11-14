@@ -61,6 +61,15 @@ describe('Theme fallback', () => {
     expect(stepScene(theme, 10)).toBe('kop-rainbow')
   })
 
+  it("แม่กบ's Theme lays out its own Games; the Steps not built yet are still แม่กง's", () => {
+    const theme = getTheme(maeKop.theme)
+    const own = [1, 2]
+    for (const step of stepNumbers) {
+      expect(stepLayout(theme, step) === maeKongTheme.steps[step]?.layout, `Step ${step}`).toBe(!own.includes(step))
+      expect(stepLayout(theme, step), `Step ${step}`).not.toBe(getTheme(maeKom.theme).steps[step]?.layout)
+    }
+  })
+
   it("แม่กบ's Mascot is น้องกบ with her own poses, under her taro-leaf umbrella on the cover", () => {
     const { name, poses } = getTheme(maeKop.theme).mascot
     expect(name).toBe('น้องกบ')

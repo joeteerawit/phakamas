@@ -63,7 +63,7 @@ test('a student plays แม่กบ from the cover, by the Map, through all 10
     await wordButton(page, a).click()
     await wordButton(page, b).click()
   }
-  await expect(page.getByRole('status').filter({ hasText: 'เก่งมาก' })).toBeVisible()
+  await expect(page.getByTestId('star-counter')).toHaveText(/9\/9/)
 
   await nextLink(page).click()
   await expectStep(page, 9, 'อ่านออก บอกได้')
@@ -75,11 +75,11 @@ test('a student plays แม่กบ from the cover, by the Map, through all 10
   await expect(scoreRow(page, 'จับคู่ดูคำ')).toContainText('2/2')
 })
 
-test('every แม่กบ picture card loads', async ({ page }) => {
-  for (const step of [2, 5]) {
-    await open(page, step, {}, 'mae-kop')
-    const images = page.getByRole('main').locator('img')
-    await expect(images.first()).toBeVisible()
+test('every แม่กบ picture card loads (Step 5 shows all twelve)', async ({ page }) => {
+  {
+    await open(page, 5, {}, 'mae-kop')
+    const images = page.getByRole('main').locator('img[src*="/word-"]')
+    await expect(images).toHaveCount(12)
     for (const img of await images.all()) {
       await expect(img).toHaveJSProperty('complete', true)
       expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth), (await img.getAttribute('src')) ?? '').toBeGreaterThan(0)
