@@ -3,6 +3,7 @@ import { activitySteps } from '../../session/activities'
 import { maeKopKit } from './kit'
 import { PondMap } from './map/PondMap'
 import { CoverStep } from './steps/CoverStep'
+import { ListenRepeatStep } from './steps/ListenRepeatStep'
 import { VocabularyStep } from './steps/VocabularyStep'
 
 /**
@@ -14,7 +15,7 @@ export const maeKopTheme: Theme = {
   steps: {
     1: { layout: CoverStep, scene: 'kop-cover' },
     2: { layout: VocabularyStep, scene: 'kop-drizzle' },
-    3: { scene: 'kop-drizzle' },
+    3: { layout: ListenRepeatStep, scene: 'kop-drizzle' },
     4: { scene: 'kop-drizzle' },
     [activitySteps.wordSelection]: { scene: 'kop-drizzle' },
     [activitySteps.wordFilling]: { scene: 'kop-drizzle' },
