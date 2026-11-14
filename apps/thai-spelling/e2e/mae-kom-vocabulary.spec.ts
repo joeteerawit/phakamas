@@ -11,6 +11,8 @@ const SLUGS = ['rom', 'lom', 'som', 'nom', 'phom', 'cham']
 const windows = (page: Page) => page.getByRole('list').getByRole('button')
 const shopWindow = (page: Page, word: string) => page.getByRole('button', { name: new RegExp(`^${word} `) })
 const scene = (page: Page) => page.getByTestId('stage-scene')
+// The Step's own status line (the layout's feedback toast is a status region too).
+const streetStatus = (page: Page) => page.getByRole('status').filter({ hasText: 'ร้าน' })
 const ahead = (page: Page) => page.getByRole('link', { name: 'ไปต่อ', exact: true })
 
 test('the six words are dark shop windows side by side along the shop street, each in its own shop', async ({ page }) => {
@@ -39,7 +41,7 @@ test('the six words are dark shop windows side by side along the shop street, ea
   }
   await expect(page.getByTestId('street-barrier')).toBeVisible()
   await expect(ahead(page)).toHaveCount(0)
-  await expect(page.getByRole('status')).toHaveText('แตะหน้าต่างร้านให้ไฟติด (0/6)')
+  await expect(streetStatus(page)).toHaveText('แตะหน้าต่างร้านให้ไฟติด (0/6)')
 })
 
 test('tapping a shop lights its window, shows its picture and plays its word, and น้องส้ม walks to it', async ({ page }) => {
@@ -61,7 +63,7 @@ test('tapping a shop lights its window, shows its picture and plays its word, an
     near(at.cx, window.cx, `under ${WORDS[i]}`)
     expect(at.top).toBeGreaterThan(window.bottom)
   }
-  await expect(page.getByRole('status')).toHaveText('แตะหน้าต่างร้านให้ไฟติด (3/6)')
+  await expect(streetStatus(page)).toHaveText('แตะหน้าต่างร้านให้ไฟติด (3/6)')
   await expect(windows(page).nth(1)).not.toHaveAttribute('data-lit')
 })
 
@@ -75,7 +77,7 @@ test('the street ahead opens only once all six shops are lit, and ไปต่�
     if (i === 2) await shopWindow(page, WORDS[0]!).click()
     await endCurrent(page)
   }
-  await expect(page.getByRole('status')).toHaveText('ไฟติดครบ 6 ร้านแล้ว ไปต่อกันเลย')
+  await expect(streetStatus(page)).toHaveText('ไฟติดครบ 6 ร้านแล้ว ไปต่อกันเลย')
   await expect(page.getByTestId('street-barrier')).toHaveCount(0)
   await ahead(page).click()
   await expect(page).toHaveURL(/\/lesson\/mae-kom\/3$/)
@@ -137,7 +139,7 @@ for (const viewport of [
       for (const word of WORDS) await expectTapTarget(shopWindow(page, word))
       for (const target of [ahead(page), ...['กลับไปแผนที่', 'ย้อนกลับ', 'ถัดไป'].map((name) => page.getByRole('link', { name }))]) await expectTapTarget(target)
     }
-    await expectNoDrifterCrosses(page, [windows(page), ahead(page), page.getByRole('status')])
+    await expectNoDrifterCrosses(page, [windows(page), ahead(page), streetStatus(page)])
 
     // ไปต่อ and น้องส้ม (outside the last shop) keep clear of the windows and the corner buttons.
     await waitUntilStill(page.getByTestId('shop-mascot'))
@@ -162,7 +164,7 @@ test('keyboard and screen reader: each shop window is a named button, Enter ligh
     await endCurrent(page)
     await expect(shopWindow(page, word)).toHaveAccessibleName(`${word} ฟังแล้ว`)
   }
-  await expect(page.getByRole('status')).toHaveText('ไฟติดครบ 6 ร้านแล้ว ไปต่อกันเลย')
+  await expect(streetStatus(page)).toHaveText('ไฟติดครบ 6 ร้านแล้ว ไปต่อกันเลย')
   await ahead(page).focus()
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/\/lesson\/mae-kom\/3$/)
@@ -184,9 +186,11 @@ test('the windy Scene drifts slowly; under reduced motion it is still, and so is
   for (const [i, word] of WORDS.entries()) {
     await shopWindow(page, word).click()
     await endCurrent(page)
-    const at = await stageBox(page, page.getByTestId('shop-mascot'))
-    near(at.cx, (await stageBox(page, windows(page).nth(i))).cx, `at ${word} at once`)
-    await expect(windows(page).nth(i).getByTestId('window-light')).toHaveCSS('transition-duration', '0s')
+    const window = await stageBox(page, windows(page).nth(i))
+    await expect
+      .poll(async () => Math.abs((await stageBox(page, page.getByTestId('shop-mascot'))).cx - window.cx), { message: `at ${word} at once`, timeout: 300 })
+      .toBeLessThanOrEqual(2)
+    await expect(windows(page).nth(i).getByTestId('window-light')).toHaveCSS('transition-property', 'none')
   }
   await expect(page.getByTestId('street-barrier')).toHaveCount(0)
   await expect(ahead(page)).toBeVisible()

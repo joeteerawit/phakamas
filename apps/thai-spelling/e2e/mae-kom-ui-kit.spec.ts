@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { open } from './audioStub.js'
-import { overlaps, stageBox } from './stageBox.js'
+import { overlaps, stageBox, waitUntilStill } from './stageBox.js'
 import { expectTapTarget } from './tapTarget.js'
 
 // แม่กม's UI Kit (#63, docs/mae-kom-spec.md): nothing on its Steps may look like แม่กง's controls.
@@ -195,6 +195,8 @@ for (const viewport of [
       expect(box.y, `Step ${step} music`).toBeCloseTo(32 * scale, 0)
       if (phone) {
         for (const target of corners(page)) await expectTapTarget(target)
+        // Once the Step's cards have popped in.
+        await waitUntilStill(...(await page.getByRole('main').getByRole('button').all()))
         for (const target of await page.getByRole('main').getByRole('button').all()) await expectTapTarget(target)
       }
     }
