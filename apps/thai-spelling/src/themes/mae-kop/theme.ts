@@ -6,6 +6,7 @@ import { CoverStep } from './steps/CoverStep'
 import { ListenRepeatStep } from './steps/ListenRepeatStep'
 import { RhymeMatchingStep } from './steps/RhymeMatchingStep'
 import { RhymeStep } from './steps/RhymeStep'
+import { SentenceStep } from './steps/SentenceStep'
 import { SpottingStep } from './steps/SpottingStep'
 import { VocabularyStep } from './steps/VocabularyStep'
 import { WordFillingStep } from './steps/WordFillingStep'
@@ -27,7 +28,7 @@ export const maeKopTheme: Theme = {
     // Step 7's comic has no Scene: its panels fill the window over a plain gutter.
     7: { layout: RhymeStep, scene: 'kop-gutter' },
     [activitySteps.rhymeMatching]: { layout: RhymeMatchingStep, scene: 'kop-drizzle' },
-    9: { scene: 'kop-drizzle' },
+    9: { layout: SentenceStep, scene: 'kop-drizzle' },
     10: { scene: 'kop-rainbow' },
   },
   map: PondMap,
