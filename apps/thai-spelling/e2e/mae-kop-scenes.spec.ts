@@ -55,7 +55,7 @@ for (const viewport of [
       await open(page, Number(step), {}, 'mae-kop')
       await expectSceneFills(page, scene, viewport)
       if (viewport.height === 390 && step !== '1') {
-        for (const name of ['กลับไปขั้นแรก', 'ย้อนกลับ']) await expectTapTarget(page.getByRole('link', { name }))
+        for (const name of ['กลับไปแผนที่', 'ย้อนกลับ']) await expectTapTarget(page.getByRole('link', { name }))
       }
     }
   })

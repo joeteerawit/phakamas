@@ -26,15 +26,15 @@ test('the title, subtitle and grade line sit on the raincoat-yellow vinyl panel,
   expect(overlaps(await stageBox(page, panel(page)), await stageBox(page, mascot(page)))).toBe(false)
 })
 
-test('▶ starts the Lesson with the teacher intro; once under way it resumes, and เริ่มใหม่ starts over', async ({ page }) => {
+test('▶ opens the Map with the teacher intro; once under way it resumes, and เริ่มใหม่ starts over', async ({ page }) => {
   await open(page, 1, {}, 'mae-kop')
   await expect(start(page)).toHaveAccessibleName('เริ่มเรียน')
   await expect(restart(page)).toHaveCount(0)
   await start(page).click()
-  await expect(page).toHaveURL(/\/lesson\/mae-kop\/2$/)
+  await expect(page).toHaveURL(/\/lesson\/mae-kop\/map$/)
   await expect.poll(() => audioLog(page)).toContain('play:/assets/audio/explanations/mae-kop-intro.mp3')
-  await page.getByRole('link', { name: 'ถัดไป' }).click()
-  await expect(page).toHaveURL(/\/lesson\/mae-kop\/3$/)
+  await page.goto('/lesson/mae-kop/3')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('ฟังแล้วอ่านตาม')
 
   await page.goto('/lesson/mae-kop/1')
   await expect(start(page)).toHaveAccessibleName('เรียนต่อ (ขั้น 3)')
@@ -92,7 +92,7 @@ test('keyboard and screen reader: the cover reads as a page, its art hidden, and
   await start(page).focus()
   expect(parseFloat(await start(page).evaluate((el) => getComputedStyle(el).outlineWidth))).toBeGreaterThan(0)
   await page.keyboard.press('Enter')
-  await expect(page).toHaveURL(/\/lesson\/mae-kop\/2$/)
+  await expect(page).toHaveURL(/\/lesson\/mae-kop\/map$/)
 })
 
 test('the pond rains, rings spread and a paper boat drifts; under reduced motion the cover is still', async ({ page }) => {

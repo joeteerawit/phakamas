@@ -10,7 +10,7 @@ const link = (page: Page, name: string) => page.getByRole('link', { name, exact:
 const music = (page: Page) => page.getByRole('button', { name: /^(ปิดเพลง|เปิดเพลง)$/ })
 const button = (page: Page, name: string) => page.getByRole('button', { name, exact: true })
 const burst = (page: Page) => page.getByTestId('click-burst')
-const corners = (page: Page) => [link(page, 'กลับไปขั้นแรก'), link(page, 'ย้อนกลับ'), link(page, 'ถัดไป'), music(page)]
+const corners = (page: Page) => [link(page, 'กลับไปแผนที่'), link(page, 'ย้อนกลับ'), link(page, 'ถัดไป'), music(page)]
 const running = (page: Page) => page.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length)
 
 /** Counts the oscillators the page starts: each plop is one. */
@@ -55,10 +55,10 @@ test('the chrome of Steps 2–10 uses only the แม่กบ Kit: nothing from
   }
 })
 
-test('Home is a teal hut, Back and Next rubber boots, the title a teal vinyl tag', async ({ page }) => {
+test('Home is a teal hut back to the Map, Back and Next rubber boots, the title a teal vinyl tag', async ({ page }) => {
   for (const step of [2, 5, 7, 10]) {
     await page.goto(`/lesson/mae-kop/${step}`)
-    await expect(link(page, 'กลับไปขั้นแรก').locator('[data-art="hut"]'), `Step ${step}`).toBeVisible()
+    await expect(link(page, 'กลับไปแผนที่').locator('[data-art="hut"]'), `Step ${step}`).toBeVisible()
     for (const name of ['ย้อนกลับ', step === 10 ? 'กลับหน้าแรก' : 'ถัดไป']) {
       await expect(link(page, name).locator('[data-art="boot"]'), `Step ${step} ${name}`).toBeVisible()
       await expect(link(page, name).locator('img'), `Step ${step} ${name}`).toHaveCount(0)
@@ -173,7 +173,7 @@ for (const viewport of [
       const box = (await music(page).boundingBox())!
       expect(viewport.width - box.x - box.width, `Step ${step} music`).toBeCloseTo(178 * scale, 0)
       expect(box.y, `Step ${step} music`).toBeCloseTo(32 * scale, 0)
-      const home = (await link(page, 'กลับไปขั้นแรก').boundingBox())!
+      const home = (await link(page, 'กลับไปแผนที่').boundingBox())!
       expect(viewport.width - home.x - home.width).toBeCloseTo(20 * scale, 0)
       const back = (await link(page, 'ย้อนกลับ').boundingBox())!
       expect(back.x).toBeCloseTo(29 * scale, 0)

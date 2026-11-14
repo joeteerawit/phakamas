@@ -1,10 +1,11 @@
 import type { Theme } from '../types'
 import { activitySteps } from '../../session/activities'
 import { maeKopKit } from './kit'
+import { PondMap } from './map/PondMap'
 import { CoverStep } from './steps/CoverStep'
 
 /**
- * แม่กบ's rainy-pond Theme (docs/mae-kop-spec.md): its cover, a Scene for every Step and its UI Kit. A Step whose
+ * แม่กบ's rainy-pond Theme (docs/mae-kop-spec.md): its cover, a Scene for every Step, its Map and its UI Kit. A Step whose
  * layout it leaves out still plays แม่กง's Game until its own Game lands (#62).
  */
 export const maeKopTheme: Theme = {
@@ -22,6 +23,7 @@ export const maeKopTheme: Theme = {
     9: { scene: 'kop-drizzle' },
     10: { scene: 'kop-rainbow' },
   },
+  map: PondMap,
   // น้องกบ: SVG stand-ins exported to webp (scripts/placeholder-art.mjs) until the art ticket (#69) lands.
   mascot: {
     name: 'น้องกบ',
