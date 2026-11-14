@@ -1,9 +1,9 @@
-import { maeKongKit } from '../mae-kong/kit'
 import type { Theme } from '../types'
+import { maeKopKit } from './kit'
 
 /**
  * แม่กบ's rainy-pond Theme (docs/mae-kop-spec.md). Every Step it leaves out uses แม่กง's layout and Scene; its own
- * Scenes, Map, Games and UI Kit come with the later tickets of #62.
+ * Scenes, Map and Games come with the later tickets of #62.
  */
 export const maeKopTheme: Theme = {
   id: 'mae-kop',
@@ -18,5 +18,5 @@ export const maeKopTheme: Theme = {
       cover: '/assets/comic/mascot-kop-cover.webp',
     },
   },
-  kit: maeKongKit,
+  kit: maeKopKit,
 }
