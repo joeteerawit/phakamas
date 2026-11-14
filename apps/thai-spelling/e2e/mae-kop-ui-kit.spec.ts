@@ -1,12 +1,10 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { open } from './audioStub.js'
+import { otherLook } from './maeKop.js'
 import { overlaps, stageBox, waitUntilStill } from './stageBox.js'
 import { expectTapTarget } from './tapTarget.js'
 
 // แม่กบ's UI Kit (#70, docs/mae-kop-spec.md): nothing in its chrome may look like แม่กง's or แม่กม's controls.
-const MAE_KONG_ART = ['ui-home', 'play-button', 'speaker-button', 'ui-buzzer', 'ui-plank']
-const MAE_KOM_ART = ['house', 'street-sign', 'radio', 'snowflake-star']
-const MAE_KOM_CLASSES = ['ice-block', 'frost-card', 'frost-label', 'shop-banner']
 
 const link = (page: Page, name: string) => page.getByRole('link', { name, exact: true })
 const music = (page: Page) => page.getByRole('button', { name: /^(ปิดเพลง|เปิดเพลง)$/ })
@@ -35,24 +33,6 @@ const squashes = (target: Locator) =>
         .getAnimations()
         .filter((a) => !(a instanceof CSSTransition) && !(a instanceof CSSAnimation))
         .filter((a) => (a as Animation & { effect: KeyframeEffect }).effect.getKeyframes().some((f) => 'scale' in f || 'rotate' in f)).length,
-  )
-
-/** แม่กง's art, comic card ring or plank, or แม่กม's ice, frost and art, inside `root` (the chrome, or the whole page). */
-const otherLook = (root: Locator) =>
-  root.evaluateAll(
-    (roots, { kong, kom, classes }) => {
-      const found: string[] = []
-      for (const el of roots.flatMap((r) => [r, ...r.querySelectorAll('*')])) {
-        const src = el.getAttribute('src') ?? ''
-        const bg = getComputedStyle(el).backgroundImage
-        if (kong.some((name) => src.includes(`/${name}.webp`) || bg.includes(`/${name}.webp`))) found.push(src || bg)
-        if (el.classList.contains('comic-card') || bg.includes('conic-gradient')) found.push(el.className.toString())
-        if (classes.some((name) => el.classList.contains(name))) found.push(el.className.toString())
-        if (kom.includes(el.getAttribute('data-art') ?? '')) found.push(`data-art=${el.getAttribute('data-art')}`)
-      }
-      return found
-    },
-    { kong: MAE_KONG_ART, kom: MAE_KOM_ART, classes: MAE_KOM_CLASSES },
   )
 
 /** The chrome every Step shares, stretched to the window's edges: title, Step badge, Star counter, Home, music, Back and Next. */

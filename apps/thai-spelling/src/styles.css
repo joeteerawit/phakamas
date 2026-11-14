@@ -236,6 +236,32 @@
     from { opacity: 0.5; transform: scale(0.92); }
     to { opacity: 1; transform: scale(1.08); }
   }
+  /* แม่กบ rainy pond (Step 1): rain falls slightly slanted; rings spread on the water; a paper boat drifts across. */
+  --animate-rain-fall: rain-fall 1.4s linear infinite;
+  @keyframes rain-fall {
+    from { transform: translate(0, -120px); }
+    to { transform: translate(-90px, 1180px); }
+  }
+  --animate-ring-spread: ring-spread 3.2s ease-out infinite;
+  @keyframes ring-spread {
+    from { transform: scale(0.2); opacity: 0.9; }
+    to { transform: scale(1.6); opacity: 0; }
+  }
+  --animate-boat-drift: boat-drift 40s linear infinite;
+  @keyframes boat-drift {
+    0% { transform: translateX(-260px) rotate(-3deg); }
+    25% { transform: translateX(300px) rotate(3deg); }
+    50% { transform: translateX(860px) rotate(-3deg); }
+    75% { transform: translateX(1420px) rotate(3deg); }
+    100% { transform: translateX(2180px) rotate(-3deg); }
+  }
+  --animate-splash-hop: splash-hop 2.2s ease-out infinite;
+  @keyframes splash-hop {
+    0%, 50%, 100% { transform: translateY(0) scaleY(1); }
+    58% { transform: translateY(0) scaleY(0.9); }
+    72% { transform: translateY(-40px) scaleY(1.04); }
+    86% { transform: translateY(0) scaleY(0.94); }
+  }
 }
 
 /* Spacing (Density 3). Used as e.g. `gap-(--space-sm)`. */
@@ -545,6 +571,38 @@
     box-shadow:
       0 0 0 10px var(--color-raincoat),
       0 0 40px 16px rgb(255 204 0 / 0.75);
+  }
+}
+
+/*
+ * แม่กบ's cover panel: a big sheet of glossy raincoat-yellow vinyl with a shine across its top, a stitched seam
+ * (::before) and a snap button in each top corner (::after). Its border and shape come from the call site.
+ */
+@utility vinyl-panel {
+  background:
+    linear-gradient(170deg, transparent 0 6%, rgb(255 255 255 / 0.55) 6% 11%, transparent 11%) no-repeat,
+    linear-gradient(180deg, #ffe35a 0%, var(--color-raincoat) 50%, var(--color-raincoat-deep) 100%);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 16px;
+    border: 5px dashed rgb(120 80 0 / 0.5);
+    border-radius: 48px;
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 34px;
+    left: 40px;
+    right: 40px;
+    height: 44px;
+    background:
+      radial-gradient(circle at 22px 50%, var(--color-rubber-deep) 0 12px, var(--color-rubber) 12px 19px, var(--color-rubber-deep) 19px 22px, transparent 23px) left / 44px 44px no-repeat,
+      radial-gradient(circle at 22px 50%, var(--color-rubber-deep) 0 12px, var(--color-rubber) 12px 19px, var(--color-rubber-deep) 19px 22px, transparent 23px) right / 44px 44px no-repeat;
+    pointer-events: none;
   }
 }
 

@@ -2,14 +2,30 @@ import { Smartphone } from 'lucide-react'
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from 'react'
 import { SnowyStreet } from '../../themes/mae-kom/scenes/SnowyStreet'
 import { WindyStreet } from '../../themes/mae-kom/scenes/WindyStreet'
+import { AfterRain, ComicGutter, Drizzle, RainyPond } from '../../themes/mae-kop/scenes/Pond'
 import { useMascot } from '../mascotContext'
 import { Ambient } from './Ambient'
 import { ClickFeedback } from './ClickFeedback'
 import { fitStage, isPortrait, STAGE_HEIGHT, STAGE_WIDTH } from './fitStage'
 
-export type Scene = 'garden' | 'pond' | 'summary' | 'step5' | 'cover' | 'kom-cover' | 'kom-windy' | 'kom-map'
+export type Scene =
+  | 'garden'
+  | 'pond'
+  | 'summary'
+  | 'step5'
+  | 'cover'
+  | 'kom-cover'
+  | 'kom-windy'
+  | 'kom-map'
+  | 'kop-cover'
+  | 'kop-drizzle'
+  | 'kop-gutter'
+  | 'kop-rainbow'
 
-const sceneSrc: Record<Exclude<Scene, 'cover'>, string> = {
+/** แม่กบ's Scenes are drawn in CSS and SVG by their SceneMotion, with no backdrop image (docs/mae-kop-spec.md). */
+type DrawnScene = 'kop-cover' | 'kop-drizzle' | 'kop-gutter' | 'kop-rainbow'
+
+const sceneSrc: Record<Exclude<Scene, 'cover' | DrawnScene>, string> = {
   garden: '/assets/canva/backgrounds/garden.webp',
   pond: '/assets/canva/backgrounds/pond.webp',
   summary: '/assets/canva/backgrounds/cover.webp',
@@ -27,6 +43,10 @@ function SceneMotion({ scene }: { scene: Exclude<Scene, 'cover'> }) {
   if (scene === 'kom-windy') return <WindyStreet />
   // On the Map only น้องส้ม and the arrow move, drawn by the Map itself.
   if (scene === 'kom-map') return null
+  if (scene === 'kop-cover') return <RainyPond />
+  if (scene === 'kop-drizzle') return <Drizzle />
+  if (scene === 'kop-gutter') return <ComicGutter />
+  if (scene === 'kop-rainbow') return <AfterRain />
   return <Ambient scene={scene} />
 }
 
@@ -84,8 +104,9 @@ export function Stage({ scene = 'garden', children }: { scene?: Scene; children:
         {scene !== 'cover' && (
           <div
             data-testid="stage-scene"
+            data-scene={scene}
             className="absolute inset-0 bg-cover"
-            style={{ transform: `scale(${bleed.scale})`, backgroundImage: `url(${sceneSrc[scene]})` }}
+            style={{ transform: `scale(${bleed.scale})`, backgroundImage: scene in sceneSrc ? `url(${sceneSrc[scene as keyof typeof sceneSrc]})` : undefined }}
           >
             <SceneMotion scene={scene} />
           </div>

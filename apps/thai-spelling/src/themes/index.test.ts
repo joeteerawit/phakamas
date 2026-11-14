@@ -51,13 +51,14 @@ describe('Theme fallback', () => {
     expect(poses.cover).toBe('/assets/comic/mascot-som-float.webp')
   })
 
-  it("แม่กบ's Theme falls back to แม่กง's layout and Scene for every Step until its own Games land", () => {
+  it("แม่กบ's Theme draws its cover on the busy rainy pond, Steps 2–6, 8 and 9 in the drizzle, 7 on the comic gutter and 10 after the rain", () => {
     const theme = getTheme(maeKop.theme)
     expect(theme.id).toBe('mae-kop')
-    for (const step of stepNumbers) {
-      expect(stepLayout(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.layout)
-      expect(stepScene(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.scene)
-    }
+    expect(stepLayout(theme, 1)).not.toBe(maeKongTheme.steps[1]?.layout)
+    expect(stepScene(theme, 1)).toBe('kop-cover')
+    for (const step of [2, 3, 4, 5, 6, 8, 9]) expect(stepScene(theme, step), `Step ${step}`).toBe('kop-drizzle')
+    expect(stepScene(theme, 7)).toBe('kop-gutter')
+    expect(stepScene(theme, 10)).toBe('kop-rainbow')
   })
 
   it("แม่กบ's Mascot is น้องกบ with her own poses, under her taro-leaf umbrella on the cover", () => {
