@@ -1,4 +1,5 @@
 import { maeKom } from './mae-kom.ts'
+import { maeKop } from './mae-kop.ts'
 import { maeKong } from './mae-kong.ts'
 import type { Lesson } from './types.ts'
 
@@ -18,6 +19,7 @@ export type {
 const lessons: Readonly<Record<string, Lesson>> = {
   [maeKong.id]: maeKong,
   [maeKom.id]: maeKom,
+  [maeKop.id]: maeKop,
 }
 
 /** Every registered Lesson; scripts/gen-audio.sh reads its clips from these. */

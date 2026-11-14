@@ -12,7 +12,7 @@ There are nine Lessons, one per มาตรา, and each has its own Theme (ADR
 | `mae-kon` | แม่กน | น ญ ณ ร ล ฬ | Floating market | decide later | จาน ช้อน ร้าน |
 | `mae-kok` | แม่กก | ก ข ค ฆ | Hillside vegetable garden | น้องนก | นก ผัก |
 | `mae-kot` | แม่กด | ด จ ช ซ ฎ ฏ ฐ ฑ ฒ ต ถ ท ธ ศ ษ ส | Duck farm | น้องเป็ด | เป็ด มด รถ |
-| `mae-kop` | แม่กบ | บ ป พ ฟ ภ | Rainy-day pond | น้องกบ | กบ ภาพ |
+| `mae-kop` | แม่กบ | บ ป พ ฟ ภ | Rainy-day pond (spec ready) | น้องกบ | กบ ภาพ |
 
 - No two Lessons share a setting or a colour palette.
 - แม่ ก กา has no final consonant, so its Step 4 marks the open vowel at the end of the word instead.

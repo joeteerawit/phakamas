@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { allLessons } from './index'
 import { maeKom } from './mae-kom'
+import { maeKop } from './mae-kop'
 import { maeKong } from './mae-kong'
 
 // Keys look like /public/assets/comic/word-ling.webp.
@@ -17,6 +18,7 @@ describe('Lesson images', () => {
   it('finds the image paths in the Lesson data', () => {
     expect(imagePaths(maeKong)).toContain('/assets/comic/word-ling.webp')
     expect(imagePaths(maeKom)).toContain('/assets/comic/word-rom.webp')
+    expect(imagePaths(maeKop)).toContain('/assets/comic/word-kop.webp')
   })
 
   it('has a file on disk for every image the Lesson references', () => {

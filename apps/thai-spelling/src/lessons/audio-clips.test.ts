@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { audioClips } from './audio-clips'
 import { allLessons } from './index'
 import { maeKom } from './mae-kom'
+import { maeKop } from './mae-kop'
 import { maeKong } from './mae-kong'
 
 // Keys look like /public/assets/audio/intro.mp3.
@@ -77,6 +78,41 @@ describe('audioClips', () => {
       'rhyme/mae-kom/line-04',
       'sentences/mae-kom/sentence-01',
       'sentences/mae-kom/sentence-02',
+    ])
+  })
+
+  it('finds every แม่กบ AudioClip, reusing the shared word and feedback clips', () => {
+    expect(audioClips(maeKop).map((clip) => clip.id)).toEqual([
+      'explanations/mae-kop-intro',
+      'vocabulary/kop',
+      'vocabulary/phap-fold',
+      'vocabulary/chap',
+      'vocabulary/phap',
+      'vocabulary/chep',
+      'vocabulary/ap',
+      'explanations/mae-kop',
+      'spelling/kop',
+      'spelling/phap-fold',
+      'spelling/chap',
+      'spelling/phap',
+      'spelling/chep',
+      'spelling/ap',
+      'vocabulary/bai-mai',
+      'vocabulary/chup',
+      'vocabulary/pu',
+      'vocabulary/rom',
+      'vocabulary/dap',
+      'vocabulary/ban',
+      'feedback/keng-mak',
+      'vocabulary/rap',
+      'vocabulary/chop',
+      'feedback/correct',
+      'rhyme/mae-kop/line-01',
+      'rhyme/mae-kop/line-02',
+      'rhyme/mae-kop/line-03',
+      'rhyme/mae-kop/line-04',
+      'sentences/mae-kop/sentence-01',
+      'sentences/mae-kop/sentence-02',
     ])
   })
 

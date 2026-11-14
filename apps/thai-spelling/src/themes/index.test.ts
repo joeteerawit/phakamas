@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { maeKom } from '../lessons/mae-kom'
+import { maeKop } from '../lessons/mae-kop'
 import { maeKong } from '../lessons/mae-kong'
 import { getTheme, stepLayout, stepScene, type Theme } from '.'
 import { maeKongTheme } from './mae-kong/theme'
@@ -48,5 +49,21 @@ describe('Theme fallback', () => {
     const { poses } = getTheme(maeKom.theme).mascot
     for (const src of Object.values(poses)) expect(src).toMatch(/\/mascot-som-/)
     expect(poses.cover).toBe('/assets/comic/mascot-som-float.webp')
+  })
+
+  it("แม่กบ's Theme falls back to แม่กง's layout and Scene for every Step until its own Games land", () => {
+    const theme = getTheme(maeKop.theme)
+    expect(theme.id).toBe('mae-kop')
+    for (const step of stepNumbers) {
+      expect(stepLayout(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.layout)
+      expect(stepScene(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.scene)
+    }
+  })
+
+  it("แม่กบ's Mascot is น้องกบ with her own poses, under her taro-leaf umbrella on the cover", () => {
+    const { name, poses } = getTheme(maeKop.theme).mascot
+    expect(name).toBe('น้องกบ')
+    for (const src of Object.values(poses)) expect(src).toMatch(/\/mascot-kop-/)
+    expect(poses.cover).toBe('/assets/comic/mascot-kop-cover.webp')
   })
 })
