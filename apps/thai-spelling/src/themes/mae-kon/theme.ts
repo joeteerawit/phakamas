@@ -1,9 +1,9 @@
-import { maeKongKit } from '../mae-kong/kit'
 import type { Theme } from '../types'
+import { maeKonKit } from './kit'
 
 /**
  * แม่กน's floating-market Theme (docs/mae-kon-spec.md). Every Step it leaves out uses แม่กง's layout and Scene; its own
- * Scenes, Map, Games and UI Kit come with the later tickets of #59.
+ * Scenes, Map and Games come with the later tickets of #59. Its UI Kit dresses every Step's chrome already.
  */
 export const maeKonTheme: Theme = {
   id: 'mae-kon',
@@ -18,5 +18,5 @@ export const maeKonTheme: Theme = {
       cover: '/assets/comic/mascot-som-float.webp',
     },
   },
-  kit: maeKongKit,
+  kit: maeKonKit,
 }

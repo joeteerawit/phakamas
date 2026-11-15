@@ -679,3 +679,6 @@
     cursor: pointer;
   }
 }
+
+/* แม่กน's palette and UI Kit materials (docs/mae-kon-spec.md). */
+@import './themes/mae-kon/mae-kon.css';

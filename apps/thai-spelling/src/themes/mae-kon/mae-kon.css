@@ -1,0 +1,157 @@
+/*
+ * แม่กน floating market (docs/mae-kon-spec.md): its palette and its UI Kit's materials, imported once by styles.css
+ * after the shared theme. Warm teak wood, canal green, banana-leaf green, marigold orange, coral rope red, and lotus
+ * pink at dusk. Ink on honey wood 9.2:1, white on canal green 5:1, ink on bamboo 11.2:1, ink on banana leaf 13.1:1.
+ */
+@theme {
+  --color-kon-ink: #2b1d12;
+  --color-teak: #b9783f;
+  --color-teak-deep: #6b3a14;
+  --color-honey: #e8bb7f;
+  --color-honey-light: #f6dfb8;
+  --color-canal: #2e7d5b;
+  --color-canal-deep: #1d5940;
+  --color-canal-light: #cfe8d6;
+  --color-banana: #5aa83c;
+  --color-banana-deep: #34782a;
+  --color-banana-light: #d6efb8;
+  --color-bamboo: #ecd49a;
+  --color-bamboo-deep: #b48c45;
+  --color-marigold: #f59b1b;
+  --color-marigold-deep: #c9700a;
+  --color-coral: #e5533d;
+  --color-coral-deep: #a9311f;
+  --color-lotus: #f6a5c0;
+  --color-lotus-deep: #c2185b;
+  --color-dusk: #f2a65a;
+  --color-dusk-deep: #7a4b8c;
+  --color-market-sky: #ffe6b0;
+
+  /* แม่กน Scenes: vendor boats bob, lotus pads drift down the sides, birds cross, ripples spread. */
+  --animate-boat-bob: boat-bob 3.4s ease-in-out infinite alternate;
+  @keyframes boat-bob {
+    from { transform: translateY(-6px) rotate(-1.5deg); }
+    to { transform: translateY(6px) rotate(1.5deg); }
+  }
+  --animate-market-drift: market-drift 60s linear infinite;
+  @keyframes market-drift {
+    from { transform: translateX(-520px); }
+    to { transform: translateX(2440px); }
+  }
+  --animate-bird-cross: bird-cross 24s linear infinite;
+  @keyframes bird-cross {
+    0% { transform: translate(2040px, 0); }
+    50%, 100% { transform: translate(-200px, -60px); }
+  }
+  --animate-canal-ripple: canal-ripple 4s ease-out infinite;
+  @keyframes canal-ripple {
+    from { transform: scale(0.3); opacity: 0.8; }
+    to { transform: scale(1.5); opacity: 0; }
+  }
+  --animate-lotus-drift: lotus-drift 30s linear infinite;
+  @keyframes lotus-drift {
+    from { transform: translateY(-120px) rotate(0deg); }
+    to { transform: translateY(1200px) rotate(40deg); }
+  }
+}
+
+/*
+ * แม่กน's button: a warm-wood boat plank with ink grain, its two ends lashed with coral-red rope (::before and ::after,
+ * so the element must be positioned at the call site). It dips into the water when pressed; aria-pressed="true" turns
+ * it canal green. Reduced motion: the dip is not animated.
+ */
+@utility plank-button {
+  border: 5px solid var(--color-kon-ink);
+  border-radius: 22px;
+  background:
+    repeating-linear-gradient(176deg, transparent 0 22px, rgb(107 58 20 / 0.18) 22px 25px, transparent 25px 41px, rgb(107 58 20 / 0.12) 41px 43px),
+    linear-gradient(180deg, var(--color-honey-light) 0%, var(--color-honey) 55%, #d39a5a 100%);
+  color: var(--color-kon-ink);
+  box-shadow:
+    inset 0 -7px 0 rgb(107 58 20 / 0.28),
+    0 8px 0 var(--color-teak-deep);
+  transition:
+    translate 160ms ease-out,
+    box-shadow 160ms ease-out;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    bottom: -6px;
+    width: 18px;
+    border: 3px solid var(--color-kon-ink);
+    border-radius: 6px;
+    background: repeating-linear-gradient(160deg, var(--color-coral) 0 6px, var(--color-coral-deep) 6px 9px);
+    pointer-events: none;
+  }
+  &::before {
+    left: 14px;
+  }
+  &::after {
+    right: 14px;
+  }
+
+  &[aria-pressed='true'] {
+    background:
+      repeating-linear-gradient(176deg, transparent 0 22px, rgb(0 0 0 / 0.14) 22px 25px, transparent 25px 41px),
+      linear-gradient(180deg, #3f9a72 0%, var(--color-canal) 55%, var(--color-canal-deep) 100%);
+    color: var(--color-card);
+  }
+
+  &:active:not(:disabled) {
+    translate: 0 7px;
+    box-shadow:
+      inset 0 -7px 0 rgb(107 58 20 / 0.28),
+      0 1px 0 var(--color-teak-deep),
+      0 10px 0 -2px rgb(46 125 91 / 0.55);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+/*
+ * แม่กน's card: a woven bamboo tray with a banana leaf laid inside it. The weave is the border; the leaf is the
+ * padding box. Selected or playing, it glows marigold.
+ */
+@utility bamboo-tray {
+  border: 14px solid transparent;
+  border-radius: 34px;
+  background:
+    linear-gradient(180deg, #e6f5d3 0%, var(--color-banana-light) 100%) padding-box,
+    repeating-linear-gradient(45deg, var(--color-bamboo) 0 9px, var(--color-bamboo-deep) 9px 12px) border-box,
+    repeating-linear-gradient(-45deg, var(--color-bamboo) 0 9px, var(--color-bamboo-deep) 9px 12px) border-box;
+  box-shadow:
+    0 0 0 4px var(--color-kon-ink),
+    inset 0 0 0 4px var(--color-banana-deep),
+    0 10px 0 4px rgb(43 29 18 / 0.35);
+
+  &[data-highlight] {
+    box-shadow:
+      0 0 0 4px var(--color-kon-ink),
+      inset 0 0 0 4px var(--color-banana-deep),
+      0 0 0 14px var(--color-marigold),
+      0 0 40px 16px rgb(245 155 27 / 0.7);
+  }
+}
+
+/* แม่กน's labels and badges: a strip of bamboo with an ink rim, never shaped like its plank buttons. */
+@utility bamboo-label {
+  border: 5px solid var(--color-kon-ink);
+  border-radius: 999px 999px 999px 999px / 40px 40px 40px 40px;
+  background: linear-gradient(180deg, #f6e6bd 0%, var(--color-bamboo) 100%);
+  box-shadow: inset 0 -6px 0 rgb(180 140 69 / 0.5);
+}
+
+/* แม่กน's Star counter: a canal-water plaque in a teak frame, its Stars painted on a paddle blade (the leading ::before). */
+@utility paddle-counter {
+  border: 6px solid var(--color-teak-deep);
+  border-radius: 20px 999px 999px 20px;
+  background: linear-gradient(180deg, #3f9a72 0%, var(--color-canal) 100%);
+  box-shadow:
+    inset 0 0 0 3px var(--color-honey),
+    0 7px 0 rgb(43 29 18 / 0.4);
+}
