@@ -1,5 +1,6 @@
 import { Smartphone } from 'lucide-react'
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from 'react'
+import { BusyHillside, CalmTerrace, ComicWash, Sunset } from '../../themes/mae-kok/scenes/Hillside'
 import { SnowyStreet } from '../../themes/mae-kom/scenes/SnowyStreet'
 import { WindyStreet } from '../../themes/mae-kom/scenes/WindyStreet'
 import { CanalAtDusk, FloatingMarket, QuietCanal } from '../../themes/mae-kon/scenes/Market'
@@ -25,9 +26,24 @@ export type Scene =
   | 'kon-cover'
   | 'kon-canal'
   | 'kon-dusk'
+  | 'kok-cover'
+  | 'kok-terrace'
+  | 'kok-comic'
+  | 'kok-sunset'
 
-/** แม่กบ's and แม่กน's Scenes are drawn in CSS and SVG by their SceneMotion, with no backdrop image (docs/mae-kop-spec.md, docs/mae-kon-spec.md). */
-type DrawnScene = 'kop-cover' | 'kop-drizzle' | 'kop-gutter' | 'kop-rainbow' | 'kon-cover' | 'kon-canal' | 'kon-dusk'
+/**
+ * แม่กบ's and แม่กน's Scenes, and แม่กก's Step 7 wash, are drawn in CSS and SVG by their SceneMotion, with no backdrop image
+ * (docs/mae-kop-spec.md, docs/mae-kon-spec.md, docs/mae-kok-spec.md).
+ */
+type DrawnScene =
+  | 'kop-cover'
+  | 'kop-drizzle'
+  | 'kop-gutter'
+  | 'kop-rainbow'
+  | 'kon-cover'
+  | 'kon-canal'
+  | 'kon-dusk'
+  | 'kok-comic'
 
 const sceneSrc: Record<Exclude<Scene, 'cover' | DrawnScene>, string> = {
   garden: '/assets/canva/backgrounds/garden.webp',
@@ -39,6 +55,10 @@ const sceneSrc: Record<Exclude<Scene, 'cover' | DrawnScene>, string> = {
   'kom-cover': '/assets/comic/kom-scene-cover.webp',
   'kom-windy': '/assets/comic/kom-scene-windy.webp',
   'kom-map': '/assets/comic/kom-map.webp',
+  // แม่กก (docs/mae-kok-spec.md): busy terraced hillside; calm terrace; the hillside at sunset (placeholders until #83).
+  'kok-cover': '/assets/comic/kok-scene-cover.webp',
+  'kok-terrace': '/assets/comic/kok-scene-terrace.webp',
+  'kok-sunset': '/assets/comic/kok-scene-sunset.webp',
 }
 
 /** What moves in a Scene: แม่กม's Scenes have their own objects, the rest share the garden's. */
@@ -54,6 +74,10 @@ function SceneMotion({ scene }: { scene: Exclude<Scene, 'cover'> }) {
   if (scene === 'kon-cover') return <FloatingMarket />
   if (scene === 'kon-canal') return <QuietCanal />
   if (scene === 'kon-dusk') return <CanalAtDusk />
+  if (scene === 'kok-cover') return <BusyHillside />
+  if (scene === 'kok-terrace') return <CalmTerrace />
+  if (scene === 'kok-comic') return <ComicWash />
+  if (scene === 'kok-sunset') return <Sunset />
   return <Ambient scene={scene} />
 }
 

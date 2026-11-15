@@ -1,3 +1,4 @@
+import { maeKok } from './mae-kok.ts'
 import { maeKom } from './mae-kom.ts'
 import { maeKon } from './mae-kon.ts'
 import { maeKop } from './mae-kop.ts'
@@ -22,6 +23,7 @@ const lessons: Readonly<Record<string, Lesson>> = {
   [maeKom.id]: maeKom,
   [maeKop.id]: maeKop,
   [maeKon.id]: maeKon,
+  [maeKok.id]: maeKok,
 }
 
 /** Every registered Lesson; scripts/gen-audio.sh reads its clips from these. */

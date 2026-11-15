@@ -10,7 +10,7 @@ There are nine Lessons, one per มาตรา, and each has its own Theme (ADR
 | `mae-koei` | แม่เกย | ย | Rice fields | น้องควาย | ควาย หอย ปุ๋ย |
 | `mae-koeo` | แม่เกอว | ว | Night sky | น้องแมว | แมว ดาว ข้าว |
 | `mae-kon` | แม่กน | น ญ ณ ร ล ฬ | Floating market | decide later | จาน ช้อน ร้าน |
-| `mae-kok` | แม่กก | ก ข ค ฆ | Hillside vegetable garden | น้องนก | นก ผัก |
+| `mae-kok` | แม่กก | ก ข ค ฆ | Hillside vegetable garden (spec ready) | น้องนก | นก ผัก |
 | `mae-kot` | แม่กด | ด จ ช ซ ฎ ฏ ฐ ฑ ฒ ต ถ ท ธ ศ ษ ส | Duck farm | น้องเป็ด | เป็ด มด รถ |
 | `mae-kop` | แม่กบ | บ ป พ ฟ ภ | Rainy-day pond (spec ready) | น้องกบ | กบ ภาพ |
 
