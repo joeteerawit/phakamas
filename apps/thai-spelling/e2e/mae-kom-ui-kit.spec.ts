@@ -167,8 +167,8 @@ test('the Stars display: snowflake-stars on a shop banner, and in the celebratio
   await expect(counter.locator('[data-art="snowflake-star"]')).toBeVisible()
   await expect(counter).toHaveText(/ดาวที่ได้\s*0\/9/)
   for (const [a, b] of [
-    ['ร่ม', 'ชม'],
-    ['ลม', 'ผม'],
+    ['ก้าม', 'ชาม'],
+    ['ลม', 'ชม'],
   ]) {
     await page.getByRole('button', { name: new RegExp(`^${a}(\\s|$)`) }).click()
     await page.getByRole('button', { name: new RegExp(`^${b}(\\s|$)`) }).click()

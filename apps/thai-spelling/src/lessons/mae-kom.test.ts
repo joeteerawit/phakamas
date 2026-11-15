@@ -35,6 +35,8 @@ const syllablesOf: Record<string, string[]> = {
   แก้ม: ['แก้ม'],
   ยิ้ม: ['ยิ้ม'],
   ชม: ['ชม'],
+  ก้าม: ['ก้าม'],
+  กลม: ['กลม'],
 }
 
 describe('mae-kom lesson data (docs/mae-kom-spec.md)', () => {
@@ -153,25 +155,25 @@ describe('mae-kom lesson data (docs/mae-kom-spec.md)', () => {
 
   it('Step 7 has the 4 comic lines with their highlighted words marked', () => {
     expect(maeKom.rhyme.map(({ text, rhymeWords }) => [text, rhymeWords])).toEqual([
-      ['น้องส้มกางร่มเดินเล่น', ['ร่ม']],
-      ['ลมพัดแรง ผมปลิว', ['ลม', 'ผม']],
-      ['ร่มลอยขึ้นฟ้า!', ['ร่ม']],
-      ['กลับบ้านกินส้มกับนม ยิ้มแก้มแดง', ['ส้ม', 'นม', 'ยิ้ม', 'แก้ม']],
+      ['น้องส้ม กางร่มกลม', ['ส้ม', 'ร่ม', 'กลม']],
+      ['ลมแรง พัดผมปลิว', ['ลม', 'ผม']],
+      ['ร่มหลุด ลอยไปลิ่ว', ['ร่ม']],
+      ['น้องหิว กินส้มนม', ['ส้ม', 'นม']],
     ])
     // The layout highlights whole words as the segmenter splits them.
     for (const { text, rhymeWords } of maeKom.rhyme) for (const w of rhymeWords) expect(splitWords(text)).toContain(w)
   })
 
-  it('Step 8 matches ร่ม↔ชม and ลม↔ผม, with a word clip for every buzzer', () => {
+  it('Step 8 matches ก้าม↔ชาม and ลม↔ชม, with a word clip for every buzzer', () => {
     expect(maeKom.rhymeMatching.pairs).toEqual([
-      { left: 'ร่ม', right: 'ชม' },
-      { left: 'ลม', right: 'ผม' },
+      { left: 'ก้าม', right: 'ชาม' },
+      { left: 'ลม', right: 'ชม' },
     ])
     expect(maeKom.rhymeMatching.words.map(({ id, text }) => [id, text])).toEqual([
-      ['vocabulary/rom', 'ร่ม'],
-      ['vocabulary/phom', 'ผม'],
+      ['vocabulary/kam', 'ก้าม'],
       ['vocabulary/lom', 'ลม'],
       ['vocabulary/chom', 'ชม'],
+      ['vocabulary/cham', 'ชาม'],
     ])
   })
 

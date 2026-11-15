@@ -70,6 +70,7 @@ describe('audioClips', () => {
       'vocabulary/kaem',
       'vocabulary/mue',
       'feedback/keng-mak',
+      'vocabulary/kam',
       'vocabulary/chom',
       'feedback/correct',
       'rhyme/mae-kom/line-01',

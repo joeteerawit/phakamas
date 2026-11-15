@@ -92,21 +92,23 @@ export const maeKom = {
   },
   rhymeMatching: {
     // Each pair sits on a diagonal of the buzzer grid, as on แม่กง.
+    // A pair shares its vowel and its แม่กม final (อา+ม, โอะ+ม), so no wrong pair rhymes.
     pairs: [
-      { left: 'ร่ม', right: 'ชม' },
-      { left: 'ลม', right: 'ผม' },
+      { left: 'ก้าม', right: 'ชาม' },
+      { left: 'ลม', right: 'ชม' },
     ],
-    words: [rom.audio, phom.audio, lom.audio, { id: 'vocabulary/chom', text: 'ชม' }],
+    words: [{ id: 'vocabulary/kam', text: 'ก้าม' }, lom.audio, { id: 'vocabulary/chom', text: 'ชม' }, cham.audio],
     sounds: {
       correct: { id: 'feedback/correct', text: 'ถูกต้อง' },
     },
   },
-  // One comic panel per line; `panel` stays unset until the Step 7 comic art exists (#54).
+  // One comic panel per วรรค of one กลอนสี่ บท: 5 syllables read 2 + 3, กลม↔ลม, ปลิว↔ลิ่ว, ลิ่ว↔หิว.
+  // `panel` stays unset until the Step 7 comic art exists (#54).
   rhyme: [
-    { id: 'rhyme/mae-kom/line-01', text: 'น้องส้มกางร่มเดินเล่น', rhymeWords: ['ร่ม'] },
-    { id: 'rhyme/mae-kom/line-02', text: 'ลมพัดแรง ผมปลิว', rhymeWords: ['ลม', 'ผม'] },
-    { id: 'rhyme/mae-kom/line-03', text: 'ร่มลอยขึ้นฟ้า!', rhymeWords: ['ร่ม'] },
-    { id: 'rhyme/mae-kom/line-04', text: 'กลับบ้านกินส้มกับนม ยิ้มแก้มแดง', rhymeWords: ['ส้ม', 'นม', 'ยิ้ม', 'แก้ม'] },
+    { id: 'rhyme/mae-kom/line-01', text: 'น้องส้ม กางร่มกลม', rhymeWords: ['ส้ม', 'ร่ม', 'กลม'] },
+    { id: 'rhyme/mae-kom/line-02', text: 'ลมแรง พัดผมปลิว', rhymeWords: ['ลม', 'ผม'] },
+    { id: 'rhyme/mae-kom/line-03', text: 'ร่มหลุด ลอยไปลิ่ว', rhymeWords: ['ร่ม'] },
+    { id: 'rhyme/mae-kom/line-04', text: 'น้องหิว กินส้มนม', rhymeWords: ['ส้ม', 'นม'] },
   ],
   sentences: [
     { images: [image('rom'), image('lom')], audio: { id: 'sentences/mae-kom/sentence-01', text: 'น้องส้มกางร่มกันลม' } },

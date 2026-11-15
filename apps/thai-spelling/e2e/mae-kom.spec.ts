@@ -59,7 +59,7 @@ test('a student goes through แม่กม from the cover, by the Map, to the 
 
   await nextLink(page).click()
   await expectStep(page, 8, 'จับคู่ดูคำ')
-  for (const [a, b] of [['ร่ม', 'ชม'], ['ลม', 'ผม']] as const) {
+  for (const [a, b] of [['ก้าม', 'ชาม'], ['ลม', 'ชม']] as const) {
     await wordButton(page, a).click()
     await wordButton(page, b).click()
   }

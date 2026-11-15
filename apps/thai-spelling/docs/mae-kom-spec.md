@@ -19,8 +19,8 @@ Words are fixed in `src/lessons/mae-kom.ts` for now. Later a Session will draw t
 | Step 4 narration | The same pattern as แม่กง, with these six words and ม as the final consonant |
 | Step 5 "แม่กมอยู่ไหน?" | Correct: the six words plus แก้ม and ยิ้ม. Distractors: แมว, ม้า, มือ (ม is their initial), ลิง (แม่กง) |
 | Step 6 "กล่องคำแม่กม" | Word Bank = the six words |
-| Step 7 "อ่านการ์ตูนแม่กม" | A 4-panel comic with one line per panel in a speech bubble; the highlighted words are in brackets: น้องส้มกางร่มเดินเล่น [ร่ม] · ลมพัดแรง ผมปลิว [ลม ผม] · ร่มลอยขึ้นฟ้า! [ร่ม] · กลับบ้านกินส้มกับนม ยิ้มแก้มแดง [ส้ม นม ยิ้ม แก้ม] |
-| Step 8 | Pairs ร่ม ↔ ชม, ลม ↔ ผม |
+| Step 7 "อ่านการ์ตูนแม่กม" | A 4-panel comic, one บท of กลอนสี่ with one วรรค per panel in a speech bubble. Each วรรค is 5 syllables read 2 + 3, rhyming กลม↔ลม, ปลิว↔ลิ่ว, ลิ่ว↔หิว (#112). The highlighted words are in brackets: น้องส้ม กางร่มกลม [ส้ม ร่ม กลม] · ลมแรง พัดผมปลิว [ลม ผม] · ร่มหลุด ลอยไปลิ่ว [ร่ม] · น้องหิว กินส้มนม [ส้ม นม] |
+| Step 8 | Pairs ก้าม ↔ ชาม, ลม ↔ ชม: each pair shares its vowel and its แม่กม final, so no wrong pair rhymes (#113) |
 | Step 9 | "น้องส้มกางร่มกันลม" (ร่ม + ลม), "แม่เทนมใส่ชาม" (นม + ชาม) |
 
 Rules: a Target Word has every syllable ending in ม, so ขนม and ผ้าห่ม are left out. Words with ำ (น้ำ, ดำ) never appear as content, but they may appear in Scene backdrops. The Mascot's name never shares a sentence with the fruit ส้ม. Audio uses `scripts/gen-audio.sh` (edge-tts, Premwadee), as for แม่กง.
