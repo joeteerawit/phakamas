@@ -132,3 +132,14 @@ export function Sunset() {
     </div>
   )
 }
+
+/** Step 7 has no Scene: a flat sky-to-soil wash behind the trellis, with nothing moving. */
+export function ComicWash() {
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="scene-motion"
+      className={`${layer} bg-[linear-gradient(180deg,#bfe6fb_0%,#e9f6ff_45%,#c9e8a6_70%,var(--color-soil)_100%)]`}
+    />
+  )
+}

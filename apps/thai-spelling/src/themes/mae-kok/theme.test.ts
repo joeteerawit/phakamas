@@ -6,16 +6,17 @@ import { maeKongTheme } from '../mae-kong/theme'
 const stepNumbers = maeKok.steps.map((_, i) => i + 1)
 
 describe('แม่กก Theme', () => {
-  it('stages its cover on the busy hillside, Steps 2–6, 8 and 9 on the calm terrace and 10 at sunset', () => {
+  it('stages its cover on the busy hillside, Steps 2–6, 8 and 9 on the calm terrace, 7 on a plain wash and 10 at sunset', () => {
     const theme = getTheme(maeKok.theme)
     expect(theme.id).toBe('mae-kok')
     expect(stepScene(theme, 1)).toBe('kok-cover')
     for (const step of [2, 3, 4, 5, 6, 8, 9]) expect(stepScene(theme, step), `Step ${step}`).toBe('kok-terrace')
+    expect(stepScene(theme, 7)).toBe('kok-comic')
     expect(stepScene(theme, 10)).toBe('kok-sunset')
   })
 
   // The Steps whose Games have landed; the rest still use แม่กง's layouts.
-  const own = [1, 2, 3, 4, 5, 6]
+  const own = [1, 2, 3, 4, 5, 6, 7]
   it("lays out its own Game for each Step that has one, never แม่กง's, แม่กม's or แม่กบ's", () => {
     const theme = getTheme(maeKok.theme)
     for (const step of stepNumbers) {

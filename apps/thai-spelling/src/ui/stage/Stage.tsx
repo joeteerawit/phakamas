@@ -1,6 +1,6 @@
 import { Smartphone } from 'lucide-react'
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from 'react'
-import { BusyHillside, CalmTerrace, Sunset } from '../../themes/mae-kok/scenes/Hillside'
+import { BusyHillside, CalmTerrace, ComicWash, Sunset } from '../../themes/mae-kok/scenes/Hillside'
 import { SnowyStreet } from '../../themes/mae-kom/scenes/SnowyStreet'
 import { WindyStreet } from '../../themes/mae-kom/scenes/WindyStreet'
 import { AfterRain, ComicGutter, Drizzle, RainyPond } from '../../themes/mae-kop/scenes/Pond'
@@ -24,10 +24,14 @@ export type Scene =
   | 'kop-rainbow'
   | 'kok-cover'
   | 'kok-terrace'
+  | 'kok-comic'
   | 'kok-sunset'
 
-/** แม่กบ's Scenes are drawn in CSS and SVG by their SceneMotion, with no backdrop image (docs/mae-kop-spec.md). */
-type DrawnScene = 'kop-cover' | 'kop-drizzle' | 'kop-gutter' | 'kop-rainbow'
+/**
+ * แม่กบ's Scenes, and แม่กก's Step 7 wash, are drawn in CSS and SVG by their SceneMotion, with no backdrop image
+ * (docs/mae-kop-spec.md, docs/mae-kok-spec.md).
+ */
+type DrawnScene = 'kop-cover' | 'kop-drizzle' | 'kop-gutter' | 'kop-rainbow' | 'kok-comic'
 
 const sceneSrc: Record<Exclude<Scene, 'cover' | DrawnScene>, string> = {
   garden: '/assets/canva/backgrounds/garden.webp',
@@ -57,6 +61,7 @@ function SceneMotion({ scene }: { scene: Exclude<Scene, 'cover'> }) {
   if (scene === 'kop-rainbow') return <AfterRain />
   if (scene === 'kok-cover') return <BusyHillside />
   if (scene === 'kok-terrace') return <CalmTerrace />
+  if (scene === 'kok-comic') return <ComicWash />
   if (scene === 'kok-sunset') return <Sunset />
   return <Ambient scene={scene} />
 }
