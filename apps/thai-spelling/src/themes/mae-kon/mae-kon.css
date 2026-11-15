@@ -190,3 +190,15 @@
     right: var(--rope-inset, 30px);
   }
 }
+
+/* แม่กน's Step 4 letter tile: a square of honey wood with ink grain and a dark teak edge, never shaped like a button. */
+@utility wooden-tile {
+  border: 5px solid var(--color-kon-ink);
+  border-radius: 18px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 18px, rgb(107 58 20 / 0.14) 18px 20px, transparent 20px 31px),
+    linear-gradient(180deg, #f8e6c4 0%, var(--color-honey-light) 60%, var(--color-honey) 100%);
+  box-shadow:
+    inset 0 -8px 0 rgb(107 58 20 / 0.25),
+    0 7px 0 var(--color-teak-deep);
+}
