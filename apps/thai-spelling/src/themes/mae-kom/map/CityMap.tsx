@@ -136,7 +136,7 @@ function MapBoard({ lesson }: StepProps) {
 
       <div className="pointer-events-none absolute" style={{ inset: bleed.inset }}>
         <kit.TitleSign>
-          <h1 className="truncate">แผนที่เมืองหิมะ</h1>
+          <h1 className="truncate-thai">แผนที่เมืองหิมะ</h1>
         </kit.TitleSign>
         <Link
           to="/lesson/$lessonId/$step"

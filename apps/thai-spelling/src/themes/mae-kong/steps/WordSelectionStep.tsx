@@ -153,7 +153,7 @@ function PictureCard({ choice, left, top, selected, result, round, onToggle }: P
         className={cx('absolute inset-0 block', cardLook(result))}
       >
         {/* Right-aligned so the widest word (บ้าน) clears the tap hint. */}
-        <span className="absolute top-[204px] right-[8px] font-heading text-[54px] leading-[1.2] font-bold text-navy">
+        <span className="absolute top-[204px] right-[8px] z-10 font-heading text-[54px] leading-[1.2] font-bold text-navy">
           {choice.word}
         </span>
         {result && <span className="sr-only"> {resultText[result]}</span>}

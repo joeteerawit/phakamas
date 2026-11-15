@@ -85,7 +85,7 @@ export function StepLayout({ lesson, stepNumber, feedback = null, scene = 'garde
           <h1 className="sr-only">{title}</h1>
         ) : (
           <kit.TitleSign>
-            <h1 className="truncate">{title}</h1>
+            <h1 className="truncate-thai">{title}</h1>
           </kit.TitleSign>
         )}
 

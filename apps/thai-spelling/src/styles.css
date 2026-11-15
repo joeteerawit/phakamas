@@ -307,6 +307,15 @@
   bottom: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom) + var(--space-sm));
 }
 
+/* truncate, with the clip box raised so a tone mark stacked on an upper vowel (ที่, ยิ้ม) isn't cut off; layout is unchanged. */
+@utility truncate-thai {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-top: 0.4em;
+  margin-top: -0.4em;
+}
+
 /* The comic card ring's angle. Registered so it animates; without @property the ring stays still. */
 @property --card-angle {
   syntax: '<angle>';
