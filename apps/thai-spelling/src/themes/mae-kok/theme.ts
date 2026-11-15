@@ -10,12 +10,13 @@ import { PottingStep } from './steps/PottingStep'
 import { RhymeMatchingStep } from './steps/RhymeMatchingStep'
 import { SentenceStep } from './steps/SentenceStep'
 import { StakeStep } from './steps/StakeStep'
+import { SummaryStep } from './steps/SummaryStep'
 import { VocabularyStep } from './steps/VocabularyStep'
 
 /**
- * แม่กก's hillside-garden Theme (docs/mae-kok-spec.md): its cover on the busy terraced hillside, the calm terrace for
- * Steps 2–6, 8 and 9, a plain wash for 7 and the hillside at sunset for 10, and its own UI Kit on every Step. Every layout it leaves out
- * uses แม่กง's for now; its Games come with the later tickets of #60. The cover's ▶ opens its Map.
+ * แม่กก's hillside-garden Theme (docs/mae-kok-spec.md): its own Game for every Step, its cover on the busy terraced
+ * hillside, the calm terrace for Steps 2–6, 8 and 9, a plain wash for 7 and the hillside at sunset for 10, its Map
+ * (opened by the cover's ▶), its Mascot and its own UI Kit.
  */
 export const maeKokTheme: Theme = {
   id: 'mae-kok',
@@ -30,7 +31,7 @@ export const maeKokTheme: Theme = {
     7: { layout: ComicStep, scene: 'kok-comic' },
     [activitySteps.rhymeMatching]: { layout: RhymeMatchingStep, scene: 'kok-terrace' },
     9: { layout: SentenceStep, scene: 'kok-terrace' },
-    10: { scene: 'kok-sunset' },
+    10: { layout: SummaryStep, scene: 'kok-sunset' },
   },
   map: HillsideMap,
   // น้องนก: placeholder SVG drawings exported to webp (scripts/placeholder-art-mae-kok.mjs) until the art ticket (#83) lands.
