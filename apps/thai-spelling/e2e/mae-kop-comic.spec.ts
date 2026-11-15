@@ -7,9 +7,9 @@ import { expectTapTarget } from './tapTarget.js'
 // แม่กบ Step 7, read the rain away (#78). src/lessons/mae-kop.ts: the four lines and their แม่กบ words.
 const LINES = [
   { text: 'ฝนตกแล้ว กบออกมาอาบฝน', words: ['กบ', 'อาบ'] },
-  { text: 'น้องกบพับเรือ ให้ลอยไป', words: ['พับ'] },
-  { text: 'ลื่นล้ม แต่ไม่เจ็บ', words: ['เจ็บ'] },
-  { text: 'ฝนหยุด วาดภาพสายรุ้ง', words: ['ภาพ'] },
+  { text: 'กบพับเรือกระดาษ ปล่อยลอยไป', words: ['กบ', 'พับ'] },
+  { text: 'วิ่งไปจับเรือ ลื่นล้มเจ็บเข่า', words: ['จับ', 'เจ็บ'] },
+  { text: 'ฝนหยุด กบวาดภาพเรือกับสายรุ้ง', words: ['กบ', 'ภาพ'] },
 ]
 
 async function open(page: Page, mic: Mic = 'allow') {

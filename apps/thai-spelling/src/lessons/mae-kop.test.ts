@@ -151,9 +151,9 @@ describe('mae-kop lesson data (docs/mae-kop-spec.md)', () => {
   it('Step 7 has the 4 comic lines with their highlighted words marked', () => {
     expect(maeKop.rhyme.map(({ text, rhymeWords }) => [text, rhymeWords])).toEqual([
       ['ฝนตกแล้ว กบออกมาอาบฝน', ['กบ', 'อาบ']],
-      ['น้องกบพับเรือ ให้ลอยไป', ['พับ']],
-      ['ลื่นล้ม แต่ไม่เจ็บ', ['เจ็บ']],
-      ['ฝนหยุด วาดภาพสายรุ้ง', ['ภาพ']],
+      ['กบพับเรือกระดาษ ปล่อยลอยไป', ['กบ', 'พับ']],
+      ['วิ่งไปจับเรือ ลื่นล้มเจ็บเข่า', ['จับ', 'เจ็บ']],
+      ['ฝนหยุด กบวาดภาพเรือกับสายรุ้ง', ['กบ', 'ภาพ']],
     ])
     // The layout highlights whole words as the segmenter splits them.
     for (const { text, rhymeWords } of maeKop.rhyme) for (const w of rhymeWords) expect(splitWords(text)).toContain(w)

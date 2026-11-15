@@ -107,9 +107,9 @@ export const maeKop = {
   // One comic panel per line; the Step 7 Game draws its panels until the art ticket (#69) lands.
   rhyme: [
     { id: 'rhyme/mae-kop/line-01', text: 'ฝนตกแล้ว กบออกมาอาบฝน', rhymeWords: ['กบ', 'อาบ'] },
-    { id: 'rhyme/mae-kop/line-02', text: 'น้องกบพับเรือ ให้ลอยไป', rhymeWords: ['พับ'] },
-    { id: 'rhyme/mae-kop/line-03', text: 'ลื่นล้ม แต่ไม่เจ็บ', rhymeWords: ['เจ็บ'] },
-    { id: 'rhyme/mae-kop/line-04', text: 'ฝนหยุด วาดภาพสายรุ้ง', rhymeWords: ['ภาพ'] },
+    { id: 'rhyme/mae-kop/line-02', text: 'กบพับเรือกระดาษ ปล่อยลอยไป', rhymeWords: ['กบ', 'พับ'] },
+    { id: 'rhyme/mae-kop/line-03', text: 'วิ่งไปจับเรือ ลื่นล้มเจ็บเข่า', rhymeWords: ['จับ', 'เจ็บ'] },
+    { id: 'rhyme/mae-kop/line-04', text: 'ฝนหยุด กบวาดภาพเรือกับสายรุ้ง', rhymeWords: ['กบ', 'ภาพ'] },
   ],
   sentences: [
     { images: [image('chep'), image('chup')], audio: { id: 'sentences/mae-kop/sentence-01', text: 'กบเจ็บ แม่จูบให้หาย' } },
