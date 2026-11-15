@@ -6,6 +6,7 @@ import { CoverStep } from './steps/CoverStep'
 import { ListenRepeatStep } from './steps/ListenRepeatStep'
 import { SpottingStep } from './steps/SpottingStep'
 import { VocabularyStep } from './steps/VocabularyStep'
+import { WordSelectionStep } from './steps/WordSelectionStep'
 
 /**
  * แม่กน's floating-market Theme (docs/mae-kon-spec.md): its Scenes, Map, Mascot and UI Kit. Steps it has no Game for yet
@@ -18,7 +19,7 @@ export const maeKonTheme: Theme = {
     2: { layout: VocabularyStep, scene: 'kon-canal' },
     3: { layout: ListenRepeatStep, scene: 'kon-canal' },
     4: { layout: SpottingStep, scene: 'kon-canal' },
-    [activitySteps.wordSelection]: { scene: 'kon-canal' },
+    [activitySteps.wordSelection]: { layout: WordSelectionStep, scene: 'kon-canal' },
     [activitySteps.wordFilling]: { scene: 'kon-canal' },
     7: { scene: 'kon-canal' },
     [activitySteps.rhymeMatching]: { scene: 'kon-canal' },

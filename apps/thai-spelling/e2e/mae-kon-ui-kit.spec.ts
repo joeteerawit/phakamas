@@ -130,7 +130,7 @@ test('feedback is a round woven tray น้องส้ม holds up from her boa
     await expect.poll(async () => Math.abs((await mascot.boundingBox())!.x), `${viewport.width}: at the left edge`).toBeLessThan(1)
     await waitUntilStill(mascot.locator('img'))
     const her = await stageBox(page, mascot)
-    for (const control of [...corners(page), button(page, 'ตรวจคำตอบ'), button(page, 'เริ่มใหม่'), status]) {
+    for (const control of [...corners(page), button(page, 'ตรวจคำตอบ'), button(page, 'ล้างตะกร้า'), status]) {
       expect(overlaps(her, await stageBox(page, control))).toBe(false)
     }
   }

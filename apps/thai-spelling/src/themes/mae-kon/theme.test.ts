@@ -6,7 +6,7 @@ import { maeKongTheme } from '../mae-kong/theme'
 const stepNumbers = maeKon.steps.map((_, i) => i + 1)
 const theme = getTheme(maeKon.theme)
 /** The Steps whose Game has landed (#99, #101–#109). */
-const OWN = [1, 2, 3, 4]
+const OWN = [1, 2, 3, 4, 5]
 
 describe('แม่กน Theme', () => {
   it('draws its cover on the busy floating market, Steps 2–9 on the quiet canal and 10 on the canal at dusk', () => {
