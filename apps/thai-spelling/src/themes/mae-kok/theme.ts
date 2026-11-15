@@ -8,6 +8,7 @@ import { HarvestStep } from './steps/HarvestStep'
 import { ListenRepeatStep } from './steps/ListenRepeatStep'
 import { PottingStep } from './steps/PottingStep'
 import { RhymeMatchingStep } from './steps/RhymeMatchingStep'
+import { SentenceStep } from './steps/SentenceStep'
 import { StakeStep } from './steps/StakeStep'
 import { VocabularyStep } from './steps/VocabularyStep'
 
@@ -28,7 +29,7 @@ export const maeKokTheme: Theme = {
     // Step 7's comic has no Scene: its trellis hangs over a plain sky-to-soil wash.
     7: { layout: ComicStep, scene: 'kok-comic' },
     [activitySteps.rhymeMatching]: { layout: RhymeMatchingStep, scene: 'kok-terrace' },
-    9: { scene: 'kok-terrace' },
+    9: { layout: SentenceStep, scene: 'kok-terrace' },
     10: { scene: 'kok-sunset' },
   },
   map: HillsideMap,
