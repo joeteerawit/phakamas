@@ -32,7 +32,10 @@ test('a student plays แม่กก from the cover, by the Map, through all 10
   await expect(page).toHaveURL(/\/lesson\/mae-kok\/map$/)
   await page.getByRole('link', { name: /^ขั้น 2 / }).click()
   await expectStep(page, 2, 'ดูภาพเรียนรู้คำ')
-  for (const word of WORDS) await wordButton(page, word).click()
+  for (const [i, word] of WORDS.entries()) {
+    await page.getByRole('button', { name: new RegExp(`^แปลงที่ ${i + 1} `) }).click()
+    await expect(wordButton(page, word)).toHaveAttribute('data-grown', 'true')
+  }
 
   await nextLink(page).click()
   await expectStep(page, 3, 'ฟังแล้วอ่านตาม')

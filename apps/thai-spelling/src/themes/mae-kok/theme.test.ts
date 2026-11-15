@@ -14,10 +14,19 @@ describe('แม่กก Theme', () => {
     expect(stepScene(theme, 10)).toBe('kok-sunset')
   })
 
-  it("lays out its own cover; Steps 2–10 still use แม่กง's layouts until their Games land", () => {
+  // The Steps whose Games have landed; the rest still use แม่กง's layouts.
+  const own = [1, 2]
+  it("lays out its own Game for each Step that has one, never แม่กง's, แม่กม's or แม่กบ's", () => {
     const theme = getTheme(maeKok.theme)
-    expect(stepLayout(theme, 1)).not.toBe(maeKongTheme.steps[1]?.layout)
-    for (const step of stepNumbers.slice(1)) expect(stepLayout(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.layout)
+    for (const step of stepNumbers) {
+      const layout = stepLayout(theme, step)
+      if (!own.includes(step)) {
+        expect(layout, `Step ${step}`).toBe(maeKongTheme.steps[step]?.layout)
+        continue
+      }
+      expect(theme.steps[step]?.layout, `Step ${step}`).toBeDefined()
+      for (const other of [maeKongTheme, getTheme('mae-kom'), getTheme('mae-kop')]) expect(layout, `Step ${step}`).not.toBe(other.steps[step]?.layout)
+    }
   })
 
   it('has its own Map, opened by the cover', () => {

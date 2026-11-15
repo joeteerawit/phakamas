@@ -3,6 +3,7 @@ import type { Theme } from '../types'
 import { maeKokKit } from './kit'
 import { HillsideMap } from './map/HillsideMap'
 import { CoverStep } from './steps/CoverStep'
+import { VocabularyStep } from './steps/VocabularyStep'
 
 /**
  * แม่กก's hillside-garden Theme (docs/mae-kok-spec.md): its cover on the busy terraced hillside, the calm terrace for
@@ -13,7 +14,7 @@ export const maeKokTheme: Theme = {
   id: 'mae-kok',
   steps: {
     1: { layout: CoverStep, scene: 'kok-cover' },
-    2: { scene: 'kok-terrace' },
+    2: { layout: VocabularyStep, scene: 'kok-terrace' },
     3: { scene: 'kok-terrace' },
     4: { scene: 'kok-terrace' },
     [activitySteps.wordSelection]: { scene: 'kok-terrace' },
