@@ -4,6 +4,7 @@ import { maeKonKit } from './kit'
 import { MarketMap } from './map/MarketMap'
 import { CoverStep } from './steps/CoverStep'
 import { ListenRepeatStep } from './steps/ListenRepeatStep'
+import { RhymeStep } from './steps/RhymeStep'
 import { SpottingStep } from './steps/SpottingStep'
 import { VocabularyStep } from './steps/VocabularyStep'
 import { WordFillingStep } from './steps/WordFillingStep'
@@ -22,7 +23,7 @@ export const maeKonTheme: Theme = {
     4: { layout: SpottingStep, scene: 'kon-canal' },
     [activitySteps.wordSelection]: { layout: WordSelectionStep, scene: 'kon-canal' },
     [activitySteps.wordFilling]: { layout: WordFillingStep, scene: 'kon-canal' },
-    7: { scene: 'kon-canal' },
+    7: { layout: RhymeStep, scene: 'kon-canal' },
     [activitySteps.rhymeMatching]: { scene: 'kon-canal' },
     9: { scene: 'kon-canal' },
     10: { scene: 'kon-dusk' },

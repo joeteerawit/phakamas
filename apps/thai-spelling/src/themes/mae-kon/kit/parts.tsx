@@ -91,7 +91,7 @@ export function BambooTitle({ children }: { children: ReactNode }) {
     <div className="absolute top-[29px] left-[47px] h-[115px] w-[382px]">
       <span aria-hidden="true" className="absolute -top-[10px] -right-[14px] -left-[14px] h-[16px] rounded-full border-[4px] border-kon-ink bg-[repeating-linear-gradient(90deg,var(--color-bamboo)_0_46px,var(--color-bamboo-deep)_46px_50px)]" />
       <span aria-hidden="true" className="absolute top-[2px] right-[46px] left-[46px] h-[16px] border-x-[4px] border-coral" />
-      <div className="absolute inset-x-0 top-[14px] bottom-0 flex items-center justify-center rounded-[14px] border-[5px] border-kon-ink bg-[repeating-linear-gradient(90deg,#f3dfa9_0_30px,var(--color-bamboo)_30px_34px,#e2c47f_34px_36px)] px-[30px] font-heading text-[38px] leading-[1.4] font-bold text-kon-ink shadow-[0_8px_0_rgb(43_29_18/0.4)]">
+      <div className="absolute inset-x-0 top-[14px] bottom-0 flex items-center justify-center rounded-[14px] border-[5px] border-kon-ink bg-[repeating-linear-gradient(90deg,#f3dfa9_0_30px,var(--color-bamboo)_30px_34px,#e2c47f_34px_36px)] px-[26px] font-heading text-[34px] leading-[1.4] font-bold text-kon-ink shadow-[0_8px_0_rgb(43_29_18/0.4)]">
         {children}
       </div>
     </div>
