@@ -19,7 +19,7 @@ Words are fixed in `src/lessons/mae-kop.ts` for now. Later a Session will draw t
 | Teaching point | ภาพ ends in พ, which sounds like บ, so it is in แม่กบ too. It is the only Target Word whose final is not บ |
 | Step 4 narration | The same pattern as แม่กง, with these six words; it names บ as their final and says the พ of ภาพ sounds like บ |
 | Step 5 "แม่กบอยู่ไหน?" | Correct: the six words plus จูบ and ดาบ. Distractors: ใบไม้, ปู, บ้าน (บ or ป is their initial), ร่ม (แม่กม) |
-| Step 6 "กล่องคำแม่กบ" | Word Bank = the six words |
+| Step 6 "กล่องคำแม่กบ" | Word Bank = the six words; instruction `ลากเรือคำไปวางในแอ่งน้ำใต้ภาพให้ถูกต้อง`, since the child sails a word boat into a puddle rather than filling a blank (#116) |
 | Step 7 "อ่านการ์ตูนแม่กบ" | A 4-panel comic telling one story, one line per panel in a speech bubble (#117); the highlighted words are in brackets: ฝนตกแล้ว กบออกมาอาบฝน [กบ อาบ] · กบพับเรือกระดาษ ปล่อยลอยไป [กบ พับ] · วิ่งไปจับเรือ ลื่นล้มเจ็บเข่า [จับ เจ็บ] · ฝนหยุด กบวาดภาพเรือกับสายรุ้ง [กบ ภาพ] |
 | Step 8 | Pairs กบ ↔ จบ, จับ ↔ รับ |
 | Step 9 | "กบเจ็บ แม่จูบให้หาย" (เจ็บ + จูบ), "พี่พับภาพเป็นเรือ" (พับ + ภาพ) |

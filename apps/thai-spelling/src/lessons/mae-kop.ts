@@ -89,7 +89,7 @@ export const maeKop = {
   wordSelection,
   // No bank word sits under its own picture, so the order gives nothing away.
   wordFilling: {
-    instruction: 'เลือกคำในกล่องคำเติมในช่องว่างให้ถูกต้อง',
+    instruction: 'ลากเรือคำไปวางในแอ่งน้ำใต้ภาพให้ถูกต้อง',
     bank: ['ภาพ', 'อาบ', 'กบ', 'เจ็บ', 'จับ', 'พับ'],
     pictures: [kop, phapFold, chap, phap, chep, ap].map(({ word, image }) => ({ image, answer: word })),
   },

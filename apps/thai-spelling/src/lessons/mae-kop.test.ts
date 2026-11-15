@@ -142,7 +142,7 @@ describe('mae-kop lesson data (docs/mae-kop-spec.md)', () => {
 
   it('Step 6 fills the 6 pictures from the bank, no word under its own picture', () => {
     const { bank, pictures, instruction } = maeKop.wordFilling
-    expect(instruction).toBe('เลือกคำในกล่องคำเติมในช่องว่างให้ถูกต้อง')
+    expect(instruction).toBe('ลากเรือคำไปวางในแอ่งน้ำใต้ภาพให้ถูกต้อง')
     expect(bank.toSorted()).toEqual(maeKop.vocabulary.map(({ word }) => word).toSorted())
     expect(pictures.map(({ image, answer }) => [image, answer])).toEqual(maeKop.vocabulary.map(({ word, image }) => [image, word]))
     bank.forEach((word, i) => expect(word).not.toBe(pictures[i]!.answer))
