@@ -32,7 +32,7 @@ test('a student plays แม่กน from the cover, by the Map, through all 10
   await expect(page).toHaveURL(/\/lesson\/mae-kon\/map$/)
   await page.getByRole('link', { name: /^ขั้น 2 / }).click()
   await expectStep(page, 2, 'ดูภาพเรียนรู้คำ')
-  for (const word of WORDS) await wordButton(page, word).click()
+  for (const n of [1, 2, 3, 4, 5, 6]) await page.getByRole('button', { name: `ห่อที่ ${n} แตะเพื่อแกะห่อ` }).click()
 
   await nextLink(page).click()
   await expectStep(page, 3, 'ฟังแล้วอ่านตาม')
@@ -76,7 +76,7 @@ test('a student plays แม่กน from the cover, by the Map, through all 10
 })
 
 test('every แม่กน picture card loads', async ({ page }) => {
-  for (const step of [2, 5, 9]) {
+  for (const step of [5, 9]) {
     await open(page, step, {}, 'mae-kon')
     const images = page.getByRole('main').locator('img[src*="/word-"]')
     await expect(images.first()).toBeVisible()

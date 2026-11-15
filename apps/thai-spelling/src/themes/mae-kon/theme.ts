@@ -3,16 +3,17 @@ import { activitySteps } from '../../session/activities'
 import { maeKonKit } from './kit'
 import { MarketMap } from './map/MarketMap'
 import { CoverStep } from './steps/CoverStep'
+import { VocabularyStep } from './steps/VocabularyStep'
 
 /**
- * แม่กน's floating-market Theme (docs/mae-kon-spec.md): its Scenes, Map, Mascot and UI Kit. Steps 2–10 still use แม่กง's
- * layouts over its own Scenes until their Games land (#100–#109).
+ * แม่กน's floating-market Theme (docs/mae-kon-spec.md): its Scenes, Map, Mascot and UI Kit. Steps it has no Game for yet
+ * use แม่กง's layouts over its own Scenes until their Games land (#101–#109).
  */
 export const maeKonTheme: Theme = {
   id: 'mae-kon',
   steps: {
     1: { layout: CoverStep, scene: 'kon-cover' },
-    2: { scene: 'kon-canal' },
+    2: { layout: VocabularyStep, scene: 'kon-canal' },
     3: { scene: 'kon-canal' },
     4: { scene: 'kon-canal' },
     [activitySteps.wordSelection]: { scene: 'kon-canal' },
