@@ -1,4 +1,5 @@
 import { maeKomTheme } from './mae-kom/theme'
+import { maeKonTheme } from './mae-kon/theme'
 import { maeKopTheme } from './mae-kop/theme'
 import { maeKongTheme } from './mae-kong/theme'
 import type { Theme } from './types'
@@ -9,6 +10,7 @@ const themes: Readonly<Record<string, Theme>> = {
   [maeKongTheme.id]: maeKongTheme,
   [maeKomTheme.id]: maeKomTheme,
   [maeKopTheme.id]: maeKopTheme,
+  [maeKonTheme.id]: maeKonTheme,
 }
 
 /** The Theme a Lesson names; every Lesson's Theme is registered here. */
