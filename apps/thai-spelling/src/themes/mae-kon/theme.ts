@@ -1,10 +1,11 @@
 import type { Theme } from '../types'
 import { activitySteps } from '../../session/activities'
 import { maeKonKit } from './kit'
+import { MarketMap } from './map/MarketMap'
 import { CoverStep } from './steps/CoverStep'
 
 /**
- * แม่กน's floating-market Theme (docs/mae-kon-spec.md): its Scenes, Mascot and UI Kit. Steps 2–10 still use แม่กง's
+ * แม่กน's floating-market Theme (docs/mae-kon-spec.md): its Scenes, Map, Mascot and UI Kit. Steps 2–10 still use แม่กง's
  * layouts over its own Scenes until their Games land (#100–#109).
  */
 export const maeKonTheme: Theme = {
@@ -21,6 +22,7 @@ export const maeKonTheme: Theme = {
     9: { scene: 'kon-canal' },
     10: { scene: 'kon-dusk' },
   },
+  map: MarketMap,
   // น้องส้ม in her boat: labelled placeholders (scripts/mae-kon-placeholders.mjs) until the art ticket (#97) lands.
   mascot: {
     name: 'น้องส้ม',

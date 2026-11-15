@@ -18,7 +18,7 @@ const PADDLE_IN_FROM = -1400
 /**
  * แม่กน Step 1 (docs/mae-kon-spec.md), in stage pixels over the kon-cover Scene: the title carved on a long teak
  * boat-plank sign (300–1620 × 70–500), its ends lashed with coral rope, and น้องส้ม paddling her boat in from the
- * canal to stop below it. ▶ opens the Lesson. Under reduced motion she is already there and nothing moves.
+ * canal to stop below it. ▶ opens the Map. Under reduced motion she is already there and nothing moves.
  */
 export function CoverStep({ lesson }: StepProps) {
   const still = useReducedMotion()
@@ -98,10 +98,10 @@ function CornerButtons({ cover }: { cover: Cover }) {
         </Button>
       )}
 
-      {/* ▶ paddles on into the Lesson. */}
+      {/* ▶ paddles on to the Map, where the paddle arrow marks the stop to go on with. */}
       <Link
-        to="/lesson/$lessonId/$step"
-        params={{ lessonId, step: String(resumeStep ?? 2) }}
+        to="/lesson/$lessonId/map"
+        params={{ lessonId }}
         onClick={start}
         className={cx(pressable, 'absolute right-[32px] bottom-[24px] block size-[187px]', next.className)}
       >

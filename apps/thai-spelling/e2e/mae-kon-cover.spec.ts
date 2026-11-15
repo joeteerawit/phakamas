@@ -36,13 +36,14 @@ test('the title, subtitle and grade line are on the boat-plank sign, and น้�
   expect(overlaps(words, her)).toBe(false)
 })
 
-test('▶ starts the Lesson with the teacher intro; once under way it resumes, and เริ่มใหม่ starts over', async ({ page }) => {
+test('▶ opens the Map with the teacher intro; once under way it resumes, and เริ่มใหม่ starts over', async ({ page }) => {
   await open(page, 1, {}, 'mae-kon')
   await expect(start(page)).toHaveAccessibleName('เริ่มเรียน')
   await expect(restart(page)).toHaveCount(0)
   await start(page).click()
-  await expect(page).toHaveURL(/\/lesson\/mae-kon\/2$/)
+  await expect(page).toHaveURL(/\/lesson\/mae-kon\/map$/)
   await expect.poll(() => audioLog(page)).toContain('play:/assets/audio/explanations/mae-kon-intro.mp3')
+  await page.goto('/lesson/mae-kon/2')
   await page.getByRole('link', { name: 'ถัดไป' }).click()
   await expect(page).toHaveURL(/\/lesson\/mae-kon\/3$/)
 
@@ -97,7 +98,7 @@ test('keyboard and screen reader: the cover reads as a page, its art hidden, and
   await start(page).focus()
   expect(parseFloat(await start(page).evaluate((el) => getComputedStyle(el).outlineWidth))).toBeGreaterThan(0)
   await page.keyboard.press('Enter')
-  await expect(page).toHaveURL(/\/lesson\/mae-kon\/2$/)
+  await expect(page).toHaveURL(/\/lesson\/mae-kon\/map$/)
 })
 
 test('vendor boats bob down the canal and birds cross the sky; under reduced motion น้องส้ม is already there and the cover is still', async ({ page }) => {

@@ -19,6 +19,12 @@ describe('แม่กน Theme', () => {
     for (const step of stepNumbers.slice(1)) expect(stepLayout(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.layout)
   })
 
+  it('has its own Map, the floating market from above', () => {
+    expect(theme.map).toBeDefined()
+    expect(theme.map).not.toBe(getTheme('mae-kop').map)
+    expect(theme.map).not.toBe(getTheme('mae-kom').map)
+  })
+
   it('names น้องส้ม as its Mascot, in her boat in every pose and paddling on the cover', () => {
     const { name, poses } = theme.mascot
     expect(name).toBe('น้องส้ม')
