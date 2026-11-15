@@ -3,6 +3,7 @@ import type { Theme } from '../types'
 import { maeKokKit } from './kit'
 import { HillsideMap } from './map/HillsideMap'
 import { CoverStep } from './steps/CoverStep'
+import { HarvestStep } from './steps/HarvestStep'
 import { ListenRepeatStep } from './steps/ListenRepeatStep'
 import { StakeStep } from './steps/StakeStep'
 import { VocabularyStep } from './steps/VocabularyStep'
@@ -19,7 +20,7 @@ export const maeKokTheme: Theme = {
     2: { layout: VocabularyStep, scene: 'kok-terrace' },
     3: { layout: ListenRepeatStep, scene: 'kok-terrace' },
     4: { layout: StakeStep, scene: 'kok-terrace' },
-    [activitySteps.wordSelection]: { scene: 'kok-terrace' },
+    [activitySteps.wordSelection]: { layout: HarvestStep, scene: 'kok-terrace' },
     [activitySteps.wordFilling]: { scene: 'kok-terrace' },
     [activitySteps.rhymeMatching]: { scene: 'kok-terrace' },
     9: { scene: 'kok-terrace' },
