@@ -15,7 +15,7 @@ describe('แม่กก Theme', () => {
   })
 
   // The Steps whose Games have landed; the rest still use แม่กง's layouts.
-  const own = [1, 2, 3]
+  const own = [1, 2, 3, 4]
   it("lays out its own Game for each Step that has one, never แม่กง's, แม่กม's or แม่กบ's", () => {
     const theme = getTheme(maeKok.theme)
     for (const step of stepNumbers) {
