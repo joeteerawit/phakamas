@@ -88,7 +88,7 @@ Made by the art ticket (#97) in the shared comic style; until then every one is 
 |---|---|
 | `mascot-kon-greet.webp`, `mascot-kon-cheer.webp`, `mascot-kon-encourage.webp`, `mascot-kon-cover.webp` | น้องส้ม in her wooden boat: greeting, jumping for joy, thumbs up, and paddling (the cover pose) |
 | `word-chan.webp`, `word-chon.webp`, `word-ran.webp`, `word-kin.webp`, `word-khon.webp`, `word-fan.webp`, `word-khaen.webp`, `word-nok.webp`, `word-ruea.webp` | Picture cards: plate, spoon, market stall, child eating, person, tooth, arm, bird, boat. `word-ban.webp`, `word-nom.webp` and `word-cham.webp` are reused |
-| `kon-panel-1.webp` … `kon-panel-4.webp` | Step 7 comic: paddling to the market past a stall; a vendor selling plates and spoons; a sweet-seller smiling; at home eating with mum |
+| `kon-panel-1.webp`, `kon-panel-2.webp`, `kon-panel-3.webp`, `kon-panel-4.webp` | Step 7 comic: paddling to the market past a stall; a vendor selling plates and spoons; a sweet-seller smiling; at home eating with mum |
 | `kon-scene-cover.webp`, `kon-scene-canal.webp`, `kon-scene-dusk.webp` | The three Scenes |
 | `kon-map.webp` | The floating market from above |
 | `kon-noodle-boat.webp`, `kon-bamboo-sign.webp` | Step 9 props |
