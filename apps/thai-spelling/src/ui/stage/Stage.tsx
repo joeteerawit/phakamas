@@ -1,5 +1,6 @@
 import { Smartphone } from 'lucide-react'
 import { createContext, useContext, useSyncExternalStore, type ReactNode } from 'react'
+import { BusyHillside, CalmTerrace, Sunset } from '../../themes/mae-kok/scenes/Hillside'
 import { SnowyStreet } from '../../themes/mae-kom/scenes/SnowyStreet'
 import { WindyStreet } from '../../themes/mae-kom/scenes/WindyStreet'
 import { AfterRain, ComicGutter, Drizzle, RainyPond } from '../../themes/mae-kop/scenes/Pond'
@@ -21,6 +22,9 @@ export type Scene =
   | 'kop-drizzle'
   | 'kop-gutter'
   | 'kop-rainbow'
+  | 'kok-cover'
+  | 'kok-terrace'
+  | 'kok-sunset'
 
 /** แม่กบ's Scenes are drawn in CSS and SVG by their SceneMotion, with no backdrop image (docs/mae-kop-spec.md). */
 type DrawnScene = 'kop-cover' | 'kop-drizzle' | 'kop-gutter' | 'kop-rainbow'
@@ -35,6 +39,10 @@ const sceneSrc: Record<Exclude<Scene, 'cover' | DrawnScene>, string> = {
   'kom-cover': '/assets/comic/kom-scene-cover.webp',
   'kom-windy': '/assets/comic/kom-scene-windy.webp',
   'kom-map': '/assets/comic/kom-map.webp',
+  // แม่กก (docs/mae-kok-spec.md): busy terraced hillside; calm terrace; the hillside at sunset (placeholders until #83).
+  'kok-cover': '/assets/comic/kok-scene-cover.webp',
+  'kok-terrace': '/assets/comic/kok-scene-terrace.webp',
+  'kok-sunset': '/assets/comic/kok-scene-sunset.webp',
 }
 
 /** What moves in a Scene: แม่กม's Scenes have their own objects, the rest share the garden's. */
@@ -47,6 +55,9 @@ function SceneMotion({ scene }: { scene: Exclude<Scene, 'cover'> }) {
   if (scene === 'kop-drizzle') return <Drizzle />
   if (scene === 'kop-gutter') return <ComicGutter />
   if (scene === 'kop-rainbow') return <AfterRain />
+  if (scene === 'kok-cover') return <BusyHillside />
+  if (scene === 'kok-terrace') return <CalmTerrace />
+  if (scene === 'kok-sunset') return <Sunset />
   return <Ambient scene={scene} />
 }
 

@@ -1,7 +1,8 @@
 // PLACEHOLDER art for แม่กก (docs/mae-kok-spec.md) until the art ticket (#83) lands: flat inked SVG drawings of
 // น้องนก's four poses, the new picture cards, the four Step 7 comic panels and the Scene backdrops, rendered by
 // Playwright's Chromium and encoded with cwebp into public/assets/comic/, under the names the real art will replace.
-// Usage (from apps/thai-spelling, needs cwebp on PATH): node scripts/placeholder-art-mae-kok.mjs
+// Usage (from apps/thai-spelling, needs cwebp on PATH): node scripts/placeholder-art-mae-kok.mjs [name ...]
+// With names (e.g. kok-scene-cover), only those files are drawn.
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -167,6 +168,43 @@ const panels = {
     <path d="M640 120 V200" fill="none" ${ink}/><circle cx="628" cy="200" r="16" fill="${INK}"/>`,
 }
 
+const RIDGE = '#6f8fbf'
+const RIDGE_LIGHT = '#b9cde6'
+const TERRACE = ['#7cc356', '#6ab148', '#5c9e3a', '#4f8f31']
+
+/** One terrace step: a green band whose front edge is a strip of soil, from x0 to x1 with its top at y. */
+const terrace = (x0, x1, y, depth, fill) =>
+  `<path d="M${x0} ${y} Q${(x0 + x1) / 2} ${y - 18} ${x1} ${y} V${y + depth} H${x0} Z" fill="${fill}" ${thin}/>` +
+  `<path d="M${x0} ${y + depth - 22} H${x1} V${y + depth} H${x0} Z" fill="${SOIL}" ${thin}/>`
+
+/** Blue mountains along the horizon at `y`. */
+const ridges = (y, far = RIDGE_LIGHT, near = RIDGE) =>
+  `<path d="M0 ${y} L220 ${y - 170} L420 ${y - 60} L640 ${y - 230} L900 ${y - 40} L1180 ${y - 200} L1420 ${y - 70} L1680 ${y - 220} L1920 ${y - 90} V${y + 80} H0 Z" fill="${far}" ${thin}/>` +
+  `<path d="M0 ${y + 40} L300 ${y - 70} L560 ${y + 30} L820 ${y - 100} L1100 ${y + 20} L1380 ${y - 90} L1660 ${y + 10} L1920 ${y - 60} V${y + 120} H0 Z" fill="${near}" ${thin}/>`
+
+const sky = (id, top, bottom) =>
+  `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bottom}"/></linearGradient></defs>` +
+  `<rect width="1920" height="1080" fill="url(#${id})"/>`
+
+// Scene backdrops, 1920×1080, still; the Scenes' moving objects are drawn over them in CSS and SVG.
+const scenes = {
+  // The busy terraced hillside: terraces climbing both sides, an open middle for the title signboard.
+  'kok-scene-cover': `${sky('s', '#7fc8f2', '#dff3ff')}${ridges(560)}
+    <path d="M0 620 Q960 540 1920 620 V1080 H0 Z" fill="#8fd06a" ${ink}/>
+    ${[0, 1, 2].map((i) => `<path d="M${560 + i * 30} ${640 + i * 70} Q960 ${600 + i * 70} ${1360 - i * 30} ${640 + i * 70}" fill="none" stroke="${GREEN}" stroke-width="8" stroke-dasharray="30 24" stroke-linecap="round"/>`).join('')}
+    ${[0, 1, 2, 3].map((i) => terrace(0, 520 - i * 110, 620 + i * 110, 130, TERRACE[i])).join('')}
+    ${[0, 1, 2, 3].map((i) => terrace(1400 + i * 110, 1920, 620 + i * 110, 130, TERRACE[i])).join('')}
+    ${terrace(0, 1920, 840, 260, TERRACE[1])}
+    ${[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => `<ellipse cx="${560 + i * 100}" cy="960" rx="34" ry="14" fill="${GREEN}" ${thin}/>`).join('')}`,
+  // The calm terrace: a big quiet sky, a far ridge, one wide terrace along the bottom with its crop rows.
+  'kok-scene-terrace': `${sky('s', '#9fd6f5', '#eef8ff')}${ridges(700)}
+    ${terrace(0, 1920, 820, 280, TERRACE[0])}
+    ${[880, 950, 1020].map((y) => `<path d="M0 ${y} Q960 ${y - 20} 1920 ${y}" fill="none" stroke="${GREEN}" stroke-width="10" stroke-dasharray="40 30" stroke-linecap="round"/>`).join('')}`,
+  // The hillside at sunset: a warm sky over the mountains and a bare slope; the summary Step draws its terraces.
+  'kok-scene-sunset': `${sky('s', '#f7a35c', '#ffe3b0')}<circle cx="1460" cy="420" r="120" fill="#ffd36b" ${ink}/>${ridges(620, '#c7a0c8', '#9a7bb0')}
+    <path d="M0 700 Q960 600 1920 700 V1080 H0 Z" fill="#8fa850" ${ink}/>`,
+}
+
 const art = {
   'mascot-nok-greet': svg(520, 600, bird({ wings: 'wave', mouth: 'smile' })),
   'mascot-nok-cheer': svg(520, 600, bird({ wings: 'up', mouth: 'open' })),
@@ -174,13 +212,16 @@ const art = {
   'mascot-nok-cover': svg(520, 600, coverPose),
   ...Object.fromEntries(Object.entries(cards).map(([slug, body]) => [`word-${slug}`, svg(600, 560, body)])),
   ...Object.fromEntries(Object.entries(panels).map(([name, body]) => [name, svg(800, 600, body)])),
+  ...Object.fromEntries(Object.entries(scenes).map(([name, body]) => [name, svg(1920, 1080, body)])),
 }
 
 const tmp = mkdtempSync(join(tmpdir(), 'placeholder-art-'))
 const browser = await chromium.launch()
 try {
   const page = await browser.newPage()
+  const only = process.argv.slice(2)
   for (const [name, markup] of Object.entries(art)) {
+    if (only.length > 0 && !only.includes(name)) continue
     const [, width, height] = markup.match(/width="(\d+)" height="(\d+)"/).map(Number)
     await page.setViewportSize({ width, height })
     await page.setContent(`<html><body style="margin:0;background:transparent">${markup}</body></html>`)

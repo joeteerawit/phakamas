@@ -6,13 +6,18 @@ import { maeKongTheme } from '../mae-kong/theme'
 const stepNumbers = maeKok.steps.map((_, i) => i + 1)
 
 describe('แม่กก Theme', () => {
-  it("falls back to แม่กง's layout and Scene for every Step until its own Games land", () => {
+  it('stages its cover on the busy hillside, Steps 2–6, 8 and 9 on the calm terrace and 10 at sunset', () => {
     const theme = getTheme(maeKok.theme)
     expect(theme.id).toBe('mae-kok')
-    for (const step of stepNumbers) {
-      expect(stepLayout(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.layout)
-      expect(stepScene(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.scene)
-    }
+    expect(stepScene(theme, 1)).toBe('kok-cover')
+    for (const step of [2, 3, 4, 5, 6, 8, 9]) expect(stepScene(theme, step), `Step ${step}`).toBe('kok-terrace')
+    expect(stepScene(theme, 10)).toBe('kok-sunset')
+  })
+
+  it("lays out its own cover; Steps 2–10 still use แม่กง's layouts until their Games land", () => {
+    const theme = getTheme(maeKok.theme)
+    expect(stepLayout(theme, 1)).not.toBe(maeKongTheme.steps[1]?.layout)
+    for (const step of stepNumbers.slice(1)) expect(stepLayout(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.layout)
   })
 
   it('has น้องนก as its Mascot with her own poses, gliding on the cover', () => {

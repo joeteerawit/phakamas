@@ -1,13 +1,26 @@
+import { activitySteps } from '../../session/activities'
 import type { Theme } from '../types'
 import { maeKokKit } from './kit'
+import { CoverStep } from './steps/CoverStep'
 
 /**
- * แม่กก's hillside-garden Theme (docs/mae-kok-spec.md). Every Step it leaves out uses แม่กง's layout and Scene; its
- * own Scenes, Map and Games come with the later tickets of #60. Its UI Kit is its own on every Step.
+ * แม่กก's hillside-garden Theme (docs/mae-kok-spec.md): its cover on the busy terraced hillside, the calm terrace for
+ * Steps 2–6, 8 and 9 and the hillside at sunset for 10, and its own UI Kit on every Step. Every layout it leaves out
+ * uses แม่กง's for now; its Map and Games come with the later tickets of #60.
  */
 export const maeKokTheme: Theme = {
   id: 'mae-kok',
-  steps: {},
+  steps: {
+    1: { layout: CoverStep, scene: 'kok-cover' },
+    2: { scene: 'kok-terrace' },
+    3: { scene: 'kok-terrace' },
+    4: { scene: 'kok-terrace' },
+    [activitySteps.wordSelection]: { scene: 'kok-terrace' },
+    [activitySteps.wordFilling]: { scene: 'kok-terrace' },
+    [activitySteps.rhymeMatching]: { scene: 'kok-terrace' },
+    9: { scene: 'kok-terrace' },
+    10: { scene: 'kok-sunset' },
+  },
   // น้องนก: placeholder SVG drawings exported to webp (scripts/placeholder-art-mae-kok.mjs) until the art ticket (#83) lands.
   mascot: {
     name: 'น้องนก',
