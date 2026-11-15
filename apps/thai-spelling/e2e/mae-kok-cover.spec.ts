@@ -46,11 +46,13 @@ test('the cover: the title on a staked seed-packet signboard, น้องนก
   expect(await otherLook(wholeStage(page))).toEqual([])
 })
 
-test('▶ starts the Lesson and plays the intro; a Session in progress offers เรียนต่อ and เริ่มใหม่', async ({ page }) => {
+test('▶ opens the Map and plays the intro; a Session in progress offers เรียนต่อ and เริ่มใหม่', async ({ page }) => {
   await open(page, 1, {}, 'mae-kok')
   await start(page).click()
-  await expect(page).toHaveURL(/\/lesson\/mae-kok\/2$/)
+  await expect(page).toHaveURL(/\/lesson\/mae-kok\/map$/)
   await expect.poll(() => audioLog(page)).toContain('play:/assets/audio/explanations/mae-kok-intro.mp3')
+  await page.goto('/lesson/mae-kok/2')
+  await page.getByRole('heading', { level: 1 }).waitFor()
   await page.goto('/lesson/mae-kok/1')
   await expect(start(page)).toHaveAccessibleName('เรียนต่อ (ขั้น 2)')
   await page.getByRole('button', { name: 'เริ่มใหม่' }).click()
@@ -93,7 +95,7 @@ test('keyboard and screen reader: the cover\'s controls are named and reachable,
   }
   expect(focused).toBe('เริ่มเรียน')
   await page.keyboard.press('Enter')
-  await expect(page).toHaveURL(/\/lesson\/mae-kok\/2$/)
+  await expect(page).toHaveURL(/\/lesson\/mae-kok\/map$/)
 })
 
 test('no timer: the cover waits as long as the student likes', async ({ page }) => {

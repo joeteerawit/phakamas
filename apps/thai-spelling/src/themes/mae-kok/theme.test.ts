@@ -20,6 +20,10 @@ describe('แม่กก Theme', () => {
     for (const step of stepNumbers.slice(1)) expect(stepLayout(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.layout)
   })
 
+  it('has its own Map, opened by the cover', () => {
+    expect(getTheme(maeKok.theme).map).toBeDefined()
+  })
+
   it('has น้องนก as its Mascot with her own poses, gliding on the cover', () => {
     const { name, poses } = getTheme(maeKok.theme).mascot
     expect(name).toBe('น้องนก')

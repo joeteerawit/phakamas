@@ -15,7 +15,7 @@ const loop = { repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' } as co
  * แม่กก Step 1 (docs/mae-kok-spec.md), in stage pixels over the kok-cover Scene: the title on a big kraft seed-packet
  * signboard (440–1480 × 120–660) staked into the terrace on two wooden stakes, and น้องนก in her cover pose gliding
  * over the terraces to its right. The signboard drops in and she glides gently to and fro; both still under reduced
- * motion. The corner buttons come from the Kit.
+ * motion. The corner buttons come from the Kit; ▶ opens the Map.
  */
 export function CoverStep({ lesson }: StepProps) {
   const still = useReducedMotion()
@@ -94,9 +94,10 @@ function CornerButtons({ cover }: { cover: Cover }) {
         </Button>
       )}
 
+      {/* ▶ opens the Map, where the terracotta arrow marks the stop to go on with. */}
       <Link
-        to="/lesson/$lessonId/$step"
-        params={{ lessonId, step: String(resumeStep ?? 2) }}
+        to="/lesson/$lessonId/map"
+        params={{ lessonId }}
         onClick={start}
         className={cx(pressable, 'absolute right-[32px] bottom-[24px] block size-[187px]', next.className)}
       >
