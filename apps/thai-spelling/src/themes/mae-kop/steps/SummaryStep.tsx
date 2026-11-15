@@ -51,11 +51,11 @@ export function SummaryStep({ lesson }: StepProps) {
       </p>
 
       {/* Each Activity on a raincoat pocket, side by side inside the arc; one not done yet is itself the way back to it. */}
-      <ul aria-label="ดาวแต่ละกิจกรรม" className="absolute top-[700px] left-[584px] flex w-[752px] gap-[16px]">
+      <ul aria-label="ดาวแต่ละกิจกรรม" className="absolute top-[696px] left-[536px] flex w-[848px] gap-[16px]">
         {activities.map((activity) => {
           const title = lesson.steps[activity.step - 1]?.title
           const result = results?.[activity.id]
-          const pocket = cx('relative flex h-[170px] w-[240px] flex-col items-center justify-center gap-[4px] px-[12px] pt-[30px] text-center', card)
+          const pocket = cx('relative flex h-[200px] w-[272px] flex-col items-center justify-center gap-[6px] px-[20px] pt-[34px] pb-[14px] text-center', card)
           return (
             <li key={activity.id}>
               {result?.status === 'completed' ? (
