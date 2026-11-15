@@ -88,6 +88,24 @@
   --color-lily: #4fae4a;
   --color-lily-deep: #2f7d33;
   --color-mud: #8a6a46;
+  /*
+   * แม่กก hillside garden (docs/mae-kok-spec.md): fired terracotta, kraft paper and garden green under blue mountains.
+   * Kraft-light on terracotta 4.8:1 (large bold only), soil-deep on kraft-light 12:1, soil-deep on kraft 7.6:1.
+   */
+  --color-terracotta: #b04f29;
+  --color-terracotta-deep: #74300f;
+  --color-terracotta-light: #e8a27c;
+  --color-kraft: #dcbf8e;
+  --color-kraft-deep: #a4804c;
+  --color-kraft-light: #f6e9cf;
+  --color-sprout: #5c9e3a;
+  --color-sprout-deep: #2e6a20;
+  --color-sprout-light: #c9e8a6;
+  --color-soil: #6e4426;
+  --color-soil-deep: #3a2210;
+  --color-plank: #a8743f;
+  --color-ridge: #6f8fbf;
+  --color-ridge-light: #b9cde6;
 
   --font-sans: 'Anuphan', ui-sans-serif, system-ui, sans-serif;
   --font-heading: 'Mali', 'Anuphan', ui-sans-serif, system-ui, sans-serif;
@@ -640,6 +658,131 @@
     right: 18px;
     height: 12px;
     border-inline: 4px solid var(--color-rubber-deep);
+  }
+}
+
+/*
+ * แม่กก's button (docs/mae-kok-spec.md UI Kit): a matte fired-terracotta flowerpot with a rolled rim (::before), so the
+ * element must be positioned. The main one (`data-main`) sprouts a leaf from its rim (::after). It sinks into the
+ * soil when pressed; aria-pressed="true" turns it garden green. Reduced motion: the press is not animated.
+ */
+@utility pot-button {
+  border: 5px solid var(--color-soil-deep);
+  border-radius: 20px 20px 44px 44px;
+  background:
+    radial-gradient(circle at 30% 70%, rgb(255 255 255 / 0.08) 0 2px, transparent 3px) 0 0 / 14px 14px,
+    linear-gradient(180deg, #c45f34 0%, var(--color-terracotta) 55%, #93401f 100%);
+  color: var(--color-kraft-light);
+  box-shadow:
+    inset 0 -8px 0 rgb(58 34 16 / 0.25),
+    0 7px 0 var(--color-soil-deep);
+  transition:
+    translate 140ms ease-out,
+    box-shadow 140ms ease-out;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -11px;
+    right: -11px;
+    height: max(14px, 22%);
+    border: 5px solid var(--color-soil-deep);
+    border-radius: 14px;
+    background: linear-gradient(180deg, #d77748, #a9481f);
+    pointer-events: none;
+  }
+
+  &[data-main]::after {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: 18%;
+    width: 46px;
+    height: 40px;
+    border: 4px solid var(--color-soil-deep);
+    border-radius: 0 100% 0 100%;
+    background: var(--color-sprout);
+    pointer-events: none;
+  }
+
+  &[aria-pressed='true'] {
+    background: linear-gradient(180deg, #74b44e 0%, var(--color-sprout) 55%, var(--color-sprout-deep) 100%);
+    color: var(--color-card);
+  }
+
+  &:active:not(:disabled) {
+    translate: 0 6px;
+    box-shadow:
+      inset 0 -8px 0 rgb(58 34 16 / 0.25),
+      0 1px 0 var(--color-soil-deep);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+/*
+ * แม่กก's card: a kraft seed packet with a crimped top edge (::before), so the card must be positioned. Selected or
+ * playing, it glows garden green.
+ */
+@utility seed-packet {
+  border: 6px solid var(--color-soil);
+  border-radius: 10px 10px 22px 22px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 22px, rgb(110 68 38 / 0.06) 22px 24px),
+    linear-gradient(180deg, var(--color-kraft-light) 0%, var(--color-kraft) 100%);
+  box-shadow: 0 9px 0 rgb(58 34 16 / 0.4);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background:
+      linear-gradient(135deg, var(--color-kraft-deep) 25%, transparent 25%) 0 0 / 16px 20px repeat-x,
+      linear-gradient(225deg, var(--color-kraft-deep) 25%, transparent 25%) 0 0 / 16px 20px repeat-x,
+      rgb(164 128 76 / 0.45);
+    border-bottom: 3px dashed var(--color-soil);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &[data-highlight] {
+    box-shadow:
+      0 0 0 10px var(--color-sprout),
+      0 0 40px 16px rgb(92 158 58 / 0.7);
+  }
+}
+
+/* แม่กก's labels and badges: a kraft plant label with a soil-brown rim, never shaped like its pots. */
+@utility kraft-label {
+  border: 5px solid var(--color-soil);
+  border-radius: 12px 40px 12px 40px;
+  background-color: var(--color-kraft-light);
+  box-shadow: inset 0 -6px 0 rgb(164 128 76 / 0.35);
+}
+
+/* แม่กก's Star counter: a long wooden planter box, soil heaped along its top (::before). */
+@utility planter-box {
+  border: 5px solid var(--color-soil-deep);
+  border-radius: 8px 8px 18px 18px;
+  background: repeating-linear-gradient(180deg, #e2b77d 0 18px, #cfa064 18px 21px);
+  color: var(--color-soil-deep);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 8px;
+    right: 8px;
+    height: 20px;
+    border: 4px solid var(--color-soil-deep);
+    border-radius: 999px 999px 4px 4px;
+    background: var(--color-soil);
   }
 }
 

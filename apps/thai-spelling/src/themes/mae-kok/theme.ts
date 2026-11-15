@@ -1,9 +1,9 @@
-import { maeKongKit } from '../mae-kong/kit'
 import type { Theme } from '../types'
+import { maeKokKit } from './kit'
 
 /**
  * แม่กก's hillside-garden Theme (docs/mae-kok-spec.md). Every Step it leaves out uses แม่กง's layout and Scene; its
- * own Scenes, Map, Games and UI Kit come with the later tickets of #60.
+ * own Scenes, Map and Games come with the later tickets of #60. Its UI Kit is its own on every Step.
  */
 export const maeKokTheme: Theme = {
   id: 'mae-kok',
@@ -18,5 +18,5 @@ export const maeKokTheme: Theme = {
       cover: '/assets/comic/mascot-nok-cover.webp',
     },
   },
-  kit: maeKongKit,
+  kit: maeKokKit,
 }
