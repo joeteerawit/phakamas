@@ -57,7 +57,7 @@
 
 /*
  * แม่กน's button: a warm-wood boat plank with ink grain, its two ends lashed with coral-red rope (::before and ::after,
- * so the element must be positioned at the call site). It dips into the water when pressed; aria-pressed="true" turns
+ * so the element must be positioned at the call site; --rope and --rope-inset size them). It dips into the water when pressed; aria-pressed="true" turns
  * it canal green. Reduced motion: the dip is not animated.
  */
 @utility plank-button {
@@ -80,17 +80,17 @@
     position: absolute;
     top: -6px;
     bottom: -6px;
-    width: 18px;
+    width: var(--rope, 14px);
     border: 3px solid var(--color-kon-ink);
     border-radius: 6px;
     background: repeating-linear-gradient(160deg, var(--color-coral) 0 6px, var(--color-coral-deep) 6px 9px);
     pointer-events: none;
   }
   &::before {
-    left: 14px;
+    left: var(--rope-inset, 7px);
   }
   &::after {
-    right: 14px;
+    right: var(--rope-inset, 7px);
   }
 
   &[aria-pressed='true'] {
