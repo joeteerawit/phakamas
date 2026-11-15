@@ -1,6 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test'
 import { open } from './audioStub.js'
-import { chrome, otherLook, VIEWPORTS, wordButton } from './maeKon.js'
+import { chrome, otherLook, VIEWPORTS, wholeStage, wordButton } from './maeKon.js'
 import { overlaps, stageBox, waitUntilStill } from './stageBox.js'
 import { expectTapTarget } from './tapTarget.js'
 
@@ -50,6 +50,16 @@ test('the chrome of Steps 2–10 uses only the แม่กน Kit: nothing from
     expect(await otherLook(chrome(page)), `Step ${step}`).toEqual([])
     await expect(music(page), `Step ${step}`).toHaveClass(/plank-button/)
     await expect(page.getByText(`ขั้น ${step}/10`), `Step ${step}`).toHaveClass(/bamboo-label/)
+  }
+})
+
+test('every Step and the Map, Games included, look like the แม่กน Kit only: no control from another Lesson anywhere', async ({ page }) => {
+  for (const step of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 'map']) {
+    await open(page, 1, {}, 'mae-kon')
+    await page.goto(`/lesson/mae-kon/${step}`)
+    await page.getByRole('heading', { level: 1 }).waitFor({ state: 'attached' })
+    await expect(page.getByTestId('step-content').or(page.getByTestId('map-art')).first(), `Step ${step}`).toBeAttached()
+    expect(await otherLook(wholeStage(page)), `Step ${step}`).toEqual([])
   }
 })
 

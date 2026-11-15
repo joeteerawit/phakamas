@@ -5,8 +5,6 @@ import { maeKongTheme } from '../mae-kong/theme'
 
 const stepNumbers = maeKon.steps.map((_, i) => i + 1)
 const theme = getTheme(maeKon.theme)
-/** The Steps whose Game has landed (#99, #101–#109). */
-const OWN = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 describe('แม่กน Theme', () => {
   it('draws its cover on the busy floating market, Steps 2–9 on the quiet canal and 10 on the canal at dusk', () => {
@@ -16,14 +14,11 @@ describe('แม่กน Theme', () => {
     expect(stepScene(theme, 10)).toBe('kon-dusk')
   })
 
-  it("lays out its own Game for the Steps built so far, none of them another Lesson's; the rest still use แม่กง's", () => {
+  it("lays out its own Game for every Step, none of them another Lesson's", () => {
     for (const step of stepNumbers) {
-      if (OWN.includes(step)) {
-        expect(theme.steps[step]?.layout, `Step ${step}`).toBeDefined()
-        for (const other of ['mae-kong', 'mae-kom', 'mae-kop']) expect(stepLayout(theme, step), `Step ${step}`).not.toBe(getTheme(other).steps[step]?.layout)
-      } else {
-        expect(stepLayout(theme, step), `Step ${step}`).toBe(maeKongTheme.steps[step]?.layout)
-      }
+      expect(theme.steps[step]?.layout, `Step ${step}`).toBeDefined()
+      expect(stepLayout(theme, step), `Step ${step}`).not.toBe(maeKongTheme.steps[step]?.layout)
+      for (const other of ['mae-kom', 'mae-kop']) expect(stepLayout(theme, step), `Step ${step}`).not.toBe(getTheme(other).steps[step]?.layout)
     }
   })
 

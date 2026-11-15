@@ -8,13 +8,13 @@ import { RhymeMatchingStep } from './steps/RhymeMatchingStep'
 import { RhymeStep } from './steps/RhymeStep'
 import { SentenceStep } from './steps/SentenceStep'
 import { SpottingStep } from './steps/SpottingStep'
+import { SummaryStep } from './steps/SummaryStep'
 import { VocabularyStep } from './steps/VocabularyStep'
 import { WordFillingStep } from './steps/WordFillingStep'
 import { WordSelectionStep } from './steps/WordSelectionStep'
 
 /**
- * แม่กน's floating-market Theme (docs/mae-kon-spec.md): its Scenes, Map, Mascot and UI Kit. Steps it has no Game for yet
- * use แม่กง's layouts over its own Scenes until their Games land (#101–#109).
+ * แม่กน's floating-market Theme (docs/mae-kon-spec.md): its own Game and Scene for every Step, its Map, Mascot and UI Kit.
  */
 export const maeKonTheme: Theme = {
   id: 'mae-kon',
@@ -28,7 +28,7 @@ export const maeKonTheme: Theme = {
     7: { layout: RhymeStep, scene: 'kon-canal' },
     [activitySteps.rhymeMatching]: { layout: RhymeMatchingStep, scene: 'kon-canal' },
     9: { layout: SentenceStep, scene: 'kon-canal' },
-    10: { scene: 'kon-dusk' },
+    10: { layout: SummaryStep, scene: 'kon-dusk' },
   },
   map: MarketMap,
   // น้องส้ม in her boat: labelled placeholders (scripts/mae-kon-placeholders.mjs) until the art ticket (#97) lands.
