@@ -14,7 +14,7 @@ const wordButton = (page: Page, word: string) => page.getByRole('button', { name
 const check = (page: Page) => page.getByRole('button', { name: 'ตรวจคำตอบ' })
 const bankWord = (page: Page, word: string) =>
   page.getByRole('group', { name: 'คลังคำ' }).getByRole('button', { name: word, exact: true })
-const slot = (page: Page, n: number) => page.getByRole('button', { name: new RegExp(`^ช่องที่ ${n}:`) })
+const slot = (page: Page, n: number) => page.getByRole('button', { name: new RegExp(`^เรือลำที่ ${n}:`) })
 const scoreRow = (page: Page, title: string) => page.getByRole('listitem').filter({ hasText: title })
 
 async function expectStep(page: Page, step: number, title: string) {

@@ -6,6 +6,7 @@ import { CoverStep } from './steps/CoverStep'
 import { ListenRepeatStep } from './steps/ListenRepeatStep'
 import { SpottingStep } from './steps/SpottingStep'
 import { VocabularyStep } from './steps/VocabularyStep'
+import { WordFillingStep } from './steps/WordFillingStep'
 import { WordSelectionStep } from './steps/WordSelectionStep'
 
 /**
@@ -20,7 +21,7 @@ export const maeKonTheme: Theme = {
     3: { layout: ListenRepeatStep, scene: 'kon-canal' },
     4: { layout: SpottingStep, scene: 'kon-canal' },
     [activitySteps.wordSelection]: { layout: WordSelectionStep, scene: 'kon-canal' },
-    [activitySteps.wordFilling]: { scene: 'kon-canal' },
+    [activitySteps.wordFilling]: { layout: WordFillingStep, scene: 'kon-canal' },
     7: { scene: 'kon-canal' },
     [activitySteps.rhymeMatching]: { scene: 'kon-canal' },
     9: { scene: 'kon-canal' },
