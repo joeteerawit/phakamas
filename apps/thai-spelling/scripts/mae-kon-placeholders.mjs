@@ -102,12 +102,56 @@ const panels = {
     <ellipse cx="512" cy="560" rx="120" ry="34" fill="#fff" ${thin}/>`),
 }
 
+// น้องส้ม in her wooden boat, 480×600 (the cover pose 640×480): two black braids with red ribbons, an orange top.
+// `arms` makes the pose. Placeholders have no card, only the PLACEHOLDER tag under the figure.
+const ORANGE = '#f28a1e'
+const limb = (d) =>
+  `<path d="${d}" fill="none" stroke="${INK}" stroke-width="34" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${SKIN}" stroke-width="20" stroke-linecap="round"/>`
+function girlInBoat({ arms, mouth = 'smile', paddle = false, x = 0 }) {
+  const smile = mouth === 'open' ? `<path d="M210 248 Q240 290 270 248 Z" fill="#a3302a" ${thin}/>` : `<path d="M208 246 Q240 270 272 246" fill="none" ${thin}/>`
+  const arm = {
+    wave: limb('M180 330 Q150 380 170 420') + limb('M300 330 Q350 270 360 200'),
+    up: limb('M180 330 Q130 260 128 190') + limb('M300 330 Q350 260 352 190'),
+    thumb: limb('M180 330 Q150 380 170 420') + limb('M300 330 Q350 360 340 300') + `<rect x="318" y="268" width="40" height="36" rx="14" fill="${SKIN}" ${thin}/><rect x="330" y="230" width="16" height="44" rx="8" fill="${SKIN}" ${thin}/>`,
+    paddle: limb('M180 330 Q220 380 280 380') + limb('M300 330 Q320 370 300 400'),
+  }[arms]
+  const oar = paddle
+    ? `<path d="M380 240 L230 560" stroke="${INK}" stroke-width="22" stroke-linecap="round"/><path d="M380 240 L230 560" stroke="${WOOD}" stroke-width="12" stroke-linecap="round"/><path d="M236 548 Q200 600 214 630 Q244 640 260 590 Z" fill="${WOOD}" ${ink}/>`
+    : ''
+  return `<g transform="translate(${x} 0)">
+    ${oar}
+    <path d="M150 300 Q240 280 330 300 L350 470 H130 Z" fill="${ORANGE}" ${ink}/>
+    <path d="M196 300 Q240 330 284 300" fill="none" stroke="#fff4dc" stroke-width="14" stroke-linecap="round"/>
+    ${arm}
+    <path d="M160 200 Q150 330 140 360" fill="none" stroke="${INK}" stroke-width="26" stroke-linecap="round"/><path d="M320 200 Q330 330 340 360" fill="none" stroke="${INK}" stroke-width="26" stroke-linecap="round"/>
+    <circle cx="140" cy="366" r="12" fill="${CORAL}" ${thin}/><circle cx="340" cy="366" r="12" fill="${CORAL}" ${thin}/>
+    <circle cx="240" cy="200" r="92" fill="${SKIN}" ${ink}/>
+    <path d="M148 196 Q150 96 240 100 Q330 96 332 196 Q300 140 240 140 Q180 140 148 196 Z" fill="${INK}"/>
+    <circle cx="206" cy="206" r="10" fill="${INK}"/><circle cx="274" cy="206" r="10" fill="${INK}"/>
+    <circle cx="188" cy="236" r="14" fill="#f7a8a0"/><circle cx="292" cy="236" r="14" fill="#f7a8a0"/>
+    ${smile}
+    <path d="M40 430 Q240 470 440 430 L400 540 Q240 570 80 540 Z" fill="${WOOD}" ${ink}/>
+    <path d="M60 462 Q240 500 420 462" fill="none" ${thin}/>
+    <path d="M30 580 Q90 556 150 580 T270 580 T390 580 T470 580" fill="none" stroke="${CANAL}" stroke-width="12" stroke-linecap="round"/>
+  </g>`
+}
+const tag = (width, height, name) => `
+  <rect x="12" y="${height - 56}" width="${width - 24}" height="46" rx="23" fill="#5b5146"/>
+  <text x="${width / 2}" y="${height - 24}" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="21" font-weight="700" fill="#fff" letter-spacing="2">PLACEHOLDER · ${name}</text>`
+const mascots = {
+  'mascot-kon-greet': [480, 660, girlInBoat({ arms: 'wave' })],
+  'mascot-kon-cheer': [480, 660, girlInBoat({ arms: 'up', mouth: 'open' })],
+  'mascot-kon-encourage': [480, 660, girlInBoat({ arms: 'thumb' })],
+  'mascot-kon-cover': [640, 660, girlInBoat({ arms: 'paddle', paddle: true, x: 60 })],
+}
+
 const svg = (width, height, body) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">${body}</svg>`
 
 const art = {
   ...Object.fromEntries(Object.entries(cards).map(([slug, body]) => [`word-${slug}`, svg(600, 560, frame(600, 560, `word-${slug}`, body))])),
   ...Object.fromEntries(Object.entries(panels).map(([n, body]) => [`kon-panel-${n}`, svg(1024, 768, frame(1024, 768, `kon-panel-${n}`, body))])),
+  ...Object.fromEntries(Object.entries(mascots).map(([name, [w, h, body]]) => [name, svg(w, h, body + tag(w, h, name))])),
 }
 
 const only = process.argv.slice(2)

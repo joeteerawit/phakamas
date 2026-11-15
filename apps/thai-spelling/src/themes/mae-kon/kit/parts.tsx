@@ -174,8 +174,8 @@ export function TrayBubbleContent({ feedback, text }: { feedback: Feedback; text
 // Where her boat sits, in stage px: level with a top tray (146–286), or for a bottom tray higher up the edge
 // (330–570), as the Back paddle holds the bottom-left corner.
 const BOAT = {
-  top: { top: 146, height: 140, width: 130, art: 120 },
-  bottom: { top: 330, height: 240, width: 200, art: 200 },
+  top: { top: 146, height: 140, width: 110, art: 140 },
+  bottom: { top: 330, height: 240, width: 180, art: 240 },
 }
 
 /**
@@ -201,18 +201,14 @@ export function BoatMascot({ feedback, placement }: { feedback: Feedback; placem
         animate={{ x: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
       >
+        {/* Her poses sit in her boat already. */}
         <img
           src={feedback.kind === 'correct' ? poses.cheer : poses.encourage}
           alt=""
           draggable={false}
-          className="absolute bottom-[18%] left-1/2 max-w-none -translate-x-1/2 select-none object-contain"
-          style={{ height: boat.art * 0.82 }}
+          className="absolute bottom-0 left-1/2 max-w-none -translate-x-1/2 select-none object-contain"
+          style={{ height: boat.art }}
         />
-        {/* Her boat, its bow towards the tray. */}
-        <svg viewBox="0 0 200 60" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-[30%] w-full overflow-visible">
-          <path d="M2 14 Q100 30 198 6 L172 54 Q100 62 24 54 Z" fill="var(--color-teak)" {...ink} />
-          <path d="M14 24 Q100 38 186 18" fill="none" stroke="var(--color-teak-deep)" strokeWidth={4} />
-        </svg>
       </motion.div>
     </motion.div>
   )

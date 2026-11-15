@@ -155,3 +155,37 @@
     inset 0 0 0 3px var(--color-honey),
     0 7px 0 rgb(43 29 18 / 0.4);
 }
+
+/*
+ * แม่กน's signs (the cover title, Map stops, pier signs): the plank's honey wood and grain with coral rope round both
+ * ends (::before and ::after, so the element must be positioned), but no press states, as a sign is never a button.
+ */
+@utility plank-sign {
+  border: 6px solid var(--color-kon-ink);
+  border-radius: 26px;
+  background:
+    repeating-linear-gradient(177deg, transparent 0 30px, rgb(107 58 20 / 0.16) 30px 34px, transparent 34px 56px, rgb(107 58 20 / 0.1) 56px 58px),
+    linear-gradient(180deg, var(--color-honey-light) 0%, var(--color-honey) 55%, #d39a5a 100%);
+  box-shadow:
+    inset 0 -8px 0 rgb(107 58 20 / 0.25),
+    0 10px 0 var(--color-teak-deep);
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    bottom: -8px;
+    width: 26px;
+    border: 4px solid var(--color-kon-ink);
+    border-radius: 8px;
+    background: repeating-linear-gradient(160deg, var(--color-coral) 0 8px, var(--color-coral-deep) 8px 12px);
+    pointer-events: none;
+  }
+  &::before {
+    left: 30px;
+  }
+  &::after {
+    right: 30px;
+  }
+}
